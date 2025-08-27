@@ -1,0 +1,35 @@
+export const eyeClose = require('./eyeClose.png');
+export const eyeOpen = require('./eyeOpen.png');
+export const cross = require('./cross.png');
+export const backIcon = require('./backIcon.png');
+export const homeIcon = require('./homeIcon.png');
+export const searchIcon = require('./searchIcon.png');
+export const inboxIcon = require('./inboxIcon.png');
+export const profileIcon = require('./profileIcon.png');
+export const addIcon = require('./addIcon.png');
+export const checkMark = require('./checkMark.png');
+export const setting = require('./setting.png');
+export const avatar = require('./avatar.png');
+export const addImage = require('./addImage.png');
+export const whiteTick = require('./whiteTick.png');
+export const openDropDownDown = require('./openDropDownDown.png');
+export const closeDropDownRight = require('./closeDropDownRight.png');
+export const threeDots = require('./threeDots.png');
+export const chat = require('./chat.png');
+export const send = require('./send.png');
+export const forwardIcon = require('./forward.png');
+export const card = require('./card.png');
+export const arrowDown = require('./arrowDown.png');
+export const starFilled = require('./starFilled.png');
+export const starUnfilled = require('./starUnfilled.png');
+
+// new icons
+export const editIcon = require('./editIcon.png');
+export const deleteIcon = require('./deleteIcon.png');
+export const aboutIcon = require('./aboutIcon.png');
+export const logoutIcon = require('./logoutIcon.png');
+export const privacyIcon = require('./privacyIcon.png');
+export const termsIcon = require('./termsIcon.png');
+export const lockIcon = require('./lockIcon.png');
+export const cardIcon = require('./cardIcon.png');
+export const payoutIcon = require('./payoutIcon.png');
