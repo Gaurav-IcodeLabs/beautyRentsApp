@@ -158,10 +158,12 @@ export const searchListingsByMap = createAsyncThunk<{}, {}, Thunk>(
   async (data, {dispatch, extra: sdk}) => {
     try {
       const {bounds, config} = data;
+      console.log('bounds',JSON.stringify(bounds))
       const searchParams = defaultSearchParams(config);
       const params = {
         ...searchParams,
         bounds,
+        page: 1,
         perPage: 20,
       };
       const response = await sdk.listings.query(params);

@@ -238,6 +238,24 @@ const createBounds = (
   const neLng = lng + degrees
   return `${neLat},${neLng},${swLat},${swLng}`
 }
+export function calculateBounds(centerLat, centerLng, radiusInKm) {
+  const earthRadius = 6371;
+  const radiusInRadians = radiusInKm / earthRadius;
+  const centerLatRad = (centerLat * Math.PI) / 180;
+  const centerLngRad = (centerLng * Math.PI) / 180;
+  const neLat = centerLat + (radiusInRadians * 180) / Math.PI;
+  const neLng =
+    centerLng + (radiusInRadians * 180) / Math.PI / Math.cos(centerLatRad);
+  const swLat = centerLat - (radiusInRadians * 180) / Math.PI;
+  const swLng =
+    centerLng - (radiusInRadians * 180) / Math.PI / Math.cos(centerLatRad);
+  return {
+    neLat,
+    neLng,
+    swLat,
+    swLng,
+  };
+}
 
 export {
   priceSearchParams,
@@ -248,4 +266,5 @@ export {
   handleMultipleSelect,
   handleCategoryPress,
   createBounds,
+  calculateBounds,
 }

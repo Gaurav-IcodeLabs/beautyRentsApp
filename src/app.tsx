@@ -17,10 +17,16 @@ import { mergeTranslations } from './locales';
 import { fetchCurrentUser } from './slices/user.slice';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import i18n from './locales/index';
+import { hideSplash } from 'react-native-splash-view';
 
 const App = () => {
   const [config, setConfig] = useState(null);
   useEffect(() => {
+
+    setTimeout(() => {
+      hideSplash(); // Hide after some time
+    }, 1500);
+
     const loadAssets = async () => {
       try {
         const res = await store.dispatch(fetchAppAssets({})).unwrap();
