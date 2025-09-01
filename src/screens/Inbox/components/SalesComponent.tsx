@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useAppDispatch, useTypedSelector } from '../../../sharetribeSetup'
+import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch, useTypedSelector } from '../../../sharetribeSetup';
 import {
   fetchSalesErrorSelector,
   fetchSalesInProgressSelector,
@@ -8,42 +8,42 @@ import {
   salesLoadingMoreSelector,
   salesPaginationSelector,
   transactionSaleRefsSelector,
-} from '../Inbox.slice'
+} from '../Inbox.slice';
 import {
   entitiesSelector,
   getMarketplaceEntities,
-} from '../../../slices/marketplaceData.slice'
-import OrderOrSaleTransactions from './OrderOrSaleTransactions'
+} from '../../../slices/marketplaceData.slice';
+import OrderOrSaleTransactions from './OrderOrSaleTransactions';
 
 const SalesComponent = () => {
-  const dispatch = useAppDispatch()
-  const transactionSalesRefs = useTypedSelector(transactionSaleRefsSelector)
-  const fetchSalesInProgress = useTypedSelector(fetchSalesInProgressSelector)
-  const fetchSalesError = useTypedSelector(fetchSalesErrorSelector)
-  const loadingMore = useTypedSelector(salesLoadingMoreSelector)
-  const pagination = useTypedSelector(salesPaginationSelector)
-  const entities = useTypedSelector(entitiesSelector)
-  const transactions = getMarketplaceEntities(entities, transactionSalesRefs)
-  const [refreshing, setRefreshing] = useState(false)
+  const dispatch = useAppDispatch();
+  const transactionSalesRefs = useTypedSelector(transactionSaleRefsSelector);
+  const fetchSalesInProgress = useTypedSelector(fetchSalesInProgressSelector);
+  const fetchSalesError = useTypedSelector(fetchSalesErrorSelector);
+  const loadingMore = useTypedSelector(salesLoadingMoreSelector);
+  const pagination = useTypedSelector(salesPaginationSelector);
+  const entities = useTypedSelector(entitiesSelector);
+  const transactions = getMarketplaceEntities(entities, transactionSalesRefs);
 
-  const loadData = async () => {
+  const loadData = React.useCallback(async () => {
     try {
-      await dispatch(loadSalesTransactions({ page: 1 }))
+      await dispatch(loadSalesTransactions({ page: 1 }));
     } finally {
-      setRefreshing(false)
     }
-  }
+  }, [dispatch]);
 
   const loadMoreData = async () => {
-    if (!loadingMore && !fetchSalesInProgress) {
-      if (pagination?.page === pagination?.totalPages) return
-      await dispatch(loadSalesTransactions({ page: pagination?.page + 1 }))
+    if (!loadingMore && !fetchSalesInProgress && !transactions.length) {
+      if (!transactions.length) return;
+      if (pagination?.page === pagination?.totalPages) return;
+      await dispatch(loadSalesTransactions({ page: pagination?.page + 1 }));
     }
-  }
+  };
 
   useEffect(() => {
-    loadData()
-  }, [])
+    loadData();
+  }, [loadData]);
+
   return (
     <View style={styles.container}>
       <OrderOrSaleTransactions
@@ -54,19 +54,17 @@ const SalesComponent = () => {
         loadData={() => loadData()}
         loadMoreData={() => loadMoreData()}
         loadingMore={loadingMore}
-        refreshing={refreshing}
-        setRefreshing={setRefreshing}
         // providerNotificationCount
         //pagination
       />
     </View>
-  )
-}
+  );
+};
 
-export default SalesComponent
+export default SalesComponent;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-})
+});

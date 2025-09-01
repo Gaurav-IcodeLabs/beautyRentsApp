@@ -24,7 +24,7 @@ export const colors: AppColors = {
   lightRedColor: '#B22222',
   listingBackground: '#F2F2F2',
   greyishWhite: '#F0F0F0',
-  darkGrey: '#505050',
+  darkGrey: '#949494',
   lightestGrey: '#FAFAFA',
   savedCardBackground: '#F5F5F5',
 };

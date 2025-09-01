@@ -8,10 +8,11 @@ import {
   ActivityIndicator,
   StyleSheet,
   ViewStyle,
+  StyleProp,
 } from 'react-native';
 import React from 'react';
 import { backIcon } from '../../assets';
-import { commonShadow, hitSlope } from '../../util';
+import { hitSlope } from '../../util';
 import { useNavigation } from '@react-navigation/native';
 import { fontScale, widthScale } from '../../util';
 import { colors, fontWeight } from '../../theme';
@@ -31,7 +32,7 @@ export interface ScreenHeaderProps {
   onRightIconPress?: Function;
   rightIconDisabled?: boolean;
   leftIconDisabled?: boolean;
-  rightIconStyle?: ViewStyle;
+  rightIconStyle?: StyleProp<ImageStyle>;
   rightIconTextStyle?: TextStyle;
   rightIconDisabledTextStyle?: TextStyle;
   containerStyle?: ViewStyle;
@@ -40,6 +41,7 @@ export interface ScreenHeaderProps {
   hideLeftIcon?: boolean;
   rightIconLoader?: boolean;
   rightLoaderColor?: string;
+  backgroundColor?: ViewStyle;
 }
 export const ScreenHeader = ({
   leftIcon,
@@ -65,11 +67,14 @@ export const ScreenHeader = ({
   subTitle,
   subTitleStyle,
   leftIconContainerStyle = {},
+  backgroundColor = {},
 }: ScreenHeaderProps) => {
   const navigation = useNavigation();
   const top = useSafeAreaInsets().top;
   return (
-    <View style={[Styles.headerContainer, { paddingTop: top }]}>
+    <View
+      style={[Styles.headerContainer, { paddingTop: top }, backgroundColor]}
+    >
       <View
         style={[
           Styles.container,
@@ -84,7 +89,7 @@ export const ScreenHeader = ({
                 disabled={leftIconDisabled}
                 hitSlop={hitSlope(15)}
                 onPress={() => {
-                  onLeftIconPress ? onLeftIconPress() : navigation.pop();
+                  onLeftIconPress ? onLeftIconPress() : navigation.goBack();
                 }}
               >
                 <Image
