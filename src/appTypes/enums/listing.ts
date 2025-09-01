@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export enum EditListingTabs {
   DETAILS = 'details',
   PRICING = 'pricing',
@@ -24,11 +23,10 @@ export enum ListingLayout {
 
 export enum ListingSearchTypes {
   LOCATION = 'location',
-  KEYWORDS = 'keyword'
+  KEYWORDS = 'keyword',
 }
 
 export enum ListingDeliveryOptionsTypes {
   PICKUP = 'pickup',
-  SHIPPING = 'shipping'
+  SHIPPING = 'shipping',
 }
-

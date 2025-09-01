@@ -217,6 +217,7 @@
   "EditListingAvailabilityPlanForm.timezonePickerTitle": "Select a time zone",
   "EditListingAvailabilityPlanForm.title": "Edit default schedule for {listingTitle}",
   "EditListingAvailabilityPlanForm.updateFailed": "Failed to update. Please try again.",
+  "EditListingAvailabilityPlanForm.delete": "Delete",
   "EditListingDeliveryForm.address": "Pickup address",
   "EditListingDeliveryForm.addressNotRecognized": "We didn't recognize this location. Please try another location.",
   "EditListingDeliveryForm.addressPlaceholder": "Start typing…",

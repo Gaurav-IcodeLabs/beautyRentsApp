@@ -69,8 +69,6 @@ const EditListingDetailsForm = (props: props) => {
     mode: 'onChange',
   });
   const listingType = watch('listingType');
-  const bookingType = watch('bookingType');
-  console.log('bookingType', bookingType);
   const hasCategories = selectableCategories && selectableCategories.length > 0;
   const showCategories = listingType && hasCategories;
   const showTitle = hasCategories ? allCategoriesChosen : listingType;
@@ -135,7 +133,7 @@ const EditListingDetailsForm = (props: props) => {
         disabled={!showDescription}
       />
 
-      {showCategories ? (
+      {showTitle ? (
         <>
           <Text style={styles.text}>
             {t('EditListingDetailsForm.chooseType')}

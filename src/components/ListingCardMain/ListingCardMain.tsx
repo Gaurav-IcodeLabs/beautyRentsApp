@@ -11,8 +11,8 @@ import {
   Image,
 } from 'react-native';
 import { Listing, ListingState } from '../../appTypes';
-import { deleteIcon, threeDots } from '../../assets';
-import { useColors, useConfiguration } from '../../context';
+import { deleteIcon, locationIcon, starFilled, threeDots } from '../../assets';
+import { useConfiguration } from '../../context';
 import {
   closeOwnListings,
   discardDraftListings,
@@ -20,19 +20,13 @@ import {
 } from '../../screens/Profile/Profile.slice';
 import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup';
 import { currentUserIdSelector } from '../../slices/user.slice';
-import { AppColors, colors, fontWeight } from '../../theme';
-import {
-  commonShadow,
-  fontScale,
-  heightScale,
-  screenWidth,
-  widthScale,
-} from '../../util';
+import { colors, fontWeight } from '../../theme';
+import { fontScale, heightScale, screenWidth, widthScale } from '../../util';
 import { AppImage } from '../AppImage/AppImage';
 import { Button } from '../Button/Button';
 import { UUID } from '../../appTypes/interfaces/common';
-import { requestShowListing } from '../../screens/EditListing/EditListing.slice';
 import { formatMoney } from '../../util/currency';
+import { lightenColor } from '../../util/data';
 
 interface ListingCardMainProps {
   listing: Listing;
@@ -42,30 +36,37 @@ interface ListingCardMainProps {
 
 export const ListingCardMain = (props: ListingCardMainProps) => {
   const dispatch = useAppDispatch();
-  const config = useConfiguration();
   const navigation = useNavigation();
   const { t } = useTranslation();
-  const colors: AppColors = useColors();
   const [openView, setOpenView] = useState(false);
   const [loading, setLoading] = useState(false);
   const currentUserId = useTypedSelector(currentUserIdSelector);
   const { attributes, author, images, id } = props?.listing || {};
   const { fromProfile = false } = props || {};
-  // const { amount = 0, currency } = attributes?.price || {}
-  const { state, price } = attributes;
+  const { state, price, publicData } = attributes;
+  const {
+    location,
+    totalRatingSum = 0,
+    totalRatings = 0,
+    isFeatured = false,
+  } = publicData;
+  // console.log('publicData', JSON.stringify(publicData));
   const aspectRatio = useConfiguration().layout.listingImage.aspectRatio;
-  const authorDisplayName = author?.attributes?.profile?.displayName;
   const listingTitle = attributes?.title;
   const imgUrl = images?.[0]?.attributes?.variants?.['listing-card']?.url ?? '';
   const authorId = author?.id?.uuid;
   const isOwnListing = currentUserId === authorId;
+  const averageRating =
+    totalRatings > 0
+      ? Math.round((totalRatingSum / totalRatings) * 10) / 10
+      : 0;
 
-  const openListing = async (id: UUID) => {
+  const openListing = async (ID: UUID) => {
     try {
       setLoading(true);
       const res = await dispatch(
         openOwnListings({
-          id: id,
+          id: ID,
         }),
       );
     } finally {
@@ -73,12 +74,12 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
     }
   };
 
-  const closeListing = async (id: UUID) => {
+  const closeListing = async (ID: UUID) => {
     try {
       setLoading(true);
       const res = await dispatch(
         closeOwnListings({
-          id: id,
+          id: ID,
         }),
       );
     } finally {
@@ -87,12 +88,12 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
     }
   };
 
-  const discardDraft = async (id: UUID) => {
+  const discardDraft = async (ID: UUID) => {
     try {
       setLoading(true);
       const res = await dispatch(
         discardDraftListings({
-          id: id,
+          id: ID,
         }),
       );
     } finally {
@@ -100,21 +101,23 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
     }
   };
 
-  const handleOnPress = async () => {
+  const handleOnPress = () => {
+    if (state !== ListingState.LISTING_STATE_PUBLISHED) {
+      return;
+    }
     navigation.navigate('Listing', { id: id.uuid });
-    if (state !== ListingState.LISTING_STATE_PUBLISHED) return;
   };
 
   const handleFinishListing = async () => {
     navigation.navigate('EditListing', { listingId: id });
   };
 
+  const showButtons = fromProfile && isOwnListing;
+
   return (
     <Pressable onPress={handleOnPress} style={styles.container}>
-      <View style={{ backgroundColor: colors.frostedGrey }}>
-        {fromProfile &&
-        isOwnListing &&
-        state === ListingState.LISTING_STATE_CLOSED ? (
+      <View style={{ backgroundColor: colors.lightGrey }}>
+        {showButtons && state === ListingState.LISTING_STATE_CLOSED ? (
           <View style={styles.overlayContainer}>
             <Text style={styles.overlayHeading}>
               {t('ManageListingCard.closedListing')}
@@ -131,10 +134,8 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
               loaderColor={colors.white}
             />
           </View>
-        ) : fromProfile &&
-          isOwnListing &&
-          state === ListingState.LISTING_STATE_DRAFT ? (
-          <View style={styles.draftContainer}>
+        ) : showButtons && state === ListingState.LISTING_STATE_DRAFT ? (
+          <View style={styles.overlayContainer}>
             <Text style={styles.draftHeading}>
               {t('ManageListingCard.draftOverlayText', {
                 listingTitle: listingTitle,
@@ -144,10 +145,7 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
               text={t('ManageListingCard.finishListingDraft')}
               onPress={handleFinishListing}
               style={styles.finishListingBtn}
-              textStyle={[
-                styles.finishListingText,
-                { color: colors.marketplaceColor },
-              ]}
+              textStyle={styles.finishListingText}
             />
             <TouchableOpacity
               activeOpacity={0.5}
@@ -159,12 +157,18 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
               ) : (
                 <Image
                   tintColor={colors.error}
-                  contentFit="contain"
                   style={styles.settingThreeDots}
                   source={deleteIcon}
                 />
               )}
             </TouchableOpacity>
+          </View>
+        ) : showButtons &&
+          state === ListingState.LISTING_STATE_PENDING_APPROVAL ? (
+          <View style={styles.overlayContainer}>
+            <Text style={styles.pendingApprovalText}>
+              {t('ManageListingCard.pendingApproval', { listingTitle })}
+            </Text>
           </View>
         ) : null}
         <AppImage
@@ -174,6 +178,11 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
           }}
           aspectRatio={aspectRatio}
         />
+        {isFeatured ? (
+          <View style={styles.featured}>
+            <Text style={styles.featuredText}>Featured</Text>
+          </View>
+        ) : null}
         {fromProfile &&
           isOwnListing &&
           state === ListingState.LISTING_STATE_PUBLISHED && (
@@ -183,14 +192,14 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
               onPress={() => setOpenView(!openView)}
             >
               <Image
-                tintColor={colors.marketplaceColor}
+                tintColor={colors.white}
                 style={styles.settingThreeDots}
-                contentFit="contain"
                 source={threeDots}
+                resizeMode="contain"
               />
             </TouchableOpacity>
           )}
-        {openView && (
+        {openView ? (
           <View style={styles.openViewContainerStyle}>
             <Button
               text={t('ManageListingCard.editListing')}
@@ -209,20 +218,39 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
               loaderColor={colors.black}
             />
           </View>
-        )}
+        ) : null}
       </View>
       <View style={styles.botomContainer}>
-        <View style={styles.bottomLeftcontainer}>
-          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
-            {listingTitle}
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
+          {listingTitle}
+        </Text>
+
+        <View style={styles.locationSection}>
+          <Image style={styles.locIcon} source={locationIcon} />
+          <Text numberOfLines={2} style={styles.location}>
+            {location?.address}
           </Text>
-          <Text style={styles.author}>{authorDisplayName}</Text>
         </View>
-        <View>
-          <Text style={styles.priceLabel}>{t('ListingCard.priceLabel')}</Text>
-          <Text style={[styles.price, { color: colors.marketplaceColor }]}>
-            {formatMoney(price)}
-          </Text>
+        <View style={styles.divider} />
+        <View style={styles.bottomSection}>
+          <View style={styles.priceSection}>
+            <Text numberOfLines={1} style={styles.price}>
+              {formatMoney(price, 2)}
+            </Text>
+          </View>
+          <View style={styles.reviewsSection}>
+            <Image
+              source={starFilled}
+              tintColor={colors.marketplaceColor}
+              style={styles.starIcon}
+            />
+            <Text style={styles.rating}>
+              {averageRating}/5{' '}
+              <Text style={[styles.rating, { color: colors.grey }]}>
+                ({totalRatings})
+              </Text>
+            </Text>
+          </View>
         </View>
       </View>
     </Pressable>
@@ -233,64 +261,55 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: widthScale(12),
     overflow: 'hidden',
-    backgroundColor: colors.white,
-    ...commonShadow,
+    borderWidth: 1,
+    borderColor: colors.lightGrey,
   },
   botomContainer: {
-    padding: widthScale(20),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  bottomLeftcontainer: {
-    flexShrink: 1,
-    marginRight: widthScale(20),
+    padding: widthScale(16),
   },
   title: {
     fontSize: fontScale(16),
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.semiBold,
     color: colors.black,
   },
-  author: {
+  location: {
     fontSize: fontScale(14),
-    fontWeight: fontWeight.medium,
-    marginTop: widthScale(5),
-  },
-  priceLabel: {
-    fontSize: fontScale(14),
-    fontWeight: fontWeight.medium,
-    marginBottom: widthScale(5),
+    fontWeight: fontWeight.normal,
+    color: colors.grey,
   },
   price: {
     fontSize: fontScale(16),
     fontWeight: fontWeight.bold,
+    color: colors.marketplaceColor,
   },
   deleteBtn: {
     position: 'absolute',
     zIndex: 100,
-    padding: widthScale(5),
+    padding: widthScale(10),
     right: widthScale(10),
     top: widthScale(10),
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: lightenColor(colors.marketplaceColor, 0),
+    borderRadius: widthScale(12),
   },
   settingBtn: {
     position: 'absolute',
     right: widthScale(10),
     top: widthScale(10),
     zIndex: 100,
-    backgroundColor: colors.white,
-    borderRadius: widthScale(100),
-    height: heightScale(30),
-    width: widthScale(30),
+    backgroundColor: colors.marketplaceColor,
+    borderRadius: widthScale(8),
+    paddingVertical: widthScale(8),
+    paddingHorizontal: widthScale(5),
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    ...commonShadow,
   },
   settingThreeDots: {
-    height: heightScale(16),
-    width: widthScale(16),
+    height: heightScale(20),
+    width: widthScale(20),
   },
   closeListingSection: {
     backgroundColor: colors.white,
@@ -298,50 +317,47 @@ const styles = StyleSheet.create({
     minWidth: widthScale(100),
     borderWidth: widthScale(0),
     overflow: 'hidden',
-    ...commonShadow,
   },
   closeListingText: {
     fontSize: fontScale(13),
     color: colors.black,
     fontWeight: fontWeight.normal,
   },
-  draftContainer: {
-    height: '100%',
-    width: '100%',
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: widthScale(20),
-    zIndex: 100,
-  },
   draftHeading: {
     textAlign: 'center',
-    fontSize: fontScale(14),
+    fontSize: fontScale(16),
+    fontWeight: fontWeight.medium,
+    color: colors.white,
   },
   overlayHeading: {
     textAlign: 'center',
     fontSize: fontScale(14),
     color: colors.white,
   },
+  pendingApprovalText: {
+    textAlign: 'center',
+    fontSize: fontScale(16),
+    fontWeight: fontWeight.medium,
+    color: colors.white,
+  },
   finishListingBtn: {
     marginTop: widthScale(15),
-    padding: widthScale(10),
-    backgroundColor: colors.white,
+    backgroundColor: colors.marketplaceColor,
     borderRadius: widthScale(10),
-    borderWidth: widthScale(0),
-    height: heightScale(35),
-    minWidth: widthScale(100),
+    height: heightScale(40),
+    paddingHorizontal: widthScale(12),
   },
   finishListingText: {
-    fontSize: fontScale(12),
-    fontWeight: fontWeight.normal,
+    fontSize: fontScale(14),
+    fontWeight: fontWeight.medium,
+    color: colors.white,
   },
   overlayContainer: {
     position: 'absolute',
     height: '100%',
     width: '100%',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     alignItems: 'center',
     padding: widthScale(20),
     zIndex: 100,
@@ -355,5 +371,61 @@ const styles = StyleSheet.create({
     zIndex: 100,
     paddingHorizontal: widthScale(10),
     gap: widthScale(2),
+  },
+  locationSection: {
+    marginTop: widthScale(10),
+    flexDirection: 'row',
+    gap: widthScale(5),
+  },
+  locIcon: {
+    height: widthScale(14),
+    width: widthScale(14),
+    marginTop: widthScale(1),
+    tintColor: colors.grey,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.lightGrey,
+    marginVertical: widthScale(12),
+  },
+  bottomSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: widthScale(5),
+  },
+  priceSection: {
+    flexShrink: 1,
+    paddingRight: widthScale(10),
+  },
+  reviewsSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: widthScale(10),
+    marginRight: widthScale(10),
+  },
+  starIcon: {
+    height: widthScale(16),
+    width: widthScale(16),
+  },
+  rating: {
+    fontSize: fontScale(16),
+    fontWeight: fontWeight.normal,
+    color: colors.black,
+  },
+  featured: {
+    margin: widthScale(10),
+    backgroundColor: colors.marketplaceColor,
+    position: 'absolute',
+    alignItems: 'flex-start',
+    borderRadius: widthScale(10),
+    paddingVertical: widthScale(8),
+    paddingHorizontal: widthScale(12),
+  },
+  featuredText: {
+    fontSize: fontScale(14),
+    fontWeight: fontWeight.medium,
+    color: colors.white,
   },
 });

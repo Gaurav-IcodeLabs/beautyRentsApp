@@ -236,10 +236,6 @@ const getInitialValues = (
 ) => {
   const { description, title, publicData, privateData } =
     props?.listing?.attributes || {};
-  console.log(
-    'props?.listing?.attributes',
-    JSON.stringify(props?.listing?.attributes),
-  );
   const { listingType, bookingType = '' } = publicData || {};
 
   const nestedCategories = pickCategoryFields(
@@ -252,7 +248,7 @@ const getInitialValues = (
   return {
     title,
     description,
-    // bookingType,
+    bookingType,
     ...nestedCategories,
     // Transaction type info: listingType, transactionProcessAlias, unitType
     ...getTransactionInfo(listingTypes, existingListingTypeInfo),
@@ -350,6 +346,7 @@ const getListngDetailsSchema = (initialValues, listingFieldsConfig, t) => {
       .string()
       .min(1, t('EditListingDetailsForm.descriptionRequired')),
     listingType: z.string().default(listingType),
+    bookingType: z.string().min(1, 'this is required'),
     transactionProcessAlias: z.string().default(transactionProcessAlias),
     unitType: z.string().default(unitType),
     //Check level of categories later TODO-M
@@ -373,7 +370,6 @@ const getDefaultValues = initialValues => {
     bookingType = '',
     ...rest
   } = initialValues;
-  console.log('initialValues', initialValues);
 
   //TODO-H : Need to debug later, Default values assigned from outside reflects in watch/getValues While default values assigned inside zod is not reflecting
   return {

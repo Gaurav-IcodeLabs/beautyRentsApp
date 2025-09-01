@@ -33,3 +33,6 @@ export const termsIcon = require('./termsIcon.png');
 export const lockIcon = require('./lockIcon.png');
 export const cardIcon = require('./cardIcon.png');
 export const payoutIcon = require('./payoutIcon.png');
+export const uploadIcon = require('./uploadIcon.png');
+export const locationIcon = require('./locationIcon.png');
+export const mailIcon = require('./mailIcon.png');

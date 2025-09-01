@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 import { starFilled, starUnfilled } from '../../assets';
 import { heightScale, widthScale } from '../../util';
+import { colors } from '../../theme';
 
 interface RatingProps {
   initialRating?: number;
@@ -45,6 +46,9 @@ export const Rating = ({
           disabled={!isEditable}
         >
           <Image
+            tintColor={
+              index < rating ? colors.marketplaceColor : colors.lightGrey
+            }
             source={index < rating ? starFilled : starUnfilled}
             style={[
               styles.star,

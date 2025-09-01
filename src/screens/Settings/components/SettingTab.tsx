@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,36 +14,24 @@ import { colors, fontWeight } from '../../../theme';
 interface SettingTabProps {
   lable: string;
   screen: string | null;
-  loader: boolean;
   onTabPress: () => void;
   icon: ImageSourcePropType;
 }
 
-const SettingTab: React.FC<SettingTabProps> = ({
-  lable,
-  loader,
-  onTabPress,
-  icon,
-}) => {
+const SettingTab: React.FC<SettingTabProps> = ({ lable, onTabPress, icon }) => {
   const { t } = useTranslation();
 
   return (
     <TouchableOpacity onPress={onTabPress} style={styles.container}>
-      {loader ? (
-        <ActivityIndicator color={colors.error} />
-      ) : (
-        // <View style={styles.btnSection}>
-        <View style={styles.iconSection}>
-          <Image
-            tintColor={colors.marketplaceColor}
-            resizeMode="contain"
-            style={styles.icon}
-            source={icon}
-          />
-          <Text style={styles.text}>{t(lable)}</Text>
-        </View>
-        // </View>
-      )}
+      <View style={styles.iconSection}>
+        <Image
+          tintColor={colors.marketplaceColor}
+          resizeMode="contain"
+          style={styles.icon}
+          source={icon}
+        />
+        <Text style={styles.text}>{t(lable)}</Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -60,10 +47,6 @@ const styles = StyleSheet.create({
     marginHorizontal: widthScale(20),
     borderColor: colors.frostedGrey,
   },
-  // btnSection: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  // },
   iconSection: {
     flexDirection: 'row',
     gap: widthScale(10),

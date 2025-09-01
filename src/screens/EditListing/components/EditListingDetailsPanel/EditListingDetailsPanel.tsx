@@ -119,14 +119,13 @@ export const EditListingDetailsPanel = (props: props) => {
           listingFieldsConfig={listingFields}
           inProgress={inProgress}
           onSubmit={(values: values) => {
-            console.log('values', values);
-            return;
             const {
               title,
               description,
               listingType,
               transactionProcessAlias,
               unitType,
+              bookingType,
               ...rest
             } = values;
 
@@ -165,6 +164,7 @@ export const EditListingDetailsPanel = (props: props) => {
               publicData: {
                 listingType,
                 transactionProcessAlias,
+                bookingType,
                 unitType,
                 ...cleanedNestedCategories,
                 ...publicListingFields,

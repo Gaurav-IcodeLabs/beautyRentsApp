@@ -1,11 +1,11 @@
-import { Alert, StyleSheet, Text, View } from 'react-native'
-import React, { memo, useState } from 'react'
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import React, { memo, useState } from 'react';
 import {
   Calendar,
   RenderTextInputField,
   TimeSlotDropdown,
-} from '../../../../../components'
-import { useTranslation } from 'react-i18next'
+} from '../../../../../components';
+import { useTranslation } from 'react-i18next';
 import {
   exceptionFreeSlotsPerDate,
   isInRange,
@@ -13,33 +13,34 @@ import {
   stringifyDateToISO8601,
   timeOfDayFromLocalToTimeZone,
   timestampToDate,
-} from '../../../../../util'
+  widthScale,
+} from '../../../../../util';
 import {
   getAllTimeValues,
   getAvailableEndTimes,
   getAvailableStartTimes,
   getMonthlyFetchRange,
   isDayBlockForDateTimeException,
-} from '../EditListingAvailabilityPanel.helper'
-import { useTypedSelector } from '../../../../../sharetribeSetup'
-import { monthlyExceptionQueriesSelector } from '../../../EditListing.slice'
-import CustomDayComponent from '../../../../../components/CustomDayComponent/CustomDayComponent'
-import moment from 'moment'
-import { useWatch } from 'react-hook-form'
+} from '../EditListingAvailabilityPanel.helper';
+import { useTypedSelector } from '../../../../../sharetribeSetup';
+import { monthlyExceptionQueriesSelector } from '../../../EditListing.slice';
+import CustomDayComponent from '../../../../../components/CustomDayComponent/CustomDayComponent';
+import moment from 'moment';
+import { useWatch } from 'react-hook-form';
 
-const TODAY = new Date()
+const TODAY = new Date();
 
 // Date formatting used for placeholder texts:
 const dateFormattingOptions = {
   month: 'short',
   day: 'numeric',
   weekday: 'short',
-}
+};
 
 const ExceptionDateTimeRange = props => {
-  const { t } = useTranslation()
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
-  const { allExceptions, timeZone, listingId, control, setValue } = props
+  const { t } = useTranslation();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const { allExceptions, timeZone, listingId, control, setValue } = props;
   const {
     exceptionStartDate,
     exceptionEndDate,
@@ -48,46 +49,46 @@ const ExceptionDateTimeRange = props => {
     exceptionEndTime,
   } = useWatch({
     control,
-  })
+  });
   const exceptionStartDay = timeOfDayFromLocalToTimeZone(
     exceptionStartDate,
     timeZone,
-  )
+  );
 
   const exceptionEndDay = timeOfDayFromLocalToTimeZone(
     exceptionEndDate,
     timeZone,
-  )
+  );
 
   // const [exceptionStartDay, setExceptionStartDay] = useState(null)
   // const [exceptionEndDay, setExceptionEndDay] = useState(null)
 
   const monthlyExceptionQueries = useTypedSelector(
     monthlyExceptionQueriesSelector,
-  )
+  );
   const [startMonth, endMonth] = getMonthlyFetchRange(
     monthlyExceptionQueries,
     timeZone,
-  )
+  );
   const availableDates = exceptionFreeSlotsPerDate(
     startMonth,
     endMonth,
     allExceptions,
     timeZone,
-  )
+  );
 
   const dayData = exceptionStartDay
     ? availableDates[stringifyDateToISO8601(exceptionStartDay, timeZone)]
-    : null
-  const availableSlotsOnSelectedDate = dayData?.slots || []
+    : null;
+  const availableSlotsOnSelectedDate = dayData?.slots || [];
 
   const startTimeParams = {
     timeZone,
     availableSlots: availableSlotsOnSelectedDate,
     selectedStartDate: exceptionStartDay,
-  }
+  };
 
-  const availableStartTimes = getAvailableStartTimes(startTimeParams)
+  const availableStartTimes = getAvailableStartTimes(startTimeParams);
 
   // Get selected (or suggested) startTime, endDate, and slot (aka available time range)
   const { startTime, endDate, selectedSlot } = getAllTimeValues({
@@ -95,21 +96,21 @@ const ExceptionDateTimeRange = props => {
     selectedStartTime:
       exceptionStartTime || availableStartTimes?.[0]?.timestamp,
     selectedEndDate: exceptionEndDay || exceptionStartDay,
-  })
+  });
 
   const availableEndTimes = getAvailableEndTimes({
     ...startTimeParams,
     selectedSlot,
     selectedStartTime: exceptionStartTime || startTime,
     selectedEndDate: exceptionEndDay || endDate,
-  })
+  });
   const markedDates = {
     [exceptionStartDate]: { selected: true, disableTouchEvent: true },
     [exceptionEndDate]: { selected: true, disableTouchEvent: true },
-  }
+  };
 
   const customDayComponent = memo(({ date, state }) => {
-    const isSelected = markedDates[date.dateString]?.selected ?? false
+    const isSelected = markedDates[date.dateString]?.selected ?? false;
     return (
       <CustomDayComponent
         isSelected={isSelected}
@@ -127,23 +128,23 @@ const ExceptionDateTimeRange = props => {
         }
         onDayPress={onDayPress}
       />
-    )
-  })
+    );
+  });
 
   const onDayPress = day => {
-    const selectedDay = day.dateString
+    const selectedDay = day.dateString;
 
-    const startDateMoment = moment(exceptionStartDate)
-    const endDateMoment = moment(selectedDay)
-    const range = endDateMoment.diff(startDateMoment, 'days')
+    const startDateMoment = moment(exceptionStartDate);
+    const endDateMoment = moment(selectedDay);
+    const range = endDateMoment.diff(startDateMoment, 'days');
 
     // Check for unavailable dates
-    let hasUnavailableDates = false
+    let hasUnavailableDates = false;
     for (let i = 1; i < range; i++) {
       const tempDate = startDateMoment
         .clone()
         .add(i, 'days')
-        .format('YYYY-MM-DD')
+        .format('YYYY-MM-DD');
       if (
         isDayBlockForDateTimeException(
           tempDate,
@@ -153,27 +154,28 @@ const ExceptionDateTimeRange = props => {
           timeZone,
         )
       ) {
-        hasUnavailableDates = true
-        break
+        hasUnavailableDates = true;
+        break;
       }
     }
 
     setValue('exceptionStartDate', selectedDay, {
       shouldValidate: true,
-    })
+    });
     setValue('exceptionEndDate', selectedDay, {
       shouldValidate: true,
-    })
-    setIsCalendarOpen(false)
-  }
+    });
+    setIsCalendarOpen(false);
+  };
 
   const formattedDate = new Intl.DateTimeFormat(
     'en-US',
     dateFormattingOptions,
-  ).format(TODAY)
+  ).format(TODAY);
+
   const handleStartDate = () => {
-    setIsCalendarOpen(true)
-  }
+    setIsCalendarOpen(true);
+  };
 
   return (
     <>
@@ -201,7 +203,7 @@ const ExceptionDateTimeRange = props => {
           style={styles.dateInputField}
         /> */}
         <TimeSlotDropdown
-          lableKey={'start time'}
+          lableKey={'Start time'}
           isModal={false}
           data={availableStartTimes.map(tz => ({
             label: tz.timeOfDay,
@@ -210,7 +212,7 @@ const ExceptionDateTimeRange = props => {
           containerStyle={styles.containerWidth}
           value={exceptionStartTime}
           onValueChange={item => {
-            setValue('exceptionStartTime', item.option)
+            setValue('exceptionStartTime', item.option);
           }}
         />
         <TimeSlotDropdown
@@ -223,14 +225,59 @@ const ExceptionDateTimeRange = props => {
                 }))
               : []
           }
-          lableKey={'end time'}
+          lableKey={'End time'}
           containerStyle={styles.containerWidth}
           value={exceptionEndTime}
           onValueChange={item => {
-            setValue('exceptionEndTime', item.option)
+            setValue('exceptionEndTime', item.option);
           }}
         />
       </View>
+      {/* <View style={styles.dateTimeContainer}>
+        <RenderTextInputField
+          control={control}
+          name={'exceptionEndDate'}
+          labelKey={t(
+            'EditListingAvailabilityExceptionForm.exceptionEndDateLabel',
+          )}
+          placeholderKey={formattedDate}
+          onPress={handleStartDate}
+          editable={false}
+          style={styles.dateInputField}
+        />
+      </View>
+      <View style={styles.dateTimeContainer}>
+        <TimeSlotDropdown
+          lableKey={'Start time'}
+          isModal={false}
+          data={availableStartTimes.map(tz => ({
+            label: tz.timeOfDay,
+            option: tz.timestamp,
+          }))}
+          containerStyle={styles.containerWidth}
+          value={exceptionStartTime}
+          onValueChange={item => {
+            setValue('exceptionStartTime', item.option);
+          }}
+        />
+        <TimeSlotDropdown
+          isModal={false}
+          data={
+            exceptionStartTime
+              ? availableEndTimes.map(tz => ({
+                  label: tz.timeOfDay,
+                  option: tz.timestamp,
+                }))
+              : []
+          }
+          lableKey={'End time'}
+          containerStyle={styles.containerWidth}
+          value={exceptionEndTime}
+          onValueChange={item => {
+            setValue('exceptionEndTime', item.option);
+          }}
+        />
+      </View> */}
       {isCalendarOpen ? (
         <Calendar
           isCalendarOpen={isCalendarOpen}
@@ -241,14 +288,14 @@ const ExceptionDateTimeRange = props => {
         />
       ) : null}
     </>
-  )
-}
+  );
+};
 
-export default ExceptionDateTimeRange
+export default ExceptionDateTimeRange;
 
 const styles = StyleSheet.create({
   containerWidth: {
-    width: '40%',
+    width: '48%',
   },
   dateTimeContainer: {
     flexDirection: 'row',
@@ -257,5 +304,7 @@ const styles = StyleSheet.create({
   },
   dateInputField: {
     width: '100%',
+    marginTop: widthScale(20),
+    // backgroundColor: 'red',
   },
-})
+});

@@ -1,6 +1,6 @@
-import React from 'react'
-import { useForm, useWatch } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import React from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   Modal,
@@ -8,19 +8,19 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-} from 'react-native'
-import { cross } from '../../../../../assets'
-import { Button } from '../../../../../components'
-import { useTypedSelector } from '../../../../../sharetribeSetup'
-import { fontWeight } from '../../../../../theme'
-import { fontScale, heightScale, widthScale } from '../../../../../util'
-import { updateInProgressSelector } from '../../../EditListing.slice'
-import AvailabilityPlanEntries from './AvailabilityPlanEntries'
-import FieldTimeZoneSelect from './FieldTimeZoneSelect'
+} from 'react-native';
+import { cross } from '../../../../../assets';
+import { Button } from '../../../../../components';
+import { useTypedSelector } from '../../../../../sharetribeSetup';
+import { fontWeight } from '../../../../../theme';
+import { fontScale, heightScale, widthScale } from '../../../../../util';
+import { updateInProgressSelector } from '../../../EditListing.slice';
+import AvailabilityPlanEntries from './AvailabilityPlanEntries';
+import FieldTimeZoneSelect from './FieldTimeZoneSelect';
 
 const EditListingAvailabilityPlanForm = props => {
-  const { t } = useTranslation()
-  const updateInProgress = useTypedSelector(updateInProgressSelector)
+  const { t } = useTranslation();
+  const updateInProgress = useTypedSelector(updateInProgressSelector);
   const {
     listingTitle,
     availabilityPlan,
@@ -30,31 +30,38 @@ const EditListingAvailabilityPlanForm = props => {
     initialValues,
     isEditPlanModalOpen,
     onCloseEditPlan,
-  } = props
+  } = props;
 
   const { control, handleSubmit, setValue, getValues, watch } = useForm({
     defaultValues: initialValues,
-  })
-  const values = useWatch({ control })
+  });
+  const values = useWatch({ control });
 
   const concatDayEntriesReducer = (entries, day) =>
-    values[day] ? entries.concat(values[day]) : entries
+    values[day] ? entries.concat(values[day]) : entries;
 
   const hasUnfinishedEntries = !!weekdays
     .reduce(concatDayEntriesReducer, [])
-    .find(e => !e.startTime || !e.endTime)
+    .find(e => !e.startTime || !e.endTime);
 
-  const submitDisabled = hasUnfinishedEntries
+  const submitDisabled = hasUnfinishedEntries;
   const activePlans = watch('activePlanDays');
+  const timeZone = watch('timezone');
+
   return (
     <Modal
       visible={isEditPlanModalOpen}
       animationType="fade"
-      onRequestClose={onCloseEditPlan}>
-      <ScrollView contentContainerStyle={styles.container}>
+      onRequestClose={onCloseEditPlan}
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.container}
+      >
         <TouchableOpacity
           style={styles.closeContainerStyle}
-          onPress={onCloseEditPlan}>
+          onPress={onCloseEditPlan}
+        >
           <Image source={cross} style={styles.crossImageStyle} />
         </TouchableOpacity>
         <Text style={styles.tableTitle}>
@@ -75,27 +82,34 @@ const EditListingAvailabilityPlanForm = props => {
               getValues={getValues}
               setValue={setValue}
             />
-          )
+          );
         })}
         <Button
           text={t('EditListingAvailabilityPlanForm.saveSchedule')}
           loading={updateInProgress}
           onPress={handleSubmit(onSubmit)}
           style={styles.button}
-          disabled={!activePlans || activePlans.length === 0}
+          disabled={
+            !activePlans ||
+            activePlans.length === 0 ||
+            submitDisabled ||
+            !timeZone
+          }
         />
       </ScrollView>
     </Modal>
-  )
-}
+  );
+};
 
-export default EditListingAvailabilityPlanForm
+export default EditListingAvailabilityPlanForm;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: widthScale(22),
-    padding: widthScale(20),
+    flexGrow: 1,
+    marginTop: widthScale(60),
+    marginVertical: widthScale(40),
+    paddingHorizontal: widthScale(20),
+    paddingBottom: widthScale(50),
   },
   closeContainerStyle: {
     flexDirection: 'row',
@@ -112,11 +126,12 @@ const styles = StyleSheet.create({
     fontSize: fontScale(18),
     fontWeight: fontWeight.semiBold,
     letterSpacing: fontScale(0.02),
-    marginVertical: heightScale(5),
+    marginVertical: heightScale(15),
   },
   modalTitle: {
     fontSize: fontScale(14),
     fontWeight: fontWeight.normal,
     lineHeight: fontScale(21),
+    marginBottom: widthScale(10),
   },
-})
+});

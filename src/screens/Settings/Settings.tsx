@@ -42,7 +42,6 @@ export const Settings: React.FC<SettingsScreenProps> = ({ navigation }) => {
   };
   const handleOnPress = (item: TabItemType) => {
     if (item.key === 10) {
-      // signOut();
       setShowModal(true);
     } else {
       if (item?.screen) {
@@ -63,7 +62,6 @@ export const Settings: React.FC<SettingsScreenProps> = ({ navigation }) => {
             lable={item.lable}
             screen={item.screen}
             icon={item?.icon}
-            loader={loader && item.lable === 'Settings.logout'}
             onTabPress={() => handleOnPress(item)}
           />
         )}
@@ -95,6 +93,7 @@ export const Settings: React.FC<SettingsScreenProps> = ({ navigation }) => {
               onPress={() => setShowModal(false)}
               style={[styles.btnCancel]}
               textStyle={styles.textCancel}
+              loading={loader}
             />
           </View>
         </View>

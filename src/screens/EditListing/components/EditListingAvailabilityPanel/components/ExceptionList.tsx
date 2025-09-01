@@ -36,6 +36,7 @@ import {
 } from '../EditListingAvailabilityPanel.helper';
 import ColoredView from './ColoredView';
 import ExceptionTimeList from './ExceptionTimeList';
+import { lightenColor } from '../../../../../util/data';
 
 const TODAY = new Date();
 
@@ -74,7 +75,7 @@ const ExceptionComponent = props => {
     await dispatch(requestDeleteAvailabilityException({ id: exception.id }));
   };
 
-  return start >= TODAY ? (
+  return (
     <View style={styles.exceptionView}>
       <View>
         {useFullDays ? (
@@ -102,17 +103,17 @@ const ExceptionComponent = props => {
       <TouchableOpacity
         onPress={handleDeleteException}
         disabled={deleteExceptionInProgress}
-        style={styles.rightMargin}
+        style={styles.deleteBtn}
       >
         {deleteExceptionInProgress &&
         deleteExceptionId === exception.id.uuid ? (
-          <ActivityIndicator size={'small'} color={colors.frostedGrey} />
+          <ActivityIndicator size={'small'} color={colors.black} />
         ) : (
           <Image source={deleteIcon} style={styles.deleteIcon} />
         )}
       </TouchableOpacity>
     </View>
-  ) : null;
+  );
 };
 
 const ExceptionList = props => {
@@ -173,10 +174,9 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.light,
     lineHeight: fontScale(17),
   },
-  deleteIcon: { width: widthScale(15), height: widthScale(15) },
   exceptionView: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'space-between',
     marginVertical: heightScale(10),
   },
@@ -184,9 +184,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  rightMargin: {
+  deleteBtn: {
     marginRight: widthScale(5),
-    backgroundColor: 'black',
-    borderRadius: 100,
+    backgroundColor: lightenColor(colors.marketplaceColor, 10),
+    width: widthScale(35),
+    height: widthScale(35),
+    borderRadius: widthScale(6),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteIcon: {
+    width: widthScale(15),
+    height: widthScale(15),
+    tintColor: colors.error,
   },
 });
