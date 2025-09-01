@@ -5,50 +5,50 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
-import React from 'react'
-import { fontScale, heightScale, widthScale } from '../../../util'
-import { cross } from '../../../assets'
-import { useTranslation } from 'react-i18next'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button, RenderTextInputField } from '../../../components'
-import { fontWeight } from '../../../theme'
-import { useAppDispatch, useTypedSelector } from '../../../sharetribeSetup'
+} from 'react-native';
+import React from 'react';
+import { fontScale, heightScale, widthScale } from '../../../util';
+import { cross } from '../../../assets';
+import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button, RenderTextInputField } from '../../../components';
+import { fontWeight } from '../../../theme';
+import { useAppDispatch, useTypedSelector } from '../../../sharetribeSetup';
 import {
   sendInquiry,
   sendInquiryErrorSelector,
   sendInquiryInProgressSelector,
-} from '../Listing.slice'
-import { useNavigation } from '@react-navigation/native'
-import { CheckoutConstants } from '../../../appTypes/enums/checkout'
-import { Listing } from '../../../appTypes'
+} from '../Listing.slice';
+import { useNavigation } from '@react-navigation/native';
+import { CheckoutConstants } from '../../../appTypes/enums/checkout';
+import { Listing } from '../../../appTypes';
 
 interface InquiryModalProps {
-  isInquiryModalOpen: boolean
-  onCloseInquiryModal: () => void
-  listing: Listing
+  isInquiryModalOpen: boolean;
+  onCloseInquiryModal: () => void;
+  listing: Listing;
 }
 
 const getSchema = t => {
   const formSchema = z.object({
     message: z.string().min(1, t('InquiryForm.messageRequired')),
-  })
-  return formSchema
-}
+  });
+  return formSchema;
+};
 
 const InquiryModal = (props: InquiryModalProps) => {
-  const { t } = useTranslation()
-  const navigation = useNavigation()
-  const dispatch = useAppDispatch()
-  const { isInquiryModalOpen, onCloseInquiryModal, listing } = props
+  const { t } = useTranslation();
+  const navigation = useNavigation();
+  const dispatch = useAppDispatch();
+  const { isInquiryModalOpen, onCloseInquiryModal, listing } = props;
   const sendInquiryInProgress = useTypedSelector(state =>
     sendInquiryInProgressSelector(state, listing?.id?.uuid),
-  )
+  );
   const sendInquiryError = useTypedSelector(state =>
     sendInquiryErrorSelector(state, listing?.id?.uuid),
-  )
+  );
   const {
     handleSubmit,
     formState: { isValid },
@@ -59,35 +59,36 @@ const InquiryModal = (props: InquiryModalProps) => {
     },
     mode: 'onChange',
     resolver: zodResolver(getSchema(t)),
-  })
-  const authorDisplayName = listing?.author?.attributes?.profile?.displayName
-  const listingTitle = listing?.attributes?.title
-  const messageLabel = t('InquiryForm.messageLabel', { authorDisplayName })
+  });
+  const authorDisplayName = listing?.author?.attributes?.profile?.displayName;
+  const listingTitle = listing?.attributes?.title;
+  const messageLabel = t('InquiryForm.messageLabel', { authorDisplayName });
   const messagePlaceholder = t('InquiryForm.messagePlaceholder', {
     authorDisplayName,
-  })
+  });
 
   const onSubmitInquiry = async values => {
-    const { message } = values
-    const response = await dispatch(sendInquiry({ listing, message })).unwrap()
+    const { message } = values;
+    const response = await dispatch(sendInquiry({ listing, message })).unwrap();
     if (response?.uuid) {
       navigation.navigate('Transaction', {
         transactionRole: CheckoutConstants.CUSTOMER,
         transactionId: response,
-      })
-      onCloseInquiryModal()
+      });
+      onCloseInquiryModal();
     }
-  }
-  console.log('sendInquiryInProgress', sendInquiryInProgress)
+  };
   return (
     <Modal
       visible={isInquiryModalOpen}
       onRequestClose={onCloseInquiryModal}
-      animationType="slide">
+      animationType="slide"
+    >
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.closeContainerStyle}
-          onPress={onCloseInquiryModal}>
+          onPress={onCloseInquiryModal}
+        >
           <Image source={cross} style={styles.crossImageStyle} />
         </TouchableOpacity>
 
@@ -112,10 +113,10 @@ const InquiryModal = (props: InquiryModalProps) => {
         />
       </View>
     </Modal>
-  )
-}
+  );
+};
 
-export default InquiryModal
+export default InquiryModal;
 
 const styles = StyleSheet.create({
   container: {
@@ -137,4 +138,4 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.bold,
     paddingVertical: heightScale(20),
   },
-})
+});

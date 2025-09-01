@@ -1,4 +1,7 @@
-import {} from 'react-native-image-picker';
+import {
+  ImageLibraryOptions,
+  launchImageLibrary,
+} from 'react-native-image-picker';
 import React from 'react';
 import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -35,21 +38,21 @@ const ProfileImage = ({ control, setValue }: ProfileImageProps) => {
   const { t } = useTranslation();
   const loader = useTypedSelector(imageUploadInProgressSelector);
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+    const options: ImageLibraryOptions = {
+      mediaType: 'photo',
       quality: 1,
-    });
-
+      selectionLimit: 1,
+    };
+    let result = await launchImageLibrary(options);
+    if (result.didCancel || !result.assets?.length) {
+      return;
+    }
     const asset = result.assets[0];
-
-    if (asset?.fileSize > LIMIT_IN_BYTES) {
+    if (asset?.fileSize && asset.fileSize > LIMIT_IN_BYTES) {
       Alert.alert(
         'Error',
         t('EditListingPhotosForm.imageUploadFailed.uploadOverLimit'),
       );
-    }
-    if (result.canceled) {
       return;
     }
 
@@ -58,15 +61,20 @@ const ProfileImage = ({ control, setValue }: ProfileImageProps) => {
         file: {
           uri: asset.uri,
           id: `${asset.uri}_${Date.now()}`,
-          type: asset.mimeType,
+          type: asset.type,
           name: `${Math.random()}_${Date.now()}`,
         },
       }),
     ).unwrap();
     setValue('image', res?.data?.data);
   };
+
   return (
-    <TouchableOpacity onPress={pickImage} style={styles.container}>
+    <TouchableOpacity
+      activeOpacity={0.5}
+      onPress={pickImage}
+      style={styles.container}
+    >
       <View style={styles.loaderContainer}>
         {loader ? <ActivityIndicator color={colors.black} /> : null}
       </View>
@@ -77,7 +85,11 @@ const ProfileImage = ({ control, setValue }: ProfileImageProps) => {
         />
       </View>
       <View style={styles.add}>
-        <Image style={styles.addImage} source={addImage} />
+        <Image
+          tintColor={colors.white}
+          style={styles.addImage}
+          source={addImage}
+        />
       </View>
     </TouchableOpacity>
   );
@@ -98,8 +110,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   addImage: {
-    height: widthScale(20),
-    width: widthScale(20),
+    height: widthScale(15),
+    width: widthScale(15),
   },
   add: {
     height: widthScale(25),
@@ -109,7 +121,7 @@ const styles = StyleSheet.create({
     right: -4,
     zIndex: 4,
     borderRadius: widthScale(20),
-    backgroundColor: 'white',
+    backgroundColor: colors.marketplaceColor,
     justifyContent: 'center',
     alignItems: 'center',
   },
