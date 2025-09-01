@@ -62,12 +62,12 @@ export const getTabsData = () => {
       lable: 'Settings.about',
       icon: aboutIcon,
     },
-    {
-      key: 9,
-      screen: Screens.DELETEACCOUNT,
-      lable: 'Settings.DeleteYourAccount',
-      icon: deleteIcon,
-    },
+    // {
+    //   key: 9,
+    //   screen: Screens.DELETEACCOUNT,
+    //   lable: 'Settings.DeleteYourAccount',
+    //   icon: deleteIcon,
+    // },
     {
       key: 10,
       screen: null,

@@ -1,24 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useEffect } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
-import { ContactDetailsProps } from '../../appTypes'
-import { Button, RenderTextInputField, ScreenHeader } from '../../components'
-import { useConfiguration } from '../../context'
-import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup'
+} from 'react-native';
+import { ContactDetailsProps } from '../../appTypes';
+import { Button, RenderTextInputField, ScreenHeader } from '../../components';
+import { useConfiguration } from '../../context';
+import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup';
 import {
   currentUserSelector,
   updateCurrentUser,
   updateCurrentUserInProgressSelector,
-} from '../../slices/user.slice'
-import { colors, fontWeight } from '../../theme'
+} from '../../slices/user.slice';
+import { colors, fontWeight } from '../../theme';
 import {
   fontScale,
   heightScale,
@@ -26,7 +26,7 @@ import {
   screenHeight,
   screenWidth,
   widthScale,
-} from '../../util'
+} from '../../util';
 
 import {
   changeEmail,
@@ -39,9 +39,9 @@ import {
   verifyEmailErrorSelector,
   verifyEmailInProgressSelector,
   verifyEmailSuccessSelector,
-} from './ContactDetails.slice'
-import { z } from 'zod'
-import { useRoute } from '@react-navigation/native'
+} from './ContactDetails.slice';
+import { z } from 'zod';
+import { useRoute } from '@react-navigation/native';
 
 const getSchema = (t: (key: string) => string) => {
   const formSchema = z.object({
@@ -50,54 +50,54 @@ const getSchema = (t: (key: string) => string) => {
     phoneNumber: z
       .string()
       .min(10, t('ContactDetailsForm.phoneNumberInvalid', { minLength: 10 })),
-  })
+  });
 
-  return formSchema
-}
+  return formSchema;
+};
 
 export const ContactDetails: React.FC<ContactDetailsProps> = ({
   navigation,
 }) => {
-  const { t } = useTranslation()
-  const config = useConfiguration()
-  const routes = useRoute()
-  const { verificationToken } = routes.params || ''
-  const currentUser = useTypedSelector(currentUserSelector)
-  const dispatch = useAppDispatch()
-  const emailChangeError = useTypedSelector(changeEmailErrorSelector)
-  const changeEmailInProgress = useTypedSelector(changeEmailInProgressSelector)
-  const { emailVerified, email, pendingEmail } = currentUser?.attributes || {}
-  const { publicData, protectedData } = currentUser?.attributes?.profile || {}
-  const currentPhoneNumber = protectedData?.phoneNumber || ''
-  const userType = publicData?.userType
-  const { userTypes = [] } = config.user
+  const { t } = useTranslation();
+  const config = useConfiguration();
+  const routes = useRoute();
+  const { verificationToken } = routes.params || '';
+  const currentUser = useTypedSelector(currentUserSelector);
+  const dispatch = useAppDispatch();
+  const emailChangeError = useTypedSelector(changeEmailErrorSelector);
+  const changeEmailInProgress = useTypedSelector(changeEmailInProgressSelector);
+  const { emailVerified, email, pendingEmail } = currentUser?.attributes || {};
+  const { publicData, protectedData } = currentUser?.attributes?.profile || {};
+  const currentPhoneNumber = protectedData?.phoneNumber || '';
+  const userType = publicData?.userType;
+  const { userTypes = [] } = config.user;
   const userTypeConfig =
-    userType && userTypes.find(config => config.userType === userType)
-  const { required } = userTypeConfig?.phoneNumberSettings || {}
-  const isRequired = required === true //true
-  const isPhDisabled = userTypeConfig?.defaultUserFields?.phoneNumber === false
+    userType && userTypes.find(config => config.userType === userType);
+  const { required } = userTypeConfig?.phoneNumberSettings || {};
+  const isRequired = required === true; //true
+  const isPhDisabled = userTypeConfig?.defaultUserFields?.phoneNumber === false;
   const updateUserInProgress = useTypedSelector(
     updateCurrentUserInProgressSelector,
-  )
-  const verifyEmailInProgress = useTypedSelector(verifyEmailInProgressSelector)
-  const verifyEmailSuccess = useTypedSelector(verifyEmailSuccessSelector)
-  const verifyEmailFailure = useTypedSelector(verifyEmailErrorSelector)
+  );
+  const verifyEmailInProgress = useTypedSelector(verifyEmailInProgressSelector);
+  const verifyEmailSuccess = useTypedSelector(verifyEmailSuccessSelector);
+  const verifyEmailFailure = useTypedSelector(verifyEmailErrorSelector);
   const sendVerificationEmailInProgress = useTypedSelector(
     sendVerificationEmailInProgressSelector,
-  )
+  );
   const sendVerificationEmailError = useTypedSelector(
     sendVerificationEmailErrorSelector,
-  )
+  );
 
   const tooManyVerificationRequests = isTooManyEmailVerificationRequestsError(
     sendVerificationEmailError,
-  )
+  );
 
   useEffect(() => {
     if (verificationToken != null) {
-      dispatch(verifyEmail(verificationToken))
+      dispatch(verifyEmail(verificationToken));
     }
-  }, [])
+  }, []);
   const {
     control,
     handleSubmit,
@@ -111,17 +111,17 @@ export const ContactDetails: React.FC<ContactDetailsProps> = ({
     },
     resolver: zodResolver(getSchema(t)),
     mode: 'onChange',
-  })
+  });
   const { email: updatedEmail, phoneNumber: UpdatedPhoneNumber } = useWatch({
     control,
-  })
-  const changesInEmail = email !== updatedEmail
-  const changesInPh = currentPhoneNumber !== UpdatedPhoneNumber
+  });
+  const changesInEmail = email !== updatedEmail;
+  const changesInPh = currentPhoneNumber !== UpdatedPhoneNumber;
   const handleSaveChanges = handleSubmit(async params => {
     try {
-      const actions = []
+      const actions = [];
       if (changesInEmail) {
-        actions.push(dispatch(changeEmail(params)))
+        actions.push(dispatch(changeEmail(params)));
       }
       if (changesInPh) {
         actions.push(
@@ -132,28 +132,28 @@ export const ContactDetails: React.FC<ContactDetailsProps> = ({
               },
             }),
           ),
-        )
+        );
       }
       if (actions.length > 0) {
-        await Promise.all(actions)
+        await Promise.all(actions);
       }
-      setValue('password', '')
+      setValue('password', '');
     } catch (error) {
-      console.log('error', error)
+      console.log('error', error);
     }
-  })
+  });
   const handleResendVerificationEmail = async () => {
-    await dispatch(sendVerificationEmail())
-  }
-  let resendEmailMessage = null
+    await dispatch(sendVerificationEmail());
+  };
+  let resendEmailMessage = null;
   resendEmailMessage = tooManyVerificationRequests
     ? t('ContactDetailsForm.tooManyVerificationRequests')
     : sendVerificationEmailInProgress
-      ? t('ContactDetailsForm.emailSent')
-      : t('ContactDetailsForm.resendEmailVerificationText')
+    ? t('ContactDetailsForm.emailSent')
+    : t('ContactDetailsForm.resendEmailVerificationText');
 
   return (
-    <>
+    <View style={styles.root}>
       <ScreenHeader title={t('ContactDetailsPage.heading')} />
       <View style={styles.container}>
         <RenderTextInputField
@@ -238,11 +238,15 @@ export const ContactDetails: React.FC<ContactDetailsProps> = ({
           <ActivityIndicator size="large" color={colors.darkGrey} />
         </View>
       )}
-    </>
-  )
-}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
   container: {
     flex: 1,
     marginTop: widthScale(20),
@@ -273,7 +277,8 @@ const styles = StyleSheet.create({
     color: colors.error,
   },
   button: {
-    marginTop: widthScale(20),
+    marginTop: 'auto',
+    marginBottom: widthScale(40),
   },
   activityIndicator: {
     position: 'absolute',
@@ -283,4 +288,4 @@ const styles = StyleSheet.create({
     height: screenHeight,
     width: screenWidth,
   },
-})
+});

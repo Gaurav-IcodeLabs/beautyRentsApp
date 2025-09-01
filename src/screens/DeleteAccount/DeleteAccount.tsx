@@ -1,32 +1,31 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
-import { useForm } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { z } from 'zod';
 import {
   Button,
   Countdown,
   RenderTextInputField,
   ScreenHeader,
-} from '../../components'
-import { useColors } from '../../context'
-import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup'
-import { resetPassword } from '../../slices/password.slice'
-import { currentUserEmailSelector } from '../../slices/user.slice'
-import { AppColors, fontWeight } from '../../theme'
-import { fontScale, widthScale } from '../../util'
+} from '../../components';
+import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup';
+import { resetPassword } from '../../slices/password.slice';
+import { currentUserEmailSelector } from '../../slices/user.slice';
+import { colors, fontWeight } from '../../theme';
+import { fontScale, widthScale } from '../../util';
 
 export const DeleteAccount = () => {
-  const { t } = useTranslation()
-  const userEmail = useTypedSelector(currentUserEmailSelector)
-  const dispatch = useAppDispatch()
-  const colors: AppColors = useColors()
-  const [isCounting, setIsCounting] = React.useState(false)
+  const { t } = useTranslation();
+  const userEmail = useTypedSelector(currentUserEmailSelector);
+  const dispatch = useAppDispatch();
+  // const colors: AppColors = useColors();
+  const [isCounting, setIsCounting] = React.useState(false);
   const {
     control,
     handleSubmit,
-    setValue,
+    // setValue,
     formState: { isValid },
   } = useForm({
     defaultValues: {
@@ -38,22 +37,24 @@ export const DeleteAccount = () => {
       }),
     ),
     mode: 'onChange',
-  })
+  });
 
   const onRecoverPassword = async () => {
     try {
-      const res = await dispatch(resetPassword({ email: userEmail }))
+      const res = await dispatch(resetPassword({ email: userEmail }));
       if (res?.payload?.status === 200) {
-        setIsCounting(true)
+        setIsCounting(true);
       }
     } catch (error) {
-      console.error('Error resetting password:', error)
+      console.error('Error resetting password:', error);
     }
-  }
+  };
 
   return (
-    <>
-      <ScreenHeader title={t('LayoutWrapperAccountSettingsSideNav.deleteAccountTabTitle')} />
+    <View style={styles.root}>
+      <ScreenHeader
+        title={t('LayoutWrapperAccountSettingsSideNav.deleteAccountTabTitle')}
+      />
       <View style={styles.container}>
         <Text style={styles.heading}>{t('DeleteAccountPage.heading')}</Text>
         <Text style={styles.description}>{t('DeleteAccountPage.details')}</Text>
@@ -69,7 +70,9 @@ export const DeleteAccount = () => {
               <TouchableOpacity
                 disabled={isCounting}
                 onPress={onRecoverPassword}
-                style={[styles.linkTouchable, isCounting && { opacity: 0.5 }]}>
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={[styles.linkTouchable, isCounting && { opacity: 0.5 }]}
+              >
                 <Text style={styles.resetInstructionsLink}>
                   {t('DeleteAccountForm.resendPasswordLinkText')}
                 </Text>
@@ -84,10 +87,7 @@ export const DeleteAccount = () => {
           initialSeconds={30}
           txt={t('PasswordRecoveryPage.resendEmail')}
           containerStyle={styles.contdownContainerStyle}
-          timerNumberStyle={[
-            styles.numberStyle,
-            { color: colors.marketplaceColor },
-          ]}
+          timerNumberStyle={styles.numberStyle}
         />
 
         <RenderTextInputField
@@ -104,12 +104,19 @@ export const DeleteAccount = () => {
           style={styles.btnStyle}
         />
       </View>
-    </>
-  )
-}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: widthScale(16) },
+  root: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  container: {
+    flex: 1,
+    padding: widthScale(16),
+  },
   heading: {
     fontSize: fontScale(16),
     fontWeight: fontWeight.semiBold,
@@ -138,6 +145,10 @@ const styles = StyleSheet.create({
   numberStyle: {
     fontWeight: fontWeight.normal,
     fontSize: fontScale(14),
+    color: colors.marketplaceColor,
   },
-  btnStyle: { marginTop: widthScale(20) },
-})
+  btnStyle: {
+    marginTop: 'auto',
+    marginBottom: widthScale(40),
+  },
+});
