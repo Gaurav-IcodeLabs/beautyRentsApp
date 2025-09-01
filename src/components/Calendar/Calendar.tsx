@@ -1,21 +1,13 @@
-import {
-  Alert,
-  Image,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
-import React from 'react'
-import { CalendarList } from 'react-native-calendars'
-import { Button } from '../Button/Button'
-import { widthScale } from '../../util'
-import { useTranslation } from 'react-i18next'
-import { cross } from '../../assets'
-import moment from 'moment'
+import { Image, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { CalendarList } from 'react-native-calendars';
+import { Button } from '../Button/Button';
+import { widthScale } from '../../util';
+import { useTranslation } from 'react-i18next';
+import { cross } from '../../assets';
+import moment from 'moment';
 export const Calendar = props => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const {
     setIsCalendarOpen,
     isCalendarOpen,
@@ -25,25 +17,27 @@ export const Calendar = props => {
     onDayPress,
     selectedStartDate,
     selectedEndDate,
-  } = props
+  } = props;
 
   const handleSubmit = () => {
-    onSumbit({ selectedStartDate, selectedEndDate })
-    setIsCalendarOpen()
-  }
+    onSumbit({ selectedStartDate, selectedEndDate });
+    setIsCalendarOpen();
+  };
   if (!isCalendarOpen) {
-    return null
+    return null;
   }
 
   return (
     <Modal
       visible={isCalendarOpen}
       animationType="fade"
-      onRequestClose={setIsCalendarOpen}>
+      onRequestClose={setIsCalendarOpen}
+    >
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.closeContainerStyle}
-          onPress={setIsCalendarOpen}>
+          onPress={setIsCalendarOpen}
+        >
           <Image source={cross} style={styles.crossImageStyle} />
         </TouchableOpacity>
         <View style={styles.calenderContainer}>
@@ -70,12 +64,12 @@ export const Calendar = props => {
         />
       </View>
     </Modal>
-  )
-}
+  );
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: widthScale(22),
+    marginTop: widthScale(50),
     paddingVertical: widthScale(20),
   },
   closeContainerStyle: {
@@ -98,4 +92,4 @@ const styles = StyleSheet.create({
   calenderContainer: {
     maxHeight: '90%',
   },
-})
+});

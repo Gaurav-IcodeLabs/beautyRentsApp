@@ -1,22 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
 import {
   DATE_TYPE_DATE,
   DATE_TYPE_DATETIME,
   DATE_TYPE_TIME,
+  fontScale,
   formatDateIntoPartials,
   isSameDay,
-} from '../../../../../util'
+} from '../../../../../util';
+import { colors, fontWeight } from '../../../../../theme';
 
 const TimeRange = props => {
-  const { startDate, endDate, dateType, timeZone } = props
+  const { startDate, endDate, dateType, timeZone } = props;
 
-  const start = formatDateIntoPartials(startDate, { timeZone })
-  const end = formatDateIntoPartials(endDate, { timeZone })
-  const isSingleDay = isSameDay(startDate, endDate, timeZone)
+  const start = formatDateIntoPartials(startDate, { timeZone });
+  const end = formatDateIntoPartials(endDate, { timeZone });
+  const isSingleDay = isSameDay(startDate, endDate, timeZone);
 
   if (isSingleDay && dateType === DATE_TYPE_DATE) {
-    return <Text>{`${start.date}`}</Text>
+    return <Text style={styles.date}>{`${start.date}`}</Text>;
   } else if (dateType === DATE_TYPE_DATE) {
     const range =
       formatted.length > BREAK_WORD_MIN_LENGTH ? (
@@ -27,36 +29,46 @@ const TimeRange = props => {
           </Text>
         ))
       ) : (
-        <Text>{formatted}</Text>
-      )
-    return <>{range}</>
+        <Text style={styles.date}>{formatted}</Text>
+      );
+    return <>{range}</>;
   } else if (isSingleDay && dateType === DATE_TYPE_TIME) {
     return (
       <View>
-        <Text>{`${start.time} - ${end.time}`}</Text>
+        <Text style={styles.date}>{`${start.time} - ${end.time}`}</Text>
       </View>
-    )
+    );
   } else if (dateType === DATE_TYPE_TIME) {
     return (
       <View>
-        <Text>{`${start?.time} - ${end?.time}`}</Text>
+        <Text style={styles.date}>{`${start?.time} - ${end?.time}`}</Text>
       </View>
-    )
+    );
   } else if (isSingleDay && dateType === DATE_TYPE_DATETIME) {
     return (
       <View>
-        <Text>{`${start.date}, ${start.time} - ${end.time}`}</Text>
+        <Text
+          style={styles.date}
+        >{`${start.date}, ${start.time} - ${end.time}`}</Text>
       </View>
-    )
+    );
   } else {
     return (
       <View>
-        <Text>{`${start.dateAndTime} - ${end.dateAndTime}`}</Text>
+        <Text
+          style={styles.date}
+        >{`${start.dateAndTime} - ${end.dateAndTime}`}</Text>
       </View>
-    )
+    );
   }
-}
+};
 
-export default TimeRange
+export default TimeRange;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  date: {
+    fontSize: fontScale(13),
+    fontWeight: fontWeight.medium,
+    color: colors.black,
+  },
+});

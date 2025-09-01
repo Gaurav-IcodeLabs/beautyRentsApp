@@ -146,7 +146,7 @@ export const EditListing = (props: props) => {
 
   const handleBackPress = () => {
     dispatch(resetEditListing());
-    props.navigation.pop();
+    props.navigation.goBack();
   };
 
   return (

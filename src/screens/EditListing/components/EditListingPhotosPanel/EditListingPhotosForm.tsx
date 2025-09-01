@@ -1,4 +1,3 @@
-// import * as ImagePicker from 'expo-image-picker'
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -12,11 +11,10 @@ import {
   Image,
 } from 'react-native';
 import { AppImage, Button } from '../../../../components';
-import { useColors, useConfiguration } from '../../../../context';
+import { useConfiguration } from '../../../../context';
 import { useAppDispatch, useTypedSelector } from '../../../../sharetribeSetup';
-import { AppColors, colors, fontWeight } from '../../../../theme';
+import { colors, fontWeight } from '../../../../theme';
 import {
-  commonShadow,
   fontScale,
   requirePayoutDetails,
   screenWidth,
@@ -28,10 +26,10 @@ import {
   selectedListingTypeSelector,
 } from '../../EditListing.slice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cross } from '../../../../assets';
+import { cross, uploadIcon } from '../../../../assets';
 import { useNavigation } from '@react-navigation/native';
 import {
-  fetchStripeAccount,
+  // fetchStripeAccount,
   stripeAccountSelector,
 } from '../../../../slices/StripeConnectAccount.slice';
 import {
@@ -40,6 +38,10 @@ import {
 } from '../../../../helpers/StripeHelpers';
 import { getListingTypeConfig } from '../../helper';
 import { Listing } from '../../../../appTypes';
+import {
+  ImageLibraryOptions,
+  launchImageLibrary,
+} from 'react-native-image-picker';
 
 const LIMIT_IN_BYTES = 20971520; //20MB
 
@@ -97,68 +99,83 @@ const EditListingPhotosForm = (props: EditListingPhotosFormProps) => {
   const dispatch = useAppDispatch();
 
   const { t } = useTranslation();
-  const colors: AppColors = useColors();
   const bottom = useSafeAreaInsets().bottom;
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    const options: ImageLibraryOptions = {
+      mediaType: 'photo',
       quality: 1,
-    });
-
-    const asset = result.assets[0];
-
-    if (asset?.fileSize > LIMIT_IN_BYTES) {
-      Alert.alert(
-        'Error',
-        t('EditListingPhotosForm.imageUploadFailed.uploadOverLimit'),
-      );
-    }
-
-    if (result.canceled) {
+      selectionLimit: 5,
+    };
+    let result = await launchImageLibrary(options);
+    if (result.didCancel) {
       return;
     }
 
-    const res = await dispatch(
-      requestImageUpload({
-        file: {
-          uri: asset.uri,
-          id: `${asset.uri}_${Date.now()}`,
-          type: asset.mimeType,
-          name: `${Math.random()}_${Date.now()}`,
-        },
-        listingImageConfig,
-      }),
-    ).unwrap();
+    const assets = result.assets || [];
 
-    if (res?.data.data.id) {
-      setImages([
-        {
-          id: res.data.data.id,
-          uri: res.data.data.attributes.variants['listing-card'].url,
-        },
-        ...images,
-      ]);
+    const validImages = [];
+
+    for (const asset of assets) {
+      if (asset?.fileSize && asset?.fileSize > LIMIT_IN_BYTES) {
+        Alert.alert(
+          'Error',
+          t('EditListingPhotosForm.imageUploadFailed.uploadOverLimit'),
+        );
+        continue;
+      }
+
+      try {
+        const res = await dispatch(
+          requestImageUpload({
+            file: {
+              uri: asset.uri,
+              id: `${asset.uri}_${Date.now()}`,
+              type: asset.type,
+              name: `${Math.random()}_${Date.now()}`,
+            },
+            listingImageConfig,
+          }),
+        ).unwrap();
+
+        if (res?.data?.data?.id) {
+          validImages.push({
+            id: res?.data.data.id,
+            uri: res.data.data.attributes.variants['listing-card'].url,
+          });
+        }
+      } catch (error) {
+        console.error('error image upliad', error);
+      }
+    }
+
+    if (validImages.length > 0) {
+      setImages([...validImages, ...images]);
     }
   };
 
   return (
     <View style={styles.outerContainer}>
       <TouchableOpacity
-        style={[styles.imagePick]}
+        activeOpacity={0.5}
+        style={styles.imagePick}
         onPress={pickImage}
         disabled={imageUploadingInProgress}
       >
         {imageUploadingInProgress ? (
           <ActivityIndicator size="large" color={colors.marketplaceColor} />
         ) : (
-          <>
+          <View style={styles.textSection}>
+            <Image
+              style={styles.uploadIcon}
+              source={uploadIcon}
+              tintColor={colors.marketplaceColor}
+            />
             <Text style={styles.text}>
               {t('EditListingPhotosForm.chooseImage')}
             </Text>
             <Text>{t('EditListingPhotosForm.imageTypes')}</Text>
-          </>
+          </View>
         )}
       </TouchableOpacity>
 
@@ -170,25 +187,19 @@ const EditListingPhotosForm = (props: EditListingPhotosFormProps) => {
         >
           {images?.map((image, index) => {
             return (
-              <View key={image?.id?.uuid} style={styles.image}>
+              <View key={index} style={styles.image}>
                 <TouchableOpacity
                   onPress={() => {
                     setImages(images.filter(img => img.id !== image.id));
                   }}
                   style={styles.remove}
                 >
-                  <Image
-                    style={[
-                      styles.cross,
-                      { tintColor: colors.marketplaceColor },
-                    ]}
-                    source={cross}
-                  />
+                  <Image style={styles.cross} source={cross} />
                 </TouchableOpacity>
                 <AppImage
                   style={styles.appImageStyle}
                   source={{ uri: image.uri }}
-                  width={widthScale(72)}
+                  width={widthScale(80)}
                 />
               </View>
             );
@@ -225,24 +236,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   imagePick: {
-    width: screenWidth - widthScale(40),
-    height: screenWidth - widthScale(60),
-    borderRadius: widthScale(10),
+    marginHorizontal: widthScale(20),
+    height: screenWidth / 2,
+    borderRadius: widthScale(12),
     overflow: 'hidden',
     marginBottom: widthScale(20),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.listingBackground,
-    alignSelf: 'center',
-    ...commonShadow,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.marketplaceColor,
+    borderStyle: 'dashed',
+  },
+  textSection: {
+    height: '100%',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     marginVertical: widthScale(10),
     marginHorizontal: widthScale(10),
-    width: widthScale(72),
-    height: widthScale(72),
+    width: widthScale(80),
+    height: widthScale(80),
     borderRadius: widthScale(15),
-    ...commonShadow,
+    justifyContent: 'center',
   },
   container: {},
   button: {
@@ -251,21 +269,29 @@ const styles = StyleSheet.create({
   },
   remove: {
     position: 'absolute',
-    top: widthScale(0),
-    right: widthScale(0),
+    top: widthScale(-3),
+    right: widthScale(-3),
     zIndex: 100,
     backgroundColor: colors.white,
-    borderRadius: widthScale(20),
-    height: widthScale(20),
-    width: widthScale(20),
+    borderRadius: widthScale(10),
+    height: widthScale(15),
+    width: widthScale(15),
     justifyContent: 'center',
     alignItems: 'center',
   },
   cross: {
-    width: widthScale(30),
-    height: widthScale(30),
+    width: widthScale(22),
+    height: widthScale(22),
+    tintColor: colors.marketplaceColor,
   },
-  appImageStyle: { borderRadius: widthScale(10) },
+  uploadIcon: {
+    height: widthScale(30),
+    width: widthScale(30),
+    marginBottom: widthScale(5),
+  },
+  appImageStyle: {
+    borderRadius: widthScale(10),
+  },
   text: {
     color: colors.black,
     fontSize: fontScale(24),
