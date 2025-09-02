@@ -10,33 +10,39 @@ export const CmsCTA = (props: CmsCTAProps) => {
   const { content, fieldType, href } = props;
   const navigation = useNavigation();
 
-  // console.log('content, fieldType, href', content, fieldType, href)
-  if (!content) {
-    return null;
-  }
+  // if (!content) {
+  //   return null;
+  // }
 
   const onPress = () => {
-    // console.log('first', val)
     if (fieldType === CmsFieldTypes.INTERNAL_BUTTON_LINK) {
-      //navigate somewhere
-      if (href.includes('/l')) {
-        const parts = href.split('/');
-        const id = parts[3];
-        navigation.navigate('Listing', { id });
+      if (href === '/l/new') {
+        navigation.navigate('EditListing');
+      } else if (href === '/s') {
+        navigation.navigate('Search');
       }
     } else {
-      Linking.openURL(href);
+      // Linking.openURL(href);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Button
-        style={styles.button}
-        text={content}
-        textStyle={styles.txt}
-        onPress={onPress}
-      />
+      {fieldType === 'search' ? (
+        <Button
+          style={styles.button}
+          text={'Search'}
+          textStyle={styles.txt}
+          onPress={() => navigation.navigate('Search')}
+        />
+      ) : !content ? null : (
+        <Button
+          style={styles.button}
+          text={content}
+          textStyle={styles.txt}
+          onPress={onPress}
+        />
+      )}
     </View>
   );
 };
