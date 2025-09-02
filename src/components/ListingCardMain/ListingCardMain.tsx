@@ -27,6 +27,7 @@ import { Button } from '../Button/Button';
 import { UUID } from '../../appTypes/interfaces/common';
 import { formatMoney } from '../../util/currency';
 import { lightenColor } from '../../util/data';
+import { LikeButton } from '../LikeButton/LikeButton';
 
 interface ListingCardMainProps {
   listing: Listing;
@@ -43,17 +44,20 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
   const currentUserId = useTypedSelector(currentUserIdSelector);
   const { attributes, author, images, id } = props?.listing || {};
   const { fromProfile = false } = props || {};
-  const { state, price, publicData } = attributes;
+  const { state, price, publicData } = attributes || {};
   const {
     location,
     totalRatingSum = 0,
     totalRatings = 0,
     isFeatured = false,
-  } = publicData;
+  } = publicData || {};
   // console.log('publicData', JSON.stringify(publicData));
   const aspectRatio = useConfiguration().layout.listingImage.aspectRatio;
   const listingTitle = attributes?.title;
-  const imgUrl = images?.[0]?.attributes?.variants?.['listing-card']?.url ?? '';
+  const imgUrl =
+    images?.[0]?.attributes?.variants?.['listing-card']?.url ??
+    images?.[0]?.attributes?.variants?.default?.url ??
+    '';
   const authorId = author?.id?.uuid;
   const isOwnListing = currentUserId === authorId;
   const averageRating =
@@ -199,6 +203,11 @@ export const ListingCardMain = (props: ListingCardMainProps) => {
               />
             </TouchableOpacity>
           )}
+        {!fromProfile && (
+          <View style={styles.likeButton}>
+            <LikeButton id={id?.uuid} />
+          </View>
+        )}
         {openView ? (
           <View style={styles.openViewContainerStyle}>
             <Button
@@ -427,5 +436,10 @@ const styles = StyleSheet.create({
     fontSize: fontScale(14),
     fontWeight: fontWeight.medium,
     color: colors.white,
+  },
+  likeButton: {
+    position: 'absolute',
+    top: widthScale(10),
+    right: widthScale(10),
   },
 });

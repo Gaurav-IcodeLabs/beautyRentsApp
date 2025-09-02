@@ -87,13 +87,13 @@ export const Settings: React.FC<SettingsScreenProps> = ({ navigation }) => {
               text="Settings.logout"
               onPress={signOut}
               style={styles.btn}
+              loading={loader}
             />
             <Button
               text="FilterForm.cancel"
               onPress={() => setShowModal(false)}
               style={[styles.btnCancel]}
               textStyle={styles.textCancel}
-              loading={loader}
             />
           </View>
         </View>

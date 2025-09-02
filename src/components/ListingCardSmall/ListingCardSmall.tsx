@@ -1,27 +1,28 @@
-import { useNavigation } from '@react-navigation/native'
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import { colors, fontWeight } from '../../theme'
-import { commonShadow, fontScale, widthScale } from '../../util'
-import { AppImage } from '../AppImage/AppImage'
+import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { colors, fontWeight } from '../../theme';
+import { fontScale, widthScale } from '../../util';
+import { AppImage } from '../AppImage/AppImage';
 
 interface ListingCardSmallProps {
-  listing: any
-  index: number
+  listing: any;
+  index: number;
 }
 
 export const ListingCardSmall = (props: ListingCardSmallProps) => {
-  const { listing, index } = props
-  const navigation = useNavigation()
+  const { listing, index } = props;
+  const navigation = useNavigation();
   const img =
-    listing?.images?.[0]?.attributes?.variants?.['listing-card']?.url ?? ''
+    listing?.images?.[0]?.attributes?.variants?.['listing-card']?.url ?? '';
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.push('Listing', { id: listing?.id?.uuid })
+        navigation.push('Listing', { id: listing?.id?.uuid });
       }}
-      style={[styles.listing, { marginLeft: !index ? widthScale(20) : 0 }]}>
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={[styles.listing, { marginLeft: !index ? widthScale(20) : 0 }]}
+    >
       {img ? (
         <AppImage
           width={widthScale(120)}
@@ -44,28 +45,29 @@ export const ListingCardSmall = (props: ListingCardSmallProps) => {
         {listing?.author?.attributes?.profile?.displayName}
       </Text>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   listing: {
     width: widthScale(120),
-    marginRight: widthScale(10),
+    marginRight: widthScale(16),
     backgroundColor: colors.white,
     borderRadius: widthScale(12),
     paddingBottom: widthScale(10),
     marginVertical: widthScale(5),
-    ...commonShadow,
+    borderWidth: 1,
+    borderColor: colors.lightGrey,
   },
   listingTitle: {
     fontSize: fontScale(14),
-    fontWeight: fontWeight.semiBold,
+    fontWeight: fontWeight.normal,
     marginHorizontal: widthScale(8),
     marginTop: widthScale(8),
     flexShrink: 1,
   },
   priceAndSeller: {
-    fontSize: fontScale(14),
+    fontSize: fontScale(12),
     fontWeight: fontWeight.medium,
     marginHorizontal: widthScale(8),
     marginTop: widthScale(5),
@@ -81,4 +83,4 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: widthScale(12),
     borderTopRightRadius: widthScale(12),
   },
-})
+});
