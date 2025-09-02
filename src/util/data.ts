@@ -1,6 +1,6 @@
-import { Listing, UserProfile } from '../appTypes'
-import { sanitizeEntity } from './sanitize'
-import reduce from 'lodash/reduce'
+import { Listing, UserProfile } from '../appTypes';
+import { sanitizeEntity } from './sanitize';
+import reduce from 'lodash/reduce';
 
 /**
  * Denormalise the data from the given SDK response
@@ -11,17 +11,17 @@ import reduce from 'lodash/reduce'
  * denormalised from the included data
  */
 export const denormalisedResponseEntities = sdkResponse => {
-  const apiResponse = sdkResponse.data
-  const data = apiResponse.data
-  const resources = Array.isArray(data) ? data : [data]
+  const apiResponse = sdkResponse.data;
+  const data = apiResponse.data;
+  const resources = Array.isArray(data) ? data : [data];
 
   if (!data || resources.length === 0) {
-    return []
+    return [];
   }
 
-  const entities = updatedEntities({}, apiResponse)
-  return denormalisedEntities(entities, resources)
-}
+  const entities = updatedEntities({}, apiResponse);
+  return denormalisedEntities(entities, resources);
+};
 
 /**
  * Create shell objects to ensure that attributes etc. exists.
@@ -29,9 +29,9 @@ export const denormalisedResponseEntities = sdkResponse => {
  * @param {Object} user entity object, which is to be ensured against null values
  */
 export const ensureUser = (user: UserProfile) => {
-  const empty = { id: null, type: 'user', attributes: { profile: {} } }
-  return { ...empty, ...user }
-}
+  const empty = { id: null, type: 'user', attributes: { profile: {} } };
+  return { ...empty, ...user };
+};
 
 /**
  * Create shell objects to ensure that attributes etc. exists.
@@ -44,9 +44,9 @@ export const ensureCurrentUser = user => {
     type: 'currentUser',
     attributes: { profile: {} },
     profileImage: {},
-  }
-  return { ...empty, ...user }
-}
+  };
+  return { ...empty, ...user };
+};
 
 /**
  * Create shell objects to ensure that attributes etc. exists.
@@ -59,9 +59,9 @@ export const ensureListing = (listing: Listing) => {
     type: 'listing',
     attributes: { publicData: {} },
     images: [],
-  }
-  return { ...empty, ...listing }
-}
+  };
+  return { ...empty, ...listing };
+};
 
 //new methods
 
@@ -74,10 +74,10 @@ export const combinedRelationships = (oldRels, newRels) => {
   if (!oldRels && !newRels) {
     // Special case to avoid adding an empty relationships object when
     // none of the resource objects had any relationships.
-    return null
+    return null;
   }
-  return { ...oldRels, ...newRels }
-}
+  return { ...oldRels, ...newRels };
+};
 
 /**
  * Combine the given resource objects
@@ -85,24 +85,26 @@ export const combinedRelationships = (oldRels, newRels) => {
  * See: http://jsonapi.org/format/#document-resource-objects
  */
 export const combinedResourceObjects = (oldRes, newRes) => {
-  const { id, type } = oldRes
+  const { id, type } = oldRes;
   if (newRes.id.uuid !== id.uuid || newRes.type !== type) {
-    throw new Error('Cannot merge resource objects with different ids or types')
+    throw new Error(
+      'Cannot merge resource objects with different ids or types',
+    );
   }
-  const attributes = newRes.attributes || oldRes.attributes
-  const attributesOld = oldRes.attributes || {}
-  const attributesNew = newRes.attributes || {}
+  const attributes = newRes.attributes || oldRes.attributes;
+  const attributesOld = oldRes.attributes || {};
+  const attributesNew = newRes.attributes || {};
   // Allow (potentially) sparse attributes to update only relevant fields
   const attrs = attributes
     ? { attributes: { ...attributesOld, ...attributesNew } }
-    : null
+    : null;
   const relationships = combinedRelationships(
     oldRes.relationships,
     newRes.relationships,
-  )
-  const rels = relationships ? { relationships } : null
-  return { id, type, ...attrs, ...rels }
-}
+  );
+  const rels = relationships ? { relationships } : null;
+  return { id, type, ...attrs, ...rels };
+};
 
 /**
  * Combine the resource objects form the given api response to the
@@ -113,27 +115,27 @@ export const updatedEntities = (
   apiResponse,
   sanitizeConfig = {},
 ) => {
-  const { data, included = [] } = apiResponse
-  const objects = (Array.isArray(data) ? data : [data]).concat(included)
+  const { data, included = [] } = apiResponse;
+  const objects = (Array.isArray(data) ? data : [data]).concat(included);
 
   const newEntities = objects.reduce((entities, curr) => {
-    const { id, type } = curr
+    const { id, type } = curr;
 
     // Some entities (e.g. listing and user) might include extended data,
     // you should check if src/util/sanitize.js needs to be updated.
-    const current = sanitizeEntity(curr, sanitizeConfig)
+    const current = sanitizeEntity(curr, sanitizeConfig);
 
-    entities[type] = entities[type] || {}
-    const entity = entities[type][id.uuid]
+    entities[type] = entities[type] || {};
+    const entity = entities[type][id.uuid];
     entities[type][id.uuid] = entity
       ? combinedResourceObjects({ ...entity }, current)
-      : current
+      : current;
 
-    return entities
-  }, oldEntities)
+    return entities;
+  }, oldEntities);
 
-  return newEntities
-}
+  return newEntities;
+};
 
 /**
  * Denormalise the entities with the resources from the entities object
@@ -156,18 +158,18 @@ export const denormalisedEntities = (
   throwIfNotFound = true,
 ) => {
   const denormalised = resources?.map(res => {
-    const { id, type } = res
-    const entityFound = entities[type] && id && entities[type][id.uuid]
+    const { id, type } = res;
+    const entityFound = entities[type] && id && entities[type][id.uuid];
     if (!entityFound) {
       if (throwIfNotFound) {
         throw new Error(
           `Entity with type "${type}" and id "${id ? id.uuid : id}" not found`,
-        )
+        );
       }
-      return null
+      return null;
     }
-    const entity = entities[type][id.uuid]
-    const { relationships, ...entityData } = entity
+    const entity = entities[type][id.uuid];
+    const { relationships, ...entityData } = entity;
 
     if (relationships) {
       // Recursively join in all the relationship entities
@@ -177,27 +179,27 @@ export const denormalisedEntities = (
           // A relationship reference can be either a single object or
           // an array of objects. We want to keep that form in the final
           // result.
-          const hasMultipleRefs = Array.isArray(relRef.data)
-          const multipleRefsEmpty = hasMultipleRefs && relRef.data.length === 0
+          const hasMultipleRefs = Array.isArray(relRef.data);
+          const multipleRefsEmpty = hasMultipleRefs && relRef.data.length === 0;
           if (!relRef.data || multipleRefsEmpty) {
-            ent[relName] = hasMultipleRefs ? [] : null
+            ent[relName] = hasMultipleRefs ? [] : null;
           } else {
-            const refs = hasMultipleRefs ? relRef.data : [relRef.data]
+            const refs = hasMultipleRefs ? relRef.data : [relRef.data];
 
             // If a relationship is not found, an Error should be thrown
-            const rels = denormalisedEntities(entities, refs, true)
+            const rels = denormalisedEntities(entities, refs, true);
 
-            ent[relName] = hasMultipleRefs ? rels : rels[0]
+            ent[relName] = hasMultipleRefs ? rels : rels[0];
           }
-          return ent
+          return ent;
         },
         entityData,
-      )
+      );
     }
-    return entityData
-  })
-  return denormalised.filter(e => !!e)
-}
+    return entityData;
+  });
+  return denormalised.filter(e => !!e);
+};
 
 /**
  * Denormalize JSON object.
@@ -208,50 +210,50 @@ export const denormalisedEntities = (
  * @returns deep copy of data with images denormalized into it.
  */
 const denormalizeJsonData = (data, included) => {
-  let copy
+  let copy;
 
   // Handle strings, numbers, booleans, null
   if (data === null || typeof data !== 'object') {
-    return data
+    return data;
   }
 
   // At this point the data has typeof 'object' (aka Array or Object)
   // Array is the more specific case (of Object)
   if (data instanceof Array) {
-    copy = data.map(datum => denormalizeJsonData(datum, included))
-    return copy
+    copy = data.map(datum => denormalizeJsonData(datum, included));
+    return copy;
   }
 
   // Generic Objects
   if (data instanceof Object) {
-    copy = {}
+    copy = {};
     Object.entries(data).forEach(([key, value]) => {
       // Handle denormalization of image reference
       const hasImageRefAsValue =
         typeof value == 'object' &&
         value?._ref?.type === 'imageAsset' &&
-        value?._ref?.id
+        value?._ref?.id;
       // If there is no image included,
       // the _ref might contain parameters for image resolver (Asset Delivery API resolves image URLs on the fly)
       const hasUnresolvedImageRef =
-        typeof value == 'object' && value?._ref?.resolver === 'image'
+        typeof value == 'object' && value?._ref?.resolver === 'image';
 
       if (hasImageRefAsValue) {
-        const foundRef = included.find(inc => inc.id === value._ref?.id)
-        copy[key] = foundRef
+        const foundRef = included.find(inc => inc.id === value._ref?.id);
+        copy[key] = foundRef;
       } else if (hasUnresolvedImageRef) {
         // Don't add faulty image ref
         // Note: At the time of writing, assets can expose resolver configs,
         //       which we don't want to deal with.
       } else {
-        copy[key] = denormalizeJsonData(value, included)
+        copy[key] = denormalizeJsonData(value, included);
       }
-    })
-    return copy
+    });
+    return copy;
   }
 
-  throw new Error("Unable to traverse data! It's not JSON.")
-}
+  throw new Error("Unable to traverse data! It's not JSON.");
+};
 
 /**
  * Denormalize asset json from Asset API.
@@ -259,9 +261,9 @@ const denormalizeJsonData = (data, included) => {
  * @returns deep copy of asset data with images denormalized into it.
  */
 export const denormalizeAssetData = assetJson => {
-  const { data, included } = assetJson || {}
-  return denormalizeJsonData(data, included)
-}
+  const { data, included } = assetJson || {};
+  return denormalizeJsonData(data, included);
+};
 
 /**
  * Create shell objects to ensure that attributes etc. exists.
@@ -274,9 +276,9 @@ export const ensureOwnListing = listing => {
     type: 'ownListing',
     attributes: { publicData: {} },
     images: [],
-  }
-  return { ...empty, ...listing }
-}
+  };
+  return { ...empty, ...listing };
+};
 
 /**
  * Create shell objects to ensure that attributes etc. exists.
@@ -296,9 +298,9 @@ export const ensureTransaction = (
     booking,
     listing,
     provider,
-  }
-  return { ...empty, ...transaction }
-}
+  };
+  return { ...empty, ...transaction };
+};
 
 /**
  * Get the display name of the given user as string. This function handles
@@ -313,14 +315,14 @@ export const ensureTransaction = (
  * @return {String} display name that can be rendered in the UI
  */
 export const userDisplayNameAsString = (user, defaultUserDisplayName) => {
-  const hasDisplayName = user?.attributes?.profile?.displayName
+  const hasDisplayName = user?.attributes?.profile?.displayName;
 
   if (hasDisplayName) {
-    return user?.attributes?.profile?.displayName
+    return user?.attributes?.profile?.displayName;
   } else {
-    return defaultUserDisplayName || ''
+    return defaultUserDisplayName || '';
   }
-}
+};
 
 /**
  * Get the abbreviated name of the given user. This function handles
@@ -336,16 +338,16 @@ export const userDisplayNameAsString = (user, defaultUserDisplayName) => {
  * (e.g. in Avatar initials)
  */
 export const userAbbreviatedName = (user, defaultUserAbbreviatedName) => {
-  const hasAttributes = user && user.attributes
-  const hasProfile = hasAttributes && user.attributes.profile
-  const hasDisplayName = hasProfile && user.attributes.profile.abbreviatedName
+  const hasAttributes = user && user.attributes;
+  const hasProfile = hasAttributes && user.attributes.profile;
+  const hasDisplayName = hasProfile && user.attributes.profile.abbreviatedName;
 
   if (hasDisplayName) {
-    return user.attributes.profile.abbreviatedName
+    return user.attributes.profile.abbreviatedName;
   } else {
-    return defaultUserAbbreviatedName || ''
+    return defaultUserAbbreviatedName || '';
   }
-}
+};
 
 /** to make the lighter version of the hex color */
 export const lightenColor = (color, percent) => {
@@ -353,10 +355,10 @@ export const lightenColor = (color, percent) => {
     amt = Math.round(2.55 * percent),
     R = (num >> 16) + amt,
     G = ((num >> 8) & 0x00ff) + amt,
-    B = (num & 0x0000ff) + amt
+    B = (num & 0x0000ff) + amt;
 
-  return `rgba(${R}, ${G}, ${B}, 0.2)`
-}
+  return `rgba(${R}, ${G}, ${B}, 0.2)`;
+};
 
 /**
  * Humanizes a line item code. Strips the "line-item/" namespace
@@ -369,12 +371,12 @@ export const lightenColor = (color, percent) => {
  */
 export const humanizeLineItemCode = code => {
   if (!/^line-item\/.+/.test(code)) {
-    throw new Error(`Invalid line item code: ${code}`)
+    throw new Error(`Invalid line item code: ${code}`);
   }
-  const lowercase = code.replace(/^line-item\//, '').replace(/-/g, ' ')
+  const lowercase = code.replace(/^line-item\//, '').replace(/-/g, ' ');
 
-  return lowercase.charAt(0).toUpperCase() + lowercase.slice(1)
-}
+  return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
+};
 
 /**
  * Create shell objects to ensure that attributes etc. exists.
@@ -382,9 +384,9 @@ export const humanizeLineItemCode = code => {
  * @param {Object} stripeCustomer entity from API, which is to be ensured against null values
  */
 export const ensureStripeCustomer = stripeCustomer => {
-  const empty = { id: null, type: 'stripeCustomer', attributes: {} }
-  return { ...empty, ...stripeCustomer }
-}
+  const empty = { id: null, type: 'stripeCustomer', attributes: {} };
+  return { ...empty, ...stripeCustomer };
+};
 
 /**
  * Create shell objects to ensure that attributes etc. exists.
@@ -396,13 +398,13 @@ export const ensurePaymentMethodCard = stripePaymentMethod => {
     id: null,
     type: 'stripePaymentMethod',
     attributes: { type: 'stripe-payment-method/card', card: {} },
-  }
-  const cardPaymentMethod = { ...empty, ...stripePaymentMethod }
+  };
+  const cardPaymentMethod = { ...empty, ...stripePaymentMethod };
 
   if (cardPaymentMethod.attributes.type !== 'stripe-payment-method/card') {
     throw new Error(`'ensurePaymentMethodCard' got payment method with wrong type.
-      'stripe-payment-method/card' was expected, received ${cardPaymentMethod.attributes.type}`)
+      'stripe-payment-method/card' was expected, received ${cardPaymentMethod.attributes.type}`);
   }
 
-  return cardPaymentMethod
-}
+  return cardPaymentMethod;
+};

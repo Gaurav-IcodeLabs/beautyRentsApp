@@ -23,6 +23,8 @@ export type AppStackParamList = {
   PasswordSettings: undefined;
   DeleteAccount: undefined;
   SearchListingMap: undefined;
+  OtherUserProfile: undefined;
+  WishList: undefined;
 };
 
 export type SignupScreenProps = NativeStackScreenProps<
