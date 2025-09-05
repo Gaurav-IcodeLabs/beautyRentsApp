@@ -1,7 +1,7 @@
 import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { colors, fontWeight } from '../../theme';
 import { fontScale, heightScale, screenWidth, widthScale } from '../../util';
@@ -22,6 +22,7 @@ interface RenderDropdownFieldProps {
   openDirection?: 'auto' | 'top' | 'bottom';
   inverted?: boolean;
   containerWidth?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const RenderDropdownField = (props: RenderDropdownFieldProps) => {
@@ -40,6 +41,7 @@ export const RenderDropdownField = (props: RenderDropdownFieldProps) => {
     openDirection = 'bottom',
     inverted = true,
     containerWidth = true,
+    style = {},
   } = props;
   // const [isFocus, setIsFocus] = React.useState(false);
   const { t } = useTranslation();
@@ -49,6 +51,7 @@ export const RenderDropdownField = (props: RenderDropdownFieldProps) => {
     <View
       style={[
         Styles.container,
+        style,
         containerWidth ? { width: screenWidth - widthScale(40) } : '',
       ]}
     >

@@ -1,43 +1,43 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { useConfiguration } from '../../../context'
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { useConfiguration } from '../../../context';
 import {
   isFieldForCategory,
   pickCategoryFields,
   SCHEMA_TYPE_MULTI_ENUM,
   SCHEMA_TYPE_TEXT,
   widthScale,
-} from '../../../util'
-import { pickCustomFieldProps } from '../../../util'
-import SectionDetailsMaybe from './SectionDetailsMaybe'
-import SectionMultiEnumMaybe from './SectionMultiEnumMaybe'
-import SectionTextMaybe from './SectionTextMaybe'
+} from '../../../util';
+import { pickCustomFieldProps } from '../../../util';
+import SectionDetailsMaybe from './SectionDetailsMaybe';
+import SectionMultiEnumMaybe from './SectionMultiEnumMaybe';
+import SectionTextMaybe from './SectionTextMaybe';
 
 interface CustomListingFieldsProps {
-  publicData: any
-  metadata: any
+  publicData: any;
+  metadata: any;
 }
 
 const CustomListingFields = (props: CustomListingFieldsProps) => {
-  const { publicData, metadata } = props
-  const config = useConfiguration()
-  const listingConfig = config.listing
-  const listingFieldConfigs = listingConfig.listingFields
-  const categoryConfiguration = config.categoryConfiguration
+  const { publicData, metadata } = props;
+  const config = useConfiguration();
+  const listingConfig = config.listing;
+  const listingFieldConfigs = listingConfig.listingFields;
+  const categoryConfiguration = config.categoryConfiguration;
   const { key: categoryPrefix, categories: listingCategoriesConfig } =
-    categoryConfiguration
+    categoryConfiguration;
   const categoriesObj = pickCategoryFields(
     publicData,
     categoryPrefix,
     1,
     listingCategoriesConfig,
-  )
-  const currentCategories = Object.values(categoriesObj)
+  );
+  const currentCategories = Object.values(categoriesObj);
 
   const isFieldForSelectedCategories = fieldConfig => {
-    const isTargetCategory = isFieldForCategory(currentCategories, fieldConfig)
-    return isTargetCategory
-  }
+    const isTargetCategory = isFieldForCategory(currentCategories, fieldConfig);
+    return isTargetCategory;
+  };
   const propsForCustomFields =
     pickCustomFieldProps(
       publicData,
@@ -45,7 +45,7 @@ const CustomListingFields = (props: CustomListingFieldsProps) => {
       listingFieldConfigs,
       'listingType',
       isFieldForSelectedCategories,
-    ) || []
+    ) || [];
 
   return (
     <View style={styles.container}>
@@ -56,21 +56,22 @@ const CustomListingFields = (props: CustomListingFieldsProps) => {
         listingFieldConfigs={listingFieldConfigs}
       />
       {propsForCustomFields.map((customFieldProps: any, index: number) => {
-        const { schemaType, ...fieldProps } = customFieldProps
+        const { schemaType, ...fieldProps } = customFieldProps;
         return schemaType === SCHEMA_TYPE_MULTI_ENUM ? (
           <SectionMultiEnumMaybe {...fieldProps} key={index} />
         ) : schemaType === SCHEMA_TYPE_TEXT ? (
           <SectionTextMaybe {...fieldProps} key={index} />
-        ) : null
+        ) : null;
       })}
     </View>
-  )
-}
+  );
+};
 
-export default CustomListingFields
+export default CustomListingFields;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: widthScale(10),
+    // marginVertical: widthScale(10),
+    marginBlock: widthScale(10),
   },
-})
+});

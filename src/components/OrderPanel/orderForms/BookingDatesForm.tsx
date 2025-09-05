@@ -1,14 +1,7 @@
 import React, { memo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  LayoutAnimation,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Image,
-} from 'react-native';
+import { Alert, LayoutAnimation, StyleSheet, ScrollView } from 'react-native';
 import { useConfiguration } from '../../../context';
 import {
   fetchLineItemsErrorSelector,
@@ -36,24 +29,23 @@ import {
   pickMonthlyTimeSlots,
   timeSlotEqualsDay,
 } from '../OrderPanel.helper';
-import { cross } from '../../../assets';
 
 const TODAY = new Date();
 
 const BookingDatesForm = props => {
-  const { onSubmit, price, listingId, timeZone } = props;
+  const { onSubmit, price, listingId, timeZone, marketplaceCurrency } = props;
   LayoutAnimation.linear();
   const { t } = useTranslation();
   const config = useConfiguration();
   const dispatch = useAppDispatch();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [showField, setShowField] = useState(false);
   const monthlyTimeSlots = useTypedSelector(state =>
     monthlyTimeSlotsSelector(state, listingId.uuid),
   );
   const lineItems = useTypedSelector(state =>
     lineItemsSelector(state, listingId.uuid),
   );
+
   const fetchLineItemsInProgress = useTypedSelector(state =>
     fetchLineItemsInProgressSelector(state, listingId.uuid),
   );
@@ -90,6 +82,7 @@ const BookingDatesForm = props => {
     'en-US',
     dateFormattingOptions,
   ).format(TODAY);
+
   const handleStartDate = () => {
     setIsCalendarOpen(true);
   };
@@ -119,9 +112,9 @@ const BookingDatesForm = props => {
   };
 
   const handleFormSpyChange = values => {
-    const { selectedStartDate, selectedEndDate } = values;
-    setValue('bookingStartDate', selectedStartDate);
-    setValue('bookingEndDate', selectedEndDate);
+    // const { selectedStartDate, selectedEndDate } = values;
+    setValue('bookingStartDate', values.selectedStartDate);
+    setValue('bookingEndDate', values.selectedEndDate);
     const startDate = timeOfDayFromLocalToTimeZone(selectedStartDate, timeZone);
     const endDate = timeOfDayFromLocalToTimeZone(selectedEndDate, timeZone);
     endDate?.setDate(endDate.getDate() + 1);
@@ -133,6 +126,8 @@ const BookingDatesForm = props => {
       },
       listingId,
       isOwnListing: false,
+      isDayOrHourBooking: 'day',
+      marketplaceCurrency: marketplaceCurrency,
     };
 
     dispatch(fetchTransactionLineItems(params));
@@ -233,41 +228,34 @@ const BookingDatesForm = props => {
   };
 
   return (
-    <View>
-      {showField ? (
-        <View style={styles.crossContainer}>
-          <TouchableOpacity onPress={() => setShowField(false)}>
-            <Image style={{ height: 20, width: 20 }} source={cross} />
-          </TouchableOpacity>
-        </View>
-      ) : null}
-      {showField ? (
-        <>
-          <RenderTextInputField
-            control={control}
-            name={'bookingStartDate'}
-            labelKey={'BookingDatesForm.bookingStartTitle'}
-            placeholderKey={formattedDate}
-            onPress={handleStartDate}
-            editable={false}
-          />
-          <RenderTextInputField
-            control={control}
-            name={'bookingEndDate'}
-            labelKey={'BookingDatesForm.bookingEndTitle'}
-            placeholderKey={formattedDate}
-            onPress={handleStartDate}
-            editable={false}
-          />
-        </>
-      ) : null}
+    <ScrollView
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+      bounces={false}
+    >
+      <RenderTextInputField
+        control={control}
+        name={'bookingStartDate'}
+        labelKey={'BookingDatesForm.bookingStartTitle'}
+        placeholderKey={formattedDate}
+        onPress={handleStartDate}
+        editable={false}
+      />
+      <RenderTextInputField
+        control={control}
+        name={'bookingEndDate'}
+        labelKey={'BookingDatesForm.bookingEndTitle'}
+        placeholderKey={formattedDate}
+        onPress={handleStartDate}
+        editable={false}
+      />
 
       {showEstimatedBreakdown ? (
         <EstimatedCustomerBreakdownMaybe
           breakdownData={breakdownData}
           lineItems={lineItems}
           timeZone={timeZone}
-          currency={price.currency}
+          currency={price?.currency || marketplaceCurrency}
           marketplaceName={marketplaceName}
           processName={BOOKING_PROCESS_NAME}
         />
@@ -275,30 +263,27 @@ const BookingDatesForm = props => {
 
       <Button
         text={t('BookingDatesForm.requestToBook')}
-        onPress={
-          showField
-            ? handleSubmit(handleOnSubmit)
-            : () => {
-                setShowField(true);
-              }
-        }
+        onPress={handleSubmit(handleOnSubmit)}
         loading={fetchLineItemsInProgress}
+        disabled={!selectedStartDate || !selectedEndDate}
       />
-      <Calendar
-        isCalendarOpen={isCalendarOpen}
-        setIsCalendarOpen={() => setIsCalendarOpen(false)}
-        onSumbit={handleFormSpyChange}
-        customDayComponent={customDayComponent}
-        markedDatesNew={
-          selectedStartDate && selectedEndDate
-            ? markedRange(selectedStartDate, selectedEndDate)
-            : markedDates
-        }
-        selectedStartDate={selectedStartDate}
-        selectedEndDate={selectedEndDate}
-        onDayPress={onDayPress}
-      />
-    </View>
+      {isCalendarOpen && (
+        <Calendar
+          isCalendarOpen={isCalendarOpen}
+          setIsCalendarOpen={() => setIsCalendarOpen(false)}
+          onSumbit={handleFormSpyChange}
+          customDayComponent={customDayComponent}
+          markedDatesNew={
+            selectedStartDate && selectedEndDate
+              ? markedRange(selectedStartDate, selectedEndDate)
+              : markedDates
+          }
+          selectedStartDate={selectedStartDate}
+          selectedEndDate={selectedEndDate}
+          onDayPress={onDayPress}
+        />
+      )}
+    </ScrollView>
   );
 };
 
@@ -308,5 +293,8 @@ const styles = StyleSheet.create({
   crossContainer: {
     alignItems: 'flex-end',
     marginBottom: widthScale(10),
+  },
+  container: {
+    paddingBottom: widthScale(50),
   },
 });

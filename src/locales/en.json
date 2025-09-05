@@ -479,7 +479,7 @@
   "ListingPage.payoutDetailsWarning": "This listing is not available {processType, select, booking {for booking} other {for purchase}}. You have not added your payout details yet.",
   "ListingPage.payoutDetailsWarningLink": "Add your payout details",
   "ListingPage.reviewsError": "Loading reviews failed.",
-  "ListingPage.reviewsTitle": "Reviews ({count})",
+  "ListingPage.reviewsTitle": "Customer Reviews ({count})",
   "ListingPage.schemaTitle": "{title} | {marketplaceName}",
   "ListingPage.viewImagesButton": "View photos ({count})",
   "LoadableComponentErrorBoundaryPage.description": "It looks like the app needs to be updated! Please refresh the page or go back to {link}.",
@@ -1151,7 +1151,7 @@
   "PasswordRecoveryPage.login": "Login",
   "PasswordRecoveryPage.passwordTooShort": "The password should be at least {minLength} characters.",
   "PasswordRecoveryPage.emailSubmittedSuccessMessage": "Instructions to reset your password have been sent to {{submittedEmailText}}.",
-  "ListingPage.reviewsSectionTitle": "Reviews ({count})",
+  "ListingPage.reviewsSectionTitle": "Customer Reviews ({count})",
   "UserCard.headingMessage": "Hello, I'm {{name}}.",
   "UserCard.viewProfileText": "View profile",
   "ListingPage.editProfileText": "Edit profile",
@@ -1176,6 +1176,7 @@
   "Settings.title": "Settings",
   "Settings.profileSettings": "Profile settings",
   "Settings.contactDetails": "Contact details",
+  "Settings.wishlist": "Wishlist",
   "Settings.passwordSettings": "Password settings",
   "Settings.payoutDetails": "Payout details",
   "Settings.paymentMethods": "Payment methods",
@@ -1216,5 +1217,11 @@
   "TransactionListing.description": "Description",
   "Calendar.buttonTitle": "Submit",
   "Checkout.addCard": "Add card +",
-  "Map.heading": "Map view"
+  "Map.heading": "Map view",
+  "OtherUserProfilePage.productTabTitle": "Listings",
+  "OtherUserProfilePage.reviewTabTitle": "Reviews",
+  "OtherUserProfilePage.reviewHeaderCustomer": "Reviews from customer",
+  "OtherUserProfilePage.reviewHeaderProvider": "Reviews as a customer",
+  "OtherUserProfilePage.noListings": "No listings found.",
+  "OtherUserProfilePage.noReviews": "No reviews"
 }

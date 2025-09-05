@@ -36,3 +36,5 @@ export const payoutIcon = require('./payoutIcon.png');
 export const uploadIcon = require('./uploadIcon.png');
 export const locationIcon = require('./locationIcon.png');
 export const mailIcon = require('./mailIcon.png');
+export const emptyheartIcon = require('./emptyheartIcon.png');
+export const heartFillIcon = require('./heartFillIcon.png');

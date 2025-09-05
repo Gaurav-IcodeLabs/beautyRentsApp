@@ -33,6 +33,12 @@ export const getTabsData = () => {
       icon: lockIcon,
     },
     {
+      key: 11,
+      screen: Screens.WISHLIST,
+      lable: 'Settings.wishlist',
+      icon: lockIcon,
+    },
+    {
       key: 4,
       screen: Screens.PAYOUTSETUP,
       lable: 'Settings.payoutDetails',

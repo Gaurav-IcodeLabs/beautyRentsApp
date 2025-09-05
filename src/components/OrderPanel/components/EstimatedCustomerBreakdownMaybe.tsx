@@ -1,7 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { TX_TRANSITION_ACTOR_CUSTOMER, getProcess } from '../../../transactions'
-import { useTranslation } from 'react-i18next'
+import { Text } from 'react-native';
+import React from 'react';
+import {
+  TX_TRANSITION_ACTOR_CUSTOMER,
+  getProcess,
+} from '../../../transactions';
+import { useTranslation } from 'react-i18next';
 import {
   DATE_TYPE_DATE,
   DATE_TYPE_DATETIME,
@@ -10,35 +13,35 @@ import {
   LINE_ITEM_NIGHT,
   LISTING_UNIT_TYPES,
   timeOfDayFromLocalToTimeZone,
-} from '../../../util'
+} from '../../../util';
 import {
   convertMoneyToNumber,
   convertUnitToSubUnit,
   unitDivisor,
-} from '../../../util/currency'
-import Decimal from 'decimal.js'
-import { types as sdkTypes } from '../../../util'
-import OrderBreakdown from '../../OrderBreakdown/OrderBreakdown'
+} from '../../../util/currency';
+import Decimal from 'decimal.js';
+import { types as sdkTypes } from '../../../util';
+import OrderBreakdown from '../../OrderBreakdown/OrderBreakdown';
 
-const { Money, UUID } = sdkTypes
+const { Money, UUID } = sdkTypes;
 const estimatedTotalPrice = (lineItems, marketplaceCurrency) => {
   const numericTotalPrice = lineItems.reduce((sum, lineItem) => {
-    const numericPrice = convertMoneyToNumber(lineItem.lineTotal)
-    return new Decimal(numericPrice).add(sum)
-  }, new Decimal(0))
+    const numericPrice = convertMoneyToNumber(lineItem.lineTotal);
+    return new Decimal(numericPrice).add(sum);
+  }, new Decimal(0));
 
   // All the lineItems should have same currency so we can use the first one to check that
   // In case there are no lineItems we use currency from config.js as default
   const currency =
     lineItems[0] && lineItems[0].unitPrice
       ? lineItems[0].unitPrice.currency
-      : marketplaceCurrency
+      : marketplaceCurrency;
 
   return new Money(
     convertUnitToSubUnit(numericTotalPrice.toNumber(), unitDivisor(currency)),
     currency,
-  )
-}
+  );
+};
 
 const estimatedBooking = (
   bookingStart,
@@ -46,7 +49,7 @@ const estimatedBooking = (
   lineItemUnitType,
   timeZone = 'Etc/UTC',
 ) => {
-  const duration = { start: bookingStart, end: bookingEnd }
+  const duration = { start: bookingStart, end: bookingEnd };
 
   return {
     id: new UUID('estimated-booking'),
@@ -54,8 +57,8 @@ const estimatedBooking = (
     attributes: {
       ...duration,
     },
-  }
-}
+  };
+};
 
 // When we cannot speculatively initiate a transaction (i.e. logged
 // out), we must estimate the transaction for booking breakdown. This function creates
@@ -73,19 +76,22 @@ const estimatedCustomerTransaction = (
   processName,
   marketplaceCurrency,
 ) => {
-  const transitions = process?.transitions
-  const now = new Date()
+  const transitions = process?.transitions;
+  const now = new Date();
   const customerLineItems = lineItems.filter(item =>
     item.includeFor.includes('customer'),
-  )
+  );
   const providerLineItems = lineItems.filter(item =>
     item.includeFor.includes('provider'),
-  )
-  const payinTotal = estimatedTotalPrice(customerLineItems, marketplaceCurrency)
+  );
+  const payinTotal = estimatedTotalPrice(
+    customerLineItems,
+    marketplaceCurrency,
+  );
   const payoutTotal = estimatedTotalPrice(
     providerLineItems,
     marketplaceCurrency,
-  )
+  );
 
   const bookingMaybe =
     bookingStart && bookingEnd
@@ -97,7 +103,7 @@ const estimatedCustomerTransaction = (
             timeZone,
           ),
         }
-      : {}
+      : {};
 
   return {
     id: new UUID('estimated-transaction'),
@@ -119,11 +125,11 @@ const estimatedCustomerTransaction = (
       ],
     },
     ...bookingMaybe,
-  }
-}
+  };
+};
 
 const EstimatedCustomerBreakdownMaybe = props => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const {
     breakdownData = {},
     lineItems,
@@ -131,36 +137,36 @@ const EstimatedCustomerBreakdownMaybe = props => {
     currency,
     marketplaceName,
     processName,
-  } = props
+  } = props;
   const { startDate: selectedStartDate, endDate: selectedEndDate } =
-    breakdownData
+    breakdownData;
 
   const startDate = selectedStartDate
     ? timeOfDayFromLocalToTimeZone(selectedStartDate, timeZone)
-    : null
+    : null;
   const endDate = selectedEndDate
     ? timeOfDayFromLocalToTimeZone(selectedEndDate, timeZone)
-    : selectedEndDate
-  endDate?.setDate(endDate.getDate() + 1)
+    : selectedEndDate;
+  endDate?.setDate(endDate.getDate() + 1);
 
-  let process = null
+  let process = null;
   try {
-    process = getProcess(processName)
+    process = getProcess(processName);
   } catch (e) {
-    return <Text>{t('OrderPanel.unknownTransactionProcess')}</Text>
+    return <Text>{t('OrderPanel.unknownTransactionProcess')}</Text>;
   }
 
   const unitLineItem = lineItems?.find?.(
     item => LISTING_UNIT_TYPES.includes(item.code) && !item.reversal,
-  )
-  const lineItemUnitType = unitLineItem?.code
+  );
+  const lineItemUnitType = unitLineItem?.code;
   const shouldHaveBooking = [LINE_ITEM_DAY, LINE_ITEM_NIGHT].includes(
     lineItemUnitType,
-  )
-  const hasLineItems = lineItems && lineItems.length > 0
-  const hasRequiredBookingData = !shouldHaveBooking || (startDate && endDate)
+  );
+  const hasLineItems = lineItems && lineItems.length > 0;
+  const hasRequiredBookingData = !shouldHaveBooking || (startDate && endDate);
   const dateType =
-    lineItemUnitType === LINE_ITEM_HOUR ? DATE_TYPE_DATETIME : DATE_TYPE_DATE
+    lineItemUnitType === LINE_ITEM_HOUR ? DATE_TYPE_DATETIME : DATE_TYPE_DATE;
 
   const tx =
     hasLineItems && hasRequiredBookingData
@@ -174,7 +180,7 @@ const EstimatedCustomerBreakdownMaybe = props => {
           processName,
           currency,
         )
-      : null
+      : null;
 
   return tx ? (
     <OrderBreakdown
@@ -186,9 +192,7 @@ const EstimatedCustomerBreakdownMaybe = props => {
       currency={currency}
       marketplaceName={marketplaceName}
     />
-  ) : null
-}
+  ) : null;
+};
 
-export default EstimatedCustomerBreakdownMaybe
-
-const styles = StyleSheet.create({})
+export default EstimatedCustomerBreakdownMaybe;

@@ -42,6 +42,7 @@ export interface ScreenHeaderProps {
   rightIconLoader?: boolean;
   rightLoaderColor?: string;
   backgroundColor?: ViewStyle;
+  leftIconStyle?: ImageStyle;
 }
 export const ScreenHeader = ({
   leftIcon,
@@ -68,6 +69,7 @@ export const ScreenHeader = ({
   subTitleStyle,
   leftIconContainerStyle = {},
   backgroundColor = {},
+  leftIconStyle = {},
 }: ScreenHeaderProps) => {
   const navigation = useNavigation();
   const top = useSafeAreaInsets().top;
@@ -93,7 +95,7 @@ export const ScreenHeader = ({
                 }}
               >
                 <Image
-                  style={Styles.icon}
+                  style={[Styles.icon, leftIconStyle]}
                   source={leftIcon ? leftIcon : backIcon}
                 />
               </TouchableOpacity>

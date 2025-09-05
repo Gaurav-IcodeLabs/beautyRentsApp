@@ -114,12 +114,17 @@ const AppStack = () => {
         name="ProfileSettings"
         component={Screens.ProfileSettings}
       />
-      {/* <Stack.Screen name="Transaction" component={Screens.Transaction} />
-      <Stack.Screen name="Checkout" component={Screens.Checkout} /> */}
+      {/* <Stack.Screen name="Transaction" component={Screens.Transaction} /> */}
+      {/* <Stack.Screen name="Checkout" component={Screens.Checkout} /> */}
       <Stack.Screen
         name="SearchListingMap"
         component={Screens.SearchListingMap}
       />
+      <Stack.Screen
+        name="OtherUserProfile"
+        component={Screens.OtherUserProfile}
+      />
+      <Stack.Screen name="WishList" component={Screens.WishList} />
     </Stack.Navigator>
   );
 };

@@ -44,6 +44,7 @@ export enum Screens {
   DELETEACCOUNT = 'DeleteAccount',
   PAYMENTMETHODS = 'PaymentMethods',
   PAYOUTSETUP = 'PayoutSetup',
+  WISHLIST = 'WishList',
 }
 
 export enum ListingSortKeys {

@@ -1,24 +1,24 @@
 import {
+  StyleProp,
   StyleSheet,
   Text,
   TextStyle,
   TouchableOpacity,
-  View,
   ViewStyle,
-} from 'react-native'
-import React from 'react'
-import { widthScale } from '../../util'
-import { AppColors } from '../../theme'
-import { useColors } from '../../context'
-import { lightenColor } from '../../util/data'
+} from 'react-native';
+import React from 'react';
+import { widthScale } from '../../util';
+import { AppColors } from '../../theme';
+import { useColors } from '../../context';
+import { lightenColor } from '../../util/data';
 
 interface SelectionButtonProps {
-  title: string
-  onPress?: () => void
-  isSelected: boolean
-  style?: ViewStyle
-  textStyle?: TextStyle
-  disabled?: boolean
+  title: string;
+  onPress?: () => void;
+  isSelected: boolean;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  disabled?: boolean;
 }
 
 export const SelectionButton = (props: SelectionButtonProps) => {
@@ -29,9 +29,9 @@ export const SelectionButton = (props: SelectionButtonProps) => {
     style,
     textStyle,
     disabled = false,
-  } = props
-  const colors: AppColors = useColors()
-  const tanPercentColor = lightenColor(colors.marketplaceColor, 40)
+  } = props;
+  const colors: AppColors = useColors();
+  const tanPercentColor = lightenColor(colors.marketplaceColor, 40);
   return (
     <TouchableOpacity
       disabled={disabled}
@@ -44,18 +44,20 @@ export const SelectionButton = (props: SelectionButtonProps) => {
             : tanPercentColor,
         },
         style,
-      ]}>
+      ]}
+    >
       <Text
         style={[
           styles.txt,
           { color: isSelected ? colors.white : colors.black },
           textStyle,
-        ]}>
+        ]}
+      >
         {title}
       </Text>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -64,4 +66,4 @@ const styles = StyleSheet.create({
     paddingVertical: widthScale(8),
   },
   txt: {},
-})
+});
