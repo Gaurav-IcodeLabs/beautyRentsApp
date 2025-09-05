@@ -82,7 +82,7 @@ const InquiryModal = (props: InquiryModalProps) => {
     <Modal
       visible={isInquiryModalOpen}
       onRequestClose={onCloseInquiryModal}
-      animationType="slide"
+      animationType="fade"
     >
       <View style={styles.container}>
         <TouchableOpacity
