@@ -218,6 +218,7 @@ export interface RadioButtonProps {
   isActive: boolean;
   onPress: () => void;
   size: number;
+  disabled?: boolean;
 }
 
 export interface CategoryFieldProps {

@@ -1,41 +1,56 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { LINE_ITEM_CUSTOMER_COMMISSION, widthScale } from '../../../util'
-import { formatMoney } from '../../../util/currency'
-import { useTranslation } from 'react-i18next'
-import { colors } from '../../../theme'
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import {
+  fontScale,
+  LINE_ITEM_CUSTOMER_COMMISSION,
+  widthScale,
+} from '../../../util';
+import { formatMoney } from '../../../util/currency';
+import { useTranslation } from 'react-i18next';
+import { colors, fontWeight } from '../../../theme';
 
 const LineItemCustomerCommissionRefundMaybe = props => {
-  const { t } = useTranslation()
-  const { lineItems, isCustomer, marketplaceName } = props
+  const { t } = useTranslation();
+  const { lineItems, isCustomer, marketplaceName } = props;
 
   const refund = lineItems.find(
     item => item.code === LINE_ITEM_CUSTOMER_COMMISSION && item.reversal,
-  )
+  );
 
   return isCustomer && refund ? (
     <>
       <View style={styles.container}>
-        <Text>
+        <Text style={styles.label}>
           {t('OrderBreakdown.refundCustomerFee', { marketplaceName })}
         </Text>
-        <Text>{formatMoney(refund.lineTotal)}</Text>
+        <Text style={styles.value}>{formatMoney(refund.lineTotal, 2)}</Text>
       </View>
       <View style={styles.itemSeperatorStyle} />
     </>
-  ) : null
-}
+  ) : null;
+};
 
-export default LineItemCustomerCommissionRefundMaybe
+export default LineItemCustomerCommissionRefundMaybe;
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   itemSeperatorStyle: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.grey,
     marginVertical: widthScale(6),
   },
-})
+  label: {
+    fontSize: fontScale(14),
+    fontWeight: fontWeight.normal,
+    color: colors.black,
+  },
+  value: {
+    fontSize: fontScale(14),
+    fontWeight: fontWeight.normal,
+    color: colors.black,
+  },
+});

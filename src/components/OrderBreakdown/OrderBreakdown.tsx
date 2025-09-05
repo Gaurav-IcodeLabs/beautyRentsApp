@@ -1,27 +1,29 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
 import {
+  fontScale,
   LINE_ITEM_CUSTOMER_COMMISSION,
   LINE_ITEM_PROVIDER_COMMISSION,
   LISTING_UNIT_TYPES,
   widthScale,
-} from '../../util'
-import LineItemBookingPeriod from './lineItems/LineItemBookingPeriod'
-import LineItemBasePriceMaybe from './lineItems/LineItemBasePriceMaybe'
-import LineItemShippingFeeMaybe from './lineItems/LineItemShippingFeeMaybe'
-import LineItemPickupFeeMaybe from './lineItems/LineItemPickupFeeMaybe'
-import LineItemUnknownItemsMaybe from './lineItems/LineItemUnknownItemsMaybe'
-import LineItemSubTotalMaybe from './lineItems/LineItemSubTotalMaybe'
-import LineItemRefundMaybe from './lineItems/LineItemRefundMaybe'
-import LineItemCustomerCommissionMaybe from './lineItems/LineItemCustomerCommissionMaybe'
-import LineItemCustomerCommissionRefundMaybe from './lineItems/LineItemCustomerCommissionRefundMaybe'
-import LineItemProviderCommissionMaybe from './lineItems/LineItemProviderCommissionMaybe'
-import LineItemProviderCommissionRefundMaybe from './lineItems/LineItemProviderCommissionRefundMaybe'
-import LineItemTotalPrice from './lineItems/LineItemTotalPrice'
-import { useTranslation } from 'react-i18next'
+} from '../../util';
+import LineItemBookingPeriod from './lineItems/LineItemBookingPeriod';
+import LineItemBasePriceMaybe from './lineItems/LineItemBasePriceMaybe';
+import LineItemShippingFeeMaybe from './lineItems/LineItemShippingFeeMaybe';
+import LineItemPickupFeeMaybe from './lineItems/LineItemPickupFeeMaybe';
+import LineItemUnknownItemsMaybe from './lineItems/LineItemUnknownItemsMaybe';
+import LineItemSubTotalMaybe from './lineItems/LineItemSubTotalMaybe';
+import LineItemRefundMaybe from './lineItems/LineItemRefundMaybe';
+import LineItemCustomerCommissionMaybe from './lineItems/LineItemCustomerCommissionMaybe';
+import LineItemCustomerCommissionRefundMaybe from './lineItems/LineItemCustomerCommissionRefundMaybe';
+import LineItemProviderCommissionMaybe from './lineItems/LineItemProviderCommissionMaybe';
+import LineItemProviderCommissionRefundMaybe from './lineItems/LineItemProviderCommissionRefundMaybe';
+import LineItemTotalPrice from './lineItems/LineItemTotalPrice';
+import { useTranslation } from 'react-i18next';
+import { colors, fontWeight } from '../../theme';
 
 const OrderBreakdown = props => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const {
     userRole,
     transaction,
@@ -30,28 +32,28 @@ const OrderBreakdown = props => {
     timeZone,
     currency,
     marketplaceName,
-  } = props
+  } = props;
 
-  const isCustomer = userRole === 'customer'
-  const isProvider = userRole === 'provider'
-  const allLineItems = transaction.attributes.lineItems || []
+  const isCustomer = userRole === 'customer';
+  const isProvider = userRole === 'provider';
+  const allLineItems = transaction.attributes.lineItems || [];
   // We'll show only line-items that are specific for the current userRole (customer vs provider)
   const lineItems = allLineItems.filter(lineItem =>
     lineItem.includeFor.includes(userRole),
-  )
+  );
   const unitLineItem = lineItems.find(
     item => LISTING_UNIT_TYPES.includes(item.code) && !item.reversal,
-  )
+  );
   // Line-item code that matches with base unit: day, night, hour, item
-  const lineItemUnitType = unitLineItem?.code
+  const lineItemUnitType = unitLineItem?.code;
 
   const hasCommissionLineItem = lineItems.find(item => {
     const hasCustomerCommission =
-      isCustomer && item.code === LINE_ITEM_CUSTOMER_COMMISSION
+      isCustomer && item.code === LINE_ITEM_CUSTOMER_COMMISSION;
     const hasProviderCommission =
-      isProvider && item.code === LINE_ITEM_PROVIDER_COMMISSION
-    return (hasCustomerCommission || hasProviderCommission) && !item.reversal
-  })
+      isProvider && item.code === LINE_ITEM_PROVIDER_COMMISSION;
+    return (hasCustomerCommission || hasProviderCommission) && !item.reversal;
+  });
   /**
    * OrderBreakdown contains different line items:
    *
@@ -88,7 +90,7 @@ const OrderBreakdown = props => {
    *
    */
   return (
-    <View>
+    <View style={styles.container}>
       <LineItemBookingPeriod
         booking={booking}
         code={lineItemUnitType}
@@ -140,12 +142,24 @@ const OrderBreakdown = props => {
       <LineItemTotalPrice transaction={transaction} isProvider={isProvider} />
 
       {hasCommissionLineItem ? (
-        <Text>{t('OrderBreakdown.commissionFeeNote')}</Text>
+        <Text style={styles.text}>{t('OrderBreakdown.commissionFeeNote')}</Text>
       ) : null}
     </View>
-  )
-}
+  );
+};
 
-export default OrderBreakdown
+export default OrderBreakdown;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    marginTop: widthScale(10),
+    gap: widthScale(8),
+    paddingBottom: widthScale(30),
+  },
+  text: {
+    marginTop: widthScale(5),
+    fontSize: fontScale(13),
+    fontWeight: fontWeight.medium,
+    color: colors.darkGrey,
+  },
+});
