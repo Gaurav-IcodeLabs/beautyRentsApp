@@ -1,10 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { denormalisedEntities, updatedEntities } from '../util/data'
-import { RootState } from '../sharetribeSetup'
+import { createSlice } from '@reduxjs/toolkit';
+import { denormalisedEntities, updatedEntities } from '../util/data';
+import { RootState } from '../sharetribeSetup';
 
 const merge = (state, payload: any) => {
-  const { sdkResponse, sanitizeConfig } = payload
-  const apiResponse = sdkResponse.data
+  const { sdkResponse, sanitizeConfig } = payload;
+  const apiResponse = sdkResponse.data;
   return {
     ...state,
     entities: updatedEntities(
@@ -12,24 +12,24 @@ const merge = (state, payload: any) => {
       apiResponse,
       sanitizeConfig,
     ),
-  }
-}
+  };
+};
 
 const initialState = {
   // Database of all the fetched entities.
   entities: {},
-}
+};
 
 const marketplaceDataSlice = createSlice({
   name: 'marketplaceData',
   initialState,
   reducers: {
     addMarketplaceEntities: (state, action) => {
-      const newState = merge(state, action?.payload)
-      state.entities = newState.entities
+      const newState = merge(state, action?.payload);
+      state.entities = newState.entities;
     },
   },
-})
+});
 
 /**
  * Get the denormalised listing entities with the given IDs
@@ -41,19 +41,19 @@ export const getListingsById = (entities, listingIds) => {
   const resources = listingIds.map(id => ({
     id,
     type: 'listing',
-  }))
-  const throwIfNotFound = false
-  return denormalisedEntities(entities, resources, throwIfNotFound)
-}
+  }));
+  const throwIfNotFound = false;
+  return denormalisedEntities(entities, resources, throwIfNotFound);
+};
 
 export const getOwnListingsById = (entities, listingIds) => {
   const resources = listingIds.map(id => ({
     id,
     type: 'ownListing',
-  }))
-  const throwIfNotFound = false
-  return denormalisedEntities(entities, resources, throwIfNotFound)
-}
+  }));
+  const throwIfNotFound = false;
+  return denormalisedEntities(entities, resources, throwIfNotFound);
+};
 
 /**
  * Get the denormalised entities from the given entity references.
@@ -67,13 +67,13 @@ export const getOwnListingsById = (entities, listingIds) => {
  * @return {Array<Object>} denormalised entities
  */
 export const getMarketplaceEntities = (entities, entityRefs: string[]) => {
-  const throwIfNotFound = false
-  return denormalisedEntities(entities, entityRefs, throwIfNotFound)
-}
+  const throwIfNotFound = false;
+  return denormalisedEntities(entities, entityRefs, throwIfNotFound);
+};
 
 export const entitiesSelector = (state: RootState) =>
-  state.marketplaceData.entities
+  state.marketplaceData.entities;
 
-export const { addMarketplaceEntities } = marketplaceDataSlice.actions
+export const { addMarketplaceEntities } = marketplaceDataSlice.actions;
 
-export default marketplaceDataSlice.reducer
+export default marketplaceDataSlice.reducer;

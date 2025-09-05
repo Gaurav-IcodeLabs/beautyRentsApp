@@ -1,32 +1,30 @@
-import { useNavigation } from '@react-navigation/native'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
-import { Listing } from '../../../appTypes'
-import { ListingCardSmall } from '../../../components'
-import { useTypedSelector } from '../../../sharetribeSetup'
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { Listing } from '../../../appTypes';
+import { ListingCardSmall } from '../../../components';
+import { useTypedSelector } from '../../../sharetribeSetup';
 import {
   entitiesSelector,
   getListingsById,
-} from '../../../slices/marketplaceData.slice'
-import { fontWeight } from '../../../theme'
-import { fontScale, widthScale } from '../../../util'
-import { similarListingIdsSelector } from '../Listing.slice'
+} from '../../../slices/marketplaceData.slice';
+import { fontWeight } from '../../../theme';
+import { fontScale, widthScale } from '../../../util';
+import { similarListingIdsSelector } from '../Listing.slice';
 
 interface SimilarItemsProps {
-  listingId: string
+  listingId: string;
 }
 
 const SimilarItems = (props: SimilarItemsProps) => {
-  const { listingId } = props
-  const { t } = useTranslation()
+  const { listingId } = props;
+  const { t } = useTranslation();
   const similarItemIds = useTypedSelector(
     state => similarListingIdsSelector(state, listingId) ?? [],
-  )?.filter?.(id => id.uuid !== listingId)
-  const entities = useTypedSelector(entitiesSelector)
-  const listings = entities && getListingsById(entities, similarItemIds)
-  const navigation = useNavigation()
-  if (!similarItemIds.length) return null
+  )?.filter?.(id => id.uuid !== listingId);
+  const entities = useTypedSelector(entitiesSelector);
+  const listings = entities && getListingsById(entities, similarItemIds);
+  if (!similarItemIds.length) return null;
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>{t('ListingPage.SimilarItems')}</Text>
@@ -40,17 +38,19 @@ const SimilarItems = (props: SimilarItemsProps) => {
         )}
       />
     </View>
-  )
-}
+  );
+};
 
-export default SimilarItems
+export default SimilarItems;
 
 const styles = StyleSheet.create({
-  container: { marginBottom: widthScale(20), marginTop: widthScale(10) },
+  container: {
+    marginVertical: widthScale(20),
+  },
   heading: {
     fontSize: fontScale(16),
     fontWeight: fontWeight.semiBold,
     marginLeft: widthScale(20),
-    marginBottom: widthScale(5),
+    marginBottom: widthScale(10),
   },
-})
+});

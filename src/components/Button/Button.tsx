@@ -92,7 +92,7 @@ interface ButtonProps {
   // style?: ViewStyle;
   style?: StyleProp<ViewStyle>;
   animatedViewStyle?: ViewStyle;
-  textStyle?: TextStyle;
+  textStyle?: StyleProp<TextStyle>;
   disabled?: boolean;
   loading?: boolean;
   loaderColor?: string;

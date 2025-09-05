@@ -10,7 +10,8 @@ import OverLay from '../OverLay/OverLay';
 import { widthScale } from '../../util';
 
 export const SectionColumns = (props: SectionColumnsProps) => {
-  const { title, description, callToAction, appearance, blocks } = props;
+  const { title, description, callToAction, appearance, blocks, sectionId } =
+    props;
   const hasHeaderFields =
     title.content || description.content || callToAction.content;
   const hasBlocks = blocks?.length > 0;
@@ -36,7 +37,11 @@ export const SectionColumns = (props: SectionColumnsProps) => {
 
         {hasBlocks ? (
           <View>
-            <BlockBuilder textColor={appearance?.textColor} blocks={blocks} />
+            <BlockBuilder
+              textColor={appearance?.textColor}
+              blocks={blocks}
+              sectionId={sectionId}
+            />
           </View>
         ) : null}
       </View>

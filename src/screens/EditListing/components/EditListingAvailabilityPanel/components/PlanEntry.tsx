@@ -1,22 +1,22 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import { colors } from '../../../../../theme'
-import { DATE_TYPE_DATE, DATE_TYPE_TIME, fontScale } from '../../../../../util'
-import TimeRange from './TimeRange'
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { colors } from '../../../../../theme';
+import { DATE_TYPE_DATE, DATE_TYPE_TIME, fontScale } from '../../../../../util';
+import TimeRange from './TimeRange';
 import {
   getEndTimeAsDate,
   parseLocalizedTime,
-} from '../EditListingAvailabilityPanel.helper'
+} from '../EditListingAvailabilityPanel.helper';
 
 const PlanEntry = props => {
-  const { t } = useTranslation()
-  const { date, entry, timeZone, isDaily, useFullDays } = props
+  const { t } = useTranslation();
+  const { date, entry, timeZone, isDaily, useFullDays } = props;
 
-  const isAvailable = entry.seats > 0
+  const isAvailable = entry.seats > 0;
   const availabilityInfo = isAvailable
     ? t('EditListingAvailabilityPanel.WeeklyCalendar.available')
-    : t('EditListingAvailabilityPanel.WeeklyCalendar.notAvailable')
+    : t('EditListingAvailabilityPanel.WeeklyCalendar.notAvailable');
 
   return (
     <View>
@@ -31,10 +31,10 @@ const PlanEntry = props => {
         />
       )}
     </View>
-  )
-}
+  );
+};
 
-export default PlanEntry
+export default PlanEntry;
 
 const styles = StyleSheet.create({
   availabilityText: {
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
     lineHeight: fontScale(21),
     color: colors.darkGrey,
   },
-})
+});

@@ -1,14 +1,14 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { colors, fontWeight } from '../../../theme'
-import { fontScale, widthScale } from '../../../util'
-import PropertyGroup from './PropertyGroup'
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { colors, fontWeight } from '../../../theme';
+import { fontScale, widthScale } from '../../../util';
+import PropertyGroup from './PropertyGroup';
 
 interface SectionMultiEnumMaybeProps {
-  heading?: string
-  options?: string[]
-  selectedOptions: string[]
-  showUnselectedOptions?: boolean
+  heading?: string;
+  options?: string[];
+  selectedOptions: string[];
+  showUnselectedOptions?: boolean;
 }
 
 export default function SectionMultiEnumMaybe(
@@ -19,10 +19,10 @@ export default function SectionMultiEnumMaybe(
     options,
     selectedOptions,
     showUnselectedOptions = true,
-  } = props
-  const hasContent = showUnselectedOptions || selectedOptions?.length > 0
+  } = props;
+  const hasContent = showUnselectedOptions || selectedOptions?.length > 0;
   if (!heading || !options || !hasContent) {
-    return null
+    return null;
   }
   return (
     <View style={styles.container}>
@@ -34,19 +34,19 @@ export default function SectionMultiEnumMaybe(
         showUnselectedOptions={showUnselectedOptions}
       />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: widthScale(20),
-    paddingTop: widthScale(10),
+    paddingVertical: widthScale(10),
     borderBottomWidth: 1,
-    borderColor: colors.frostedGrey,
+    borderColor: colors.lightGrey,
   },
   heading: {
-    fontWeight: fontWeight.semiBold,
+    fontWeight: fontWeight.medium,
     fontSize: fontScale(16),
-    marginBottom: widthScale(10),
+    marginBottom: widthScale(12),
   },
-})
+});

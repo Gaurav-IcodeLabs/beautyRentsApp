@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-unused-styles */
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { HeadingProps } from '../../appTypes'
-import { colors, fontWeight } from '../../theme'
-import { fontScale, widthScale } from '../../util'
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { HeadingProps } from '../../appTypes';
+import { colors, fontWeight } from '../../theme';
+import { fontScale, widthScale } from '../../util';
 export const Heading = (props: HeadingProps) => {
   const {
     fieldType,
@@ -11,18 +11,20 @@ export const Heading = (props: HeadingProps) => {
     color = colors.black,
     containerStyle = {},
     textStyle = {},
-  } = props
+  } = props;
 
   if (!content) {
-    return null
+    return null;
   }
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <Text style={[styles[fieldType] , styles.txt, { color }, textStyle]}>{content}</Text>
+      <Text style={[styles[fieldType], styles.txt, { color }, textStyle]}>
+        {content}
+      </Text>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -55,4 +57,4 @@ const styles = StyleSheet.create({
     fontSize: fontScale(11),
     fontWeight: fontWeight.bold,
   },
-})
+});

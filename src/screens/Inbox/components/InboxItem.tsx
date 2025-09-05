@@ -1,45 +1,44 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
 import {
   LISTING_UNIT_TYPES,
   STOCK_MULTIPLE_ITEMS,
   fontScale,
   getItemLastUpdatedTime,
   heightScale,
-  screenWidth,
   widthScale,
-} from '../../../util'
-import { TX_TRANSITION_ACTOR_CUSTOMER } from '../../../transactions'
-import { colors } from '../../../theme'
-import { Avatar, UserDisplayName } from '../../../components'
-import { useTranslation } from 'react-i18next'
-import { lightenColor } from '../../../util/data'
-import BookingTimeInfoMaybe from './BookingTimeInfoMaybe'
-import { useNavigation } from '@react-navigation/native'
+} from '../../../util';
+import { TX_TRANSITION_ACTOR_CUSTOMER } from '../../../transactions';
+import { colors, fontWeight } from '../../../theme';
+import { Avatar, UserDisplayName } from '../../../components';
+import { useTranslation } from 'react-i18next';
+import { lightenColor } from '../../../util/data';
+import BookingTimeInfoMaybe from './BookingTimeInfoMaybe';
+import { useNavigation } from '@react-navigation/native';
 
 // Check if the transaction line-items use booking-related units
 const getUnitLineItem = lineItems => {
   const unitLineItem = lineItems?.find(
     item => LISTING_UNIT_TYPES.includes(item.code) && !item.reversal,
-  )
-  return unitLineItem
-}
+  );
+  return unitLineItem;
+};
 
 const InboxItem = props => {
-  const navigation = useNavigation()
-  const { t } = useTranslation()
+  const navigation = useNavigation();
+  const { t } = useTranslation();
   const {
     transactionRole,
     tx,
     stateData,
     stockType = STOCK_MULTIPLE_ITEMS,
     isBooking,
-  } = props
+  } = props;
 
-  const { customer, provider, listing, attributes } = tx
-  const { lastTransitionedAt } = attributes ?? {}
-  const {title, description} = listing?.attributes || {}
-  const lastUpdatedAt = getItemLastUpdatedTime(lastTransitionedAt)
+  const { customer, provider, listing, attributes } = tx;
+  const { lastTransitionedAt } = attributes ?? {};
+  const { title } = listing?.attributes || {};
+  const lastUpdatedAt = getItemLastUpdatedTime(lastTransitionedAt);
 
   const {
     processName,
@@ -47,162 +46,181 @@ const InboxItem = props => {
     actionNeeded,
     isSaleNotification,
     isFinal,
-  } = stateData
-  const isCustomer = transactionRole === TX_TRANSITION_ACTOR_CUSTOMER
+  } = stateData;
+  const isCustomer = transactionRole === TX_TRANSITION_ACTOR_CUSTOMER;
 
-  const lineItems = tx.attributes?.lineItems
-  const hasPricingData = lineItems.length > 0
-  const unitLineItem = getUnitLineItem(lineItems)
+  const lineItems = tx.attributes?.lineItems;
+  const hasPricingData = lineItems.length > 0;
+  const unitLineItem = getUnitLineItem(lineItems);
   const quantity =
-    hasPricingData && !isBooking ? unitLineItem.quantity.value : null
+    hasPricingData && !isBooking ? unitLineItem.quantity.value : null;
   const showStock =
     stockType === STOCK_MULTIPLE_ITEMS ||
-    (quantity && unitLineItem.quantity > 1)
+    (quantity && unitLineItem.quantity > 1);
 
-
-  const otherUser = isCustomer ? provider : customer
-  const otherUserDisplayName = <UserDisplayName user={otherUser} />
-  const isOtherUserBanned = otherUser.attributes.banned
+  const otherUser = isCustomer ? provider : customer;
+  const otherUserDisplayName = <UserDisplayName user={otherUser} />;
+  // const isOtherUserBanned = otherUser.attributes.banned;
 
   const rowNotificationDot = !isSaleNotification ? (
     <View style={styles.notificationDot} />
-  ) : null
+  ) : null;
 
   const stateClasses = isFinal
     ? styles.isFinalStyle
     : actionNeeded
-      ? styles.actionNeededStyle
-      : styles.actionNotNeededStyle
+    ? styles.actionNeededStyle
+    : styles.actionNotNeededStyle;
+  const stateClassesText = isFinal
+    ? styles.isFinalStyleText
+    : actionNeeded
+    ? styles.actionNeededStyleText
+    : styles.actionNotNeededStyleText;
 
   const handleItemPress = () => {
     navigation.navigate('Transaction', {
       transactionRole: transactionRole,
       transactionId: tx.id,
-    })
-  }
-  return (
-    <TouchableOpacity style={styles.container} onPress={handleItemPress}>
-      <Avatar user={otherUser} size={widthScale(60)} />
+    });
+  };
 
-      {/* will use below comment code as per requirement */}
+  return (
+    <TouchableOpacity
+      activeOpacity={0.5}
+      style={styles.container}
+      onPress={handleItemPress}
+    >
+      <Avatar user={otherUser} size={widthScale(50)} />
       {rowNotificationDot}
-      {/* {otherUserDisplayName} */}
       <View style={styles.contentContainer}>
         <View style={styles.titleAndTime}>
           <View style={styles.titleSection}>
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
-              style={styles.titleStyle}>
-              {title}
+              style={styles.titleStyle}
+            >
+              {otherUserDisplayName}
             </Text>
           </View>
           <Text style={styles.timeStyle}>{lastUpdatedAt}</Text>
         </View>
-        {isBooking ? (
+        {/* {isBooking ? (
           <BookingTimeInfoMaybe transaction={tx} />
         ) : hasPricingData && showStock ? (
-          <Text style={styles.quantity}>{t('InboxPage.quantity', { quantity })}</Text>
-        ) : null}
+          <Text style={styles.quantity}>
+            {t('InboxPage.quantity', { quantity })}
+          </Text>
+        ) : null} */}
         <View style={styles.descriptionAndStatus}>
-          <Text
-            style={styles.description}
-            numberOfLines={2}
-            ellipsizeMode="tail">
-            {description}
-          </Text>
+          <View style={styles.titleSection}>
+            <Text
+              style={styles.description}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {title}
+            </Text>
+          </View>
 
-          <Text style={[styles.status, stateClasses]}>
-            {t(`InboxPage.${processName}.${processState}.status`, {
-              transactionRole,
-            })}
-          </Text>
+          <View style={[styles.status, stateClasses]}>
+            <Text style={[styles.statusText, stateClassesText]}>
+              {t(`InboxPage.${processName}.${processState}.status`, {
+                transactionRole,
+              })}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default InboxItem
+export default InboxItem;
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    paddingHorizontal: widthScale(20),
-    paddingVertical: widthScale(5),
+    paddingVertical: widthScale(8),
     marginTop: heightScale(10),
   },
   notificationDot: {
     position: 'absolute',
-    left: widthScale(68),
-    top:heightScale(10),
-    width: widthScale(12),
-    height: widthScale(12),
+    left: 0,
+    top: 10,
+    width: widthScale(10),
+    height: widthScale(10),
     borderRadius: widthScale(20),
     backgroundColor: colors.success,
   },
   contentContainer: {
-    width:'85%',
+    flex: 1,
+    paddingLeft: widthScale(8),
   },
   titleAndTime: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
     marginTop: widthScale(5),
   },
   titleSection: {
     flexShrink: 1,
-    marginRight: widthScale(20),
+    marginRight: widthScale(10),
   },
   descriptionAndStatus: {
     marginTop: widthScale(5),
-    width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   description: {
-    width: '65%',
-    paddingHorizontal: widthScale(10),
-  },
-  quantity: {
-    marginTop: widthScale(5),
-    marginHorizontal: widthScale(10),
-  },
-  status: {
-    width: '35%',
-    backgroundColor: colors.lightGrey,
-    borderColor: colors.lightGrey,
-    textAlign: 'center',
-    borderWidth: widthScale(1),
-    fontWeight: 'bold',
-    paddingVertical:heightScale(2),
-    overflow:'hidden',
-    borderRadius:widthScale(8),
     fontSize: fontScale(12),
+    color: colors.darkGrey,
+    fontWeight: fontWeight.medium,
+  },
+  // quantity: {
+  // marginTop: widthScale(5),
+  // marginHorizontal: widthScale(10),
+  // },
+  status: {
+    backgroundColor: colors.lightGrey,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: widthScale(5),
+    paddingHorizontal: widthScale(10),
+    borderRadius: widthScale(20),
+  },
+  statusText: {
+    fontSize: widthScale(12),
+    fontWeight: fontWeight.medium,
   },
   titleStyle: {
-    fontWeight: 'bold',
-    paddingHorizontal: widthScale(10),
+    fontWeight: fontWeight.semiBold,
     fontSize: fontScale(16),
+    color: colors.black,
   },
   timeStyle: {
     color: colors.grey,
     fontSize: fontScale(12),
+    fontWeight: fontWeight.normal,
   },
   isFinalStyle: {
     backgroundColor: lightenColor(colors.success, 10),
-    borderColor: lightenColor(colors.success, 10),
-    color: colors.success,
+    borderColor: colors.success,
   },
   actionNeededStyle: {
     backgroundColor: lightenColor(colors.orange, 10),
-    borderColor: lightenColor(colors.orange, 10),
-    color: colors.orange,
+    borderColor: colors.orange,
   },
   actionNotNeededStyle: {
-    backgroundColor: lightenColor(colors.red, 10),
-    borderColor: lightenColor(colors.red, 10),
-    color: colors.error,
-    
+    backgroundColor: lightenColor(colors.error, 10),
+    borderColor: colors.error,
   },
-})
+  isFinalStyleText: {
+    color: colors.success,
+  },
+  actionNeededStyleText: {
+    color: colors.orange,
+  },
+  actionNotNeededStyleText: {
+    color: colors.error,
+  },
+});

@@ -1,31 +1,33 @@
-import React from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import { useColors } from '../../context'
-import { widthScale } from '../../util'
-import { RadioButtonProps } from '../../appTypes'
-import { AppColors } from '../../theme'
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useColors } from '../../context';
+import { widthScale } from '../../util';
+import { RadioButtonProps } from '../../appTypes';
+import { AppColors } from '../../theme';
 
 const RadioButton = (props: RadioButtonProps) => {
-  const { isActive, onPress, size } = props
-  const colors: AppColors = useColors()
+  const { isActive, onPress, size, disabled } = props;
+  const colors: AppColors = useColors();
   return (
     <TouchableOpacity
+      disabled={disabled}
       style={[
         Styles.container,
         { width: size, height: size, borderColor: colors.marketplaceColor },
       ]}
-      onPress={onPress}>
+      onPress={onPress}
+    >
       {isActive && (
         <View
           style={[
             Styles.innerContainer,
-            { backgroundColor: colors.marketplaceColorDark },
+            { backgroundColor: colors.marketplaceColor },
           ]}
         />
       )}
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const Styles = StyleSheet.create({
   container: {
@@ -37,5 +39,5 @@ const Styles = StyleSheet.create({
     flex: 1,
     borderRadius: widthScale(100),
   },
-})
-export default RadioButton
+});
+export default RadioButton;

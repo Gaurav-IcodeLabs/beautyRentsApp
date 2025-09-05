@@ -1,13 +1,11 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { colors } from '../../../theme';
-import { heightScale, widthScale } from '../../../util';
-// import { useColors } from '../../../context'
+import { colors, fontWeight } from '../../../theme';
+import { fontScale, heightScale, widthScale } from '../../../util';
 
 const CustomTabBar = ({ activeTab, onTabPress }) => {
   const { t } = useTranslation();
-  // const color = useColors()
   const tabs = [
     { text: t('InboxPage.ordersTabTitle'), name: 'orders' },
     { text: t('InboxPage.salesTabTitle'), name: 'sales' },
@@ -46,33 +44,32 @@ const CustomTabBar = ({ activeTab, onTabPress }) => {
 export default CustomTabBar;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: widthScale(18),
-    paddingHorizontal: widthScale(8),
+    // paddingHorizontal: widthScale(20),
   },
   tabButton: {
-    // padding: widthScale(10),
     borderRadius: widthScale(12),
-    width: '40%',
+    width: '48%',
     height: heightScale(50),
     justifyContent: 'center',
     alignItems: 'center',
   },
   tabText: {
-    fontSize: 16,
+    fontSize: fontScale(16),
+    fontWeight: fontWeight.medium,
   },
   activeText: {
     color: colors.white,
   },
   inActiveText: {
-    color: colors.grey,
+    color: colors.darkGrey,
   },
   inActiveTab: {
-    backgroundColor: colors.lightGrey,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.lightGrey,
   },
 });

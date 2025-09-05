@@ -1,34 +1,35 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
 import {
+  fontScale,
   LINE_ITEM_PROVIDER_COMMISSION,
   types as sdkTypes,
   widthScale,
-} from '../../../util'
-import { formatMoney } from '../../../util/currency'
-import { useTranslation } from 'react-i18next'
-import { colors } from '../../../theme'
+} from '../../../util';
+import { formatMoney } from '../../../util/currency';
+import { useTranslation } from 'react-i18next';
+import { colors, fontWeight } from '../../../theme';
 
-const { Money } = sdkTypes
+const { Money } = sdkTypes;
 // Validate the assumption that the commission exists and the amount
 // is zero or negative.
 const isValidCommission = commissionLineItem => {
   return (
     commissionLineItem.lineTotal instanceof Money &&
     commissionLineItem.lineTotal.amount <= 0
-  )
-}
+  );
+};
 
 const LineItemProviderCommissionMaybe = props => {
-  const { t } = useTranslation()
-  const { lineItems, isProvider, marketplaceName } = props
+  const { t } = useTranslation();
+  const { lineItems, isProvider, marketplaceName } = props;
 
   const providerCommissionLineItem = lineItems.find(
     item => item.code === LINE_ITEM_PROVIDER_COMMISSION && !item.reversal,
-  )
+  );
 
   // If commission is passed it will be shown as a fee already reduces from the total price
-  let commissionItem = null
+  let commissionItem = null;
 
   // Sharetribe Web Template is using the default-booking and default-purchase transaction processes.
   // They containt the provider commissions, so by default, the providerCommissionLineItem should exist.
@@ -37,34 +38,37 @@ const LineItemProviderCommissionMaybe = props => {
   if (isProvider && providerCommissionLineItem) {
     if (!isValidCommission(providerCommissionLineItem)) {
       // eslint-disable-next-line no-console
-      console.error('invalid commission line item:', providerCommissionLineItem)
+      console.error(
+        'invalid commission line item:',
+        providerCommissionLineItem,
+      );
       throw new Error(
         'Commission should be present and the value should be zero or negative',
-      )
+      );
     }
 
-    const commission = providerCommissionLineItem.lineTotal
+    const commission = providerCommissionLineItem.lineTotal;
 
     commissionItem = (
       <>
         <View style={styles.container}>
-          <Text>
+          <Text style={styles.label}>
             {t('OrderBreakdown.commission', {
               marketplaceName,
               role: 'provider',
             })}
           </Text>
-          <Text>{formatMoney(commission)}</Text>
+          <Text style={styles.value}>{formatMoney(commission, 2)}</Text>
         </View>
         <View style={styles.itemSeperatorStyle} />
       </>
-    )
+    );
   }
 
-  return commissionItem
-}
+  return commissionItem;
+};
 
-export default LineItemProviderCommissionMaybe
+export default LineItemProviderCommissionMaybe;
 
 const styles = StyleSheet.create({
   container: {
@@ -76,4 +80,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.grey,
     marginVertical: widthScale(6),
   },
-})
+  label: {
+    fontSize: fontScale(14),
+    fontWeight: fontWeight.normal,
+    color: colors.black,
+  },
+  value: {
+    fontSize: fontScale(14),
+    fontWeight: fontWeight.normal,
+    color: colors.black,
+  },
+});

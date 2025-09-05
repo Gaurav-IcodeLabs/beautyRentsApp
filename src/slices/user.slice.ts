@@ -1,12 +1,12 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { CurrentUser, Thunk, UserState } from '../appTypes'
-import { RootState } from '../sharetribeSetup'
-import { util as sdkUtil } from '../util'
-import { denormalisedResponseEntities } from '../util/data'
-import { storableError } from '../util/errors'
-import { authInfo } from './auth.slice'
-import { boolean } from 'zod'
-import { fetchStripeAccount } from './StripeConnectAccount.slice'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { CurrentUser, Thunk, UserState } from '../appTypes';
+import { RootState } from '../sharetribeSetup';
+import { util as sdkUtil } from '../util';
+import { denormalisedResponseEntities } from '../util/data';
+import { storableError } from '../util/errors';
+import { authInfo } from './auth.slice';
+import { boolean } from 'zod';
+import { fetchStripeAccount } from './StripeConnectAccount.slice';
 
 const currentUserParameters = {
   include: ['profileImage', 'stripeAccount'],
@@ -26,7 +26,7 @@ const currentUserParameters = {
     h: 80,
     fit: 'crop',
   }),
-}
+};
 
 const mergeCurrentUser = (
   oldCurrentUser: CurrentUser,
@@ -37,8 +37,8 @@ const mergeCurrentUser = (
     type: oType,
     attributes: oAttr,
     ...oldRelationships
-  } = oldCurrentUser || {}
-  const { id, type, attributes, ...relationships } = newCurrentUser || {}
+  } = oldCurrentUser || {};
+  const { id, type, attributes, ...relationships } = newCurrentUser || {};
 
   // Passing null will remove currentUser entity.
   // Only relationships are merged.
@@ -46,9 +46,9 @@ const mergeCurrentUser = (
   return newCurrentUser === null
     ? null
     : oldCurrentUser === null
-      ? newCurrentUser
-      : { id, type, attributes, ...oldRelationships, ...relationships }
-}
+    ? newCurrentUser
+    : { id, type, attributes, ...oldRelationships, ...relationships };
+};
 
 const initialState: UserState = {
   currentUser: null,
@@ -56,68 +56,68 @@ const initialState: UserState = {
   updateCurrentUserError: null,
   updateCurrentUserInProgress: false,
   currentUserProgress: false,
-}
+};
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
     clearCurrentUser: () => {
-      return initialState
+      return initialState;
     },
     setCurrentUser: (state, { payload }) => {
-      state.currentUser = mergeCurrentUser(state.currentUser, payload)
+      state.currentUser = mergeCurrentUser(state.currentUser, payload);
     },
   },
   extraReducers: builder => {
     builder.addCase(fetchCurrentUser.pending, (state, action) => {
-      state.currentUserShowError = null
-      state.currentUserProgress = true
-    })
+      state.currentUserShowError = null;
+      state.currentUserProgress = true;
+    });
     builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
       state.currentUser = mergeCurrentUser(
         state.currentUser as CurrentUser,
         action.payload,
-      )
-      state.currentUserProgress = false
-      state.currentUserShowError = null
-    })
+      );
+      state.currentUserProgress = false;
+      state.currentUserShowError = null;
+    });
 
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {
-      state.currentUserProgress = false
-      state.currentUserShowError = storableError(action.error)
-    })
+      state.currentUserProgress = false;
+      state.currentUserShowError = storableError(action.error);
+    });
 
     builder.addCase(updateCurrentUser.pending, (state, _) => {
-      state.updateCurrentUserError = null
-      state.updateCurrentUserInProgress = true
-    })
+      state.updateCurrentUserError = null;
+      state.updateCurrentUserInProgress = true;
+    });
 
     builder.addCase(updateCurrentUser.fulfilled, (state, action) => {
       state.currentUser = mergeCurrentUser(
         state.currentUser as CurrentUser,
         action.payload,
-      )
-      state.updateCurrentUserError = null
-      state.updateCurrentUserInProgress = false
-    })
+      );
+      state.updateCurrentUserError = null;
+      state.updateCurrentUserInProgress = false;
+    });
   },
-})
+});
 
 export const fetchCurrentUser = createAsyncThunk<CurrentUser, {}, Thunk>(
   'user/fetchCurrentUserStatus',
   async (params = {}, { dispatch, extra: sdk }) => {
-    const parameters = { ...currentUserParameters, ...params }
+    const parameters = { ...currentUserParameters, ...params };
 
-    const response = await sdk.currentUser.show(parameters)
-    const entities = denormalisedResponseEntities(response)
+    const response = await sdk.currentUser.show(parameters);
+    const entities = denormalisedResponseEntities(response);
 
     if (entities.length !== 1) {
       throw new Error(
         'Expected a resource in the sdk.currentUser.show response',
-      )
+      );
     }
-    const currentUser: CurrentUser = entities[0]
+    const currentUser: CurrentUser = entities[0];
 
     // Save stripeAccount to store.stripe.stripeAccount if it exists
     //TODO-H
@@ -131,74 +131,76 @@ export const fetchCurrentUser = createAsyncThunk<CurrentUser, {}, Thunk>(
     // if (!currentUser.attributes.emailVerified) {
     //   dispatch(fetchCurrentUserHasOrders())
     // }
-    dispatch(fetchStripeAccount())
+    dispatch(fetchStripeAccount());
     // Make sure auth info is up to date
-    dispatch(authInfo({}))
-    return currentUser
+    dispatch(authInfo({}));
+    return currentUser;
   },
-)
+);
 
 export const updateCurrentUser = createAsyncThunk<{}, Thunk>(
   'user/updateCurrentUser',
   async (params, { dispatch, getState, extra: sdk }) => {
     const res = await sdk.currentUser.updateProfile(params, {
       expand: true,
-    })
-    const entities = denormalisedResponseEntities(res)
+    });
+    const entities = denormalisedResponseEntities(res);
     if (entities.length !== 1) {
       throw new Error(
         'Expected a resource in the sdk.currentUser.show response',
-      )
+      );
     }
-    const currentUser = entities[0]
-    return currentUser
+    const currentUser = entities[0];
+    return currentUser;
   },
-)
+);
 
-export const { clearCurrentUser, setCurrentUser } = userSlice.actions
+export const { clearCurrentUser, setCurrentUser } = userSlice.actions;
 
-export default userSlice.reducer
+export default userSlice.reducer;
 
 export const currentUserIdSelector = (state: RootState) =>
-  state.user?.currentUser?.id.uuid
+  state.user?.currentUser?.id.uuid;
 
-export const currentUserSelector = (state: RootState) => state.user.currentUser
+export const currentUserSelector = (state: RootState) => state.user.currentUser;
 export const currentUserProfileSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes.profile
+  state.user?.currentUser?.attributes.profile;
 
 export const currentUserTypeSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes?.profile?.publicData?.userType
+  state.user?.currentUser?.attributes?.profile?.publicData?.userType;
+export const currentUserWishListSelector = (state: RootState) =>
+  state.user?.currentUser?.attributes?.profile?.publicData?.wishList;
 export const currentUserProgressSelector = (state: RootState) =>
-  state.user?.currentUserProgress
+  state.user?.currentUserProgress;
 export const currentUserBioSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes.profile?.bio
+  state.user?.currentUser?.attributes.profile?.bio;
 
 export const currentUserEmailSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes.email
+  state.user?.currentUser?.attributes.email;
 
 export const currentUserDisplayNameSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes.profile?.displayName
+  state.user?.currentUser?.attributes.profile?.displayName;
 
 export const currentUserProfileImageSelector = (state: RootState) =>
-  state.user?.currentUser?.profileImage
+  state.user?.currentUser?.profileImage;
 
 export const currentUserStripeAccountSelector = (state: RootState) =>
-  state.user?.currentUser?.stripeAccount
+  state.user?.currentUser?.stripeAccount;
 
 export const stripeCustomerSelector = (state: RootState) =>
-  state.user.currentUser?.stripeCustomer
+  state.user.currentUser?.stripeCustomer;
 
 export const currentUserIsEmailVerifiedSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes?.emailVerified
+  state.user?.currentUser?.attributes?.emailVerified;
 
 export const currentUserPublicDataSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes.profile?.publicData
+  state.user?.currentUser?.attributes.profile?.publicData;
 
 export const currentUserMetadataSelector = (state: RootState) =>
-  state.user?.currentUser?.attributes?.profile?.metadata
+  state.user?.currentUser?.attributes?.profile?.metadata;
 
 export const updateCurrentUserErrorSelector = (state: RootState) =>
-  state.user?.updateCurrentUserError
+  state.user?.updateCurrentUserError;
 
 export const updateCurrentUserInProgressSelector = (state: RootState) =>
-  state.user?.updateCurrentUserInProgress
+  state.user?.updateCurrentUserInProgress;

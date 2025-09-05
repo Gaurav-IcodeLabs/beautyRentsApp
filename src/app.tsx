@@ -32,8 +32,6 @@ const App = () => {
         const res = await store.dispatch(fetchAppAssets({})).unwrap();
 
         if (res.appConfig) {
-          console.log('Assets fetched');
-
           i18n.addResourceBundle(
             'en',
             'translation',

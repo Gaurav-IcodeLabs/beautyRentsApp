@@ -1,35 +1,38 @@
-import React from 'react'
-import { useForm } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import { UserProfile } from '../../appTypes'
-import { CustomExtendedDataField, RenderTextInputField } from '../../components'
-import { useConfiguration } from '../../context'
-import { useTypedSelector } from '../../sharetribeSetup'
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { UserProfile } from '../../appTypes';
+import {
+  CustomExtendedDataField,
+  RenderTextInputField,
+} from '../../components';
+import { useConfiguration } from '../../context';
+import { useTypedSelector } from '../../sharetribeSetup';
 import {
   currentUserProfileImageSelector,
   currentUserProfileSelector,
   currentUserTypeSelector,
-} from '../../slices/user.slice'
-import { colors, fontWeight } from '../../theme'
+} from '../../slices/user.slice';
+import { colors, fontWeight } from '../../theme';
 import {
   fontScale,
   getPropsForCustomUserFieldInputs,
   widthScale,
-} from '../../util'
-import ProfileSettingSubmitButton from './components/ProfileSettingSubmitButton'
-import { getSchema, initialValuesForUserFields } from './helpers'
-import ProfileImage from './components/ProfileImage'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
+} from '../../util';
+import ProfileSettingSubmitButton from './components/ProfileSettingSubmitButton';
+import { getSchema, initialValuesForUserFields } from './helpers';
+import ProfileImage from './components/ProfileImage';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const ProfileSettingForm = () => {
-  const config = useConfiguration()
-  const { t } = useTranslation()
-  const { userFields, userTypes = [] } = config.user
+  const config = useConfiguration();
+  const { t } = useTranslation();
+  const { userFields, userTypes = [] } = config.user;
   const profile: UserProfile =
-    useTypedSelector(currentUserProfileSelector) || {}
-  const profileImage = useTypedSelector(currentUserProfileImageSelector)
+    useTypedSelector(currentUserProfileSelector) || {};
+  const profileImage = useTypedSelector(currentUserProfileImageSelector);
   const {
     abbreviatedName,
     bio,
@@ -39,24 +42,24 @@ const ProfileSettingForm = () => {
     privateData,
     protectedData,
     publicData,
-  } = profile || {}
-  const userType = useTypedSelector(currentUserTypeSelector)
-  const userTypeConfig = userTypes.find(config => config.userType === userType)
+  } = profile || {};
+  const userType = useTypedSelector(currentUserTypeSelector);
+  const userTypeConfig = userTypes.find(config => config.userType === userType);
   const isDisplayNameIncluded =
-    userTypeConfig?.defaultUserFields?.displayName !== false
+    userTypeConfig?.defaultUserFields?.displayName !== false;
   const displayNameMaybe =
-    isDisplayNameIncluded && displayName ? { displayName } : {}
-  const noUserTypes = !userType && !(userTypes?.length > 0)
-  const showDefaultUserFields = userType || noUserTypes
+    isDisplayNameIncluded && displayName ? { displayName } : {};
+  const noUserTypes = !userType && !(userTypes?.length > 0);
+  const showDefaultUserFields = userType || noUserTypes;
   const userFieldProps = getPropsForCustomUserFieldInputs(
     userFields,
     t,
     userType,
-  )
+  );
   const showCustomUserFields =
-    (userType || noUserTypes) && userFieldProps?.length > 0
+    (userType || noUserTypes) && userFieldProps?.length > 0;
   const isDiplayNameShow =
-    userTypeConfig?.defaultUserFields?.displayName === true
+    userTypeConfig?.defaultUserFields?.displayName === true;
 
   let initialValues = {
     image: profileImage,
@@ -73,7 +76,7 @@ const ProfileSettingForm = () => {
       userFields,
     ),
     ...initialValuesForUserFields(privateData, 'private', userType, userFields),
-  }
+  };
 
   const {
     control,
@@ -87,7 +90,7 @@ const ProfileSettingForm = () => {
     resolver: zodResolver(
       getSchema(userTypeConfig, userType, userFieldProps, t),
     ),
-  })
+  });
 
   return (
     <View style={styles.container}>
@@ -100,14 +103,14 @@ const ProfileSettingForm = () => {
               name="firstName"
               control={control}
               placeholderKey="ProfileSettingsForm.firstNamePlaceholder"
-              style={{ flex: 1 }}
+              style={styles.input}
             />
             <RenderTextInputField
               labelKey="ProfileSettingsForm.lastNameLabel"
               name="lastName"
               control={control}
               placeholderKey="ProfileSettingsForm.lastNamePlaceholder"
-              style={{ flex: 1 }}
+              style={styles.input}
             />
           </View>
 
@@ -155,14 +158,17 @@ const ProfileSettingForm = () => {
         getValues={getValues}
       />
     </View>
-  )
-}
+  );
+};
 
-export default ProfileSettingForm
+export default ProfileSettingForm;
 
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: widthScale(16),
+  },
+  input: {
+    flex: 1,
   },
   topNameFields: {
     flexDirection: 'row',
@@ -174,4 +180,4 @@ const styles = StyleSheet.create({
     fontSize: fontScale(14),
     color: colors.grey,
   },
-})
+});

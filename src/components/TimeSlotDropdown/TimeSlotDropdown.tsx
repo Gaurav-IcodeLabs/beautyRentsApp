@@ -1,33 +1,36 @@
-import { StyleSheet, Text, View, ViewStyle } from 'react-native'
-import React, { useState } from 'react'
-import { Dropdown } from 'react-native-element-dropdown'
-import {
-  commonShadow,
-  fontScale,
-  heightScale,
-  screenWidth,
-  widthScale,
-} from '../../util'
-import { colors, fontWeight } from '../../theme'
-import { useColors } from '../../context'
-import { useTranslation } from 'react-i18next'
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import React from 'react';
+import { Dropdown } from 'react-native-element-dropdown';
+import { fontScale, heightScale, widthScale } from '../../util';
+import { colors, fontWeight } from '../../theme';
+import { useTranslation } from 'react-i18next';
+import { lightenColor } from '../../util/data';
 
 interface TimeSlotDropdownProps {
-  data: any[]
-  onValueChange: (value: string) => void
-  isModal: boolean
-  lableKey: string
-  containerStyle?: ViewStyle
-  value: string
+  data: any[];
+  onValueChange: (value: string) => void;
+  isModal: boolean;
+  lableKey: string;
+  containerStyle?: ViewStyle;
+  value: string;
 }
 
-const DropdownItem = ({ item }) => {
+const DropdownItem = ({ item, selected }) => {
   return (
-    <View style={styles.item}>
+    <View
+      style={[
+        styles.item,
+        {
+          backgroundColor: selected
+            ? lightenColor(colors.marketplaceColor, 10)
+            : colors.white,
+        },
+      ]}
+    >
       <Text style={styles.itemText}>{item?.label}</Text>
     </View>
-  )
-}
+  );
+};
 
 export const TimeSlotDropdown = (props: TimeSlotDropdownProps) => {
   const {
@@ -37,23 +40,18 @@ export const TimeSlotDropdown = (props: TimeSlotDropdownProps) => {
     isModal = true,
     containerStyle,
     lableKey,
-  } = props
-  const { t } = useTranslation()
-
-  const [isFocus, setIsFocus] = useState(false)
-  const colors = useColors()
+  } = props;
+  const { t } = useTranslation();
 
   const doHandleValueChange = item => {
-    onValueChange(item)
-  }
+    onValueChange(item);
+  };
+
   return (
     <View style={[styles.container, containerStyle]}>
       {lableKey ? <Text style={styles.label}>{t(lableKey)}</Text> : null}
       <Dropdown
-        style={[
-          styles.dropdown,
-          isFocus && { borderColor: colors.marketplaceColorLight },
-        ]}
+        style={[styles.dropdown]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         containerStyle={styles.containerStyle}
@@ -63,15 +61,17 @@ export const TimeSlotDropdown = (props: TimeSlotDropdownProps) => {
         labelField="label"
         valueField="option"
         placeholder={'Select'}
-        renderItem={item => <DropdownItem item={item} />}
+        renderItem={(item, selected) => (
+          <DropdownItem item={item} selected={selected} />
+        )}
         value={value}
         onChange={item => {
-          doHandleValueChange(item)
+          doHandleValueChange(item);
         }}
       />
     </View>
-  )
-}
+  );
+};
 const styles = StyleSheet.create({
   container: {
     marginBottom: widthScale(16),
@@ -81,16 +81,15 @@ const styles = StyleSheet.create({
     height: heightScale(52),
     borderRadius: widthScale(10),
     paddingHorizontal: widthScale(10),
-    backgroundColor: colors.lightGrey,
-    borderColor: colors.transparent,
-    ...commonShadow,
+    borderColor: colors.lightGrey,
   },
-
   placeholderStyle: {
     fontSize: fontScale(14),
+    color: colors.grey,
   },
   selectedTextStyle: {
     fontSize: fontScale(14),
+    color: colors.black,
   },
   iconStyle: {
     width: widthScale(20),
@@ -106,7 +105,9 @@ const styles = StyleSheet.create({
   containerStyle: {
     borderRadius: widthScale(10),
     marginTop: widthScale(5),
-    overflow: 'hidden',
+    // overflow: 'hidden',
+    // borderWidth: 1,
+    // borderColor: colors.lightGrey,
   },
   itemText: {
     fontSize: fontScale(14),
@@ -116,4 +117,4 @@ const styles = StyleSheet.create({
     padding: widthScale(10),
     borderRadius: widthScale(10),
   },
-})
+});

@@ -5,8 +5,9 @@ import { Heading } from '../Heading/Heading';
 import { Paragraph } from '../Paragraph/Paragraph';
 import SectionContainer from '../SectionContainer/SectionContainer';
 import OverLay from '../OverLay/OverLay';
-import { widthScale } from '../../util';
+import { fontScale, widthScale } from '../../util';
 import { SectionHeroProps } from '../../appTypes';
+import { fontWeight } from '../../theme';
 
 // Section component for a website's hero section
 // The Section Hero doesn't have any Blocks by default, all the configurations are made in the Section Hero settings
@@ -28,7 +29,7 @@ export const SectionHero = (props: SectionHeroProps) => {
       {hasHeaderFields ? (
         <View style={styles.section}>
           <Heading
-            textStyle={styles.textStyle}
+            textStyle={styles.textStyleHeading}
             color={appearance?.textColor}
             {...title}
           />
@@ -48,5 +49,12 @@ const styles = StyleSheet.create({
   section: {
     padding: widthScale(20),
   },
-  textStyle: { textAlign: 'center' },
+  textStyleHeading: {
+    textAlign: 'center',
+  },
+  textStyle: {
+    textAlign: 'center',
+    fontSize: fontScale(18),
+    fontWeight: fontWeight.medium,
+  },
 });

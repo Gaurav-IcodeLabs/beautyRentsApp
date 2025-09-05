@@ -86,7 +86,7 @@ export const AppImage = ({
               width: width || '100%',
               height: aspectRatio ? imageHeight : height || '100%',
             },
-            { backgroundColor: colors.grey },
+            { backgroundColor: colors.lightGrey },
           ]}
         />
       </Animated.View>

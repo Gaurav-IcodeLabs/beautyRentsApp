@@ -33,6 +33,12 @@ export const getTabsData = () => {
       icon: lockIcon,
     },
     {
+      key: 11,
+      screen: Screens.WISHLIST,
+      lable: 'Settings.wishlist',
+      icon: lockIcon,
+    },
+    {
       key: 4,
       screen: Screens.PAYOUTSETUP,
       lable: 'Settings.payoutDetails',
@@ -62,12 +68,12 @@ export const getTabsData = () => {
       lable: 'Settings.about',
       icon: aboutIcon,
     },
-    {
-      key: 9,
-      screen: Screens.DELETEACCOUNT,
-      lable: 'Settings.DeleteYourAccount',
-      icon: deleteIcon,
-    },
+    // {
+    //   key: 9,
+    //   screen: Screens.DELETEACCOUNT,
+    //   lable: 'Settings.DeleteYourAccount',
+    //   icon: deleteIcon,
+    // },
     {
       key: 10,
       screen: null,

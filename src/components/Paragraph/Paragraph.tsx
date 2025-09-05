@@ -1,19 +1,19 @@
-import React from 'react'
-import { StyleSheet, View } from 'react-native'
-import Markdown from 'react-native-markdown-display'
-import { ParagraphProps } from '../../appTypes'
-import { colors } from '../../theme'
-import { fontScale, widthScale } from '../../util'
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import Markdown from 'react-native-markdown-display';
+import { ParagraphProps } from '../../appTypes';
+import { colors } from '../../theme';
+import { widthScale } from '../../util';
 export const Paragraph = (props: ParagraphProps) => {
   const {
     content,
     color = colors.black,
     containerStyle = {},
     textStyle = {},
-  } = props
+  } = props;
 
   if (!content) {
-    return null
+    return null;
   }
 
   return (
@@ -35,15 +35,16 @@ export const Paragraph = (props: ParagraphProps) => {
           link: {
             ...textStyle,
           },
-        }}>
+        }}
+      >
         {content}
       </Markdown>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     marginBottom: widthScale(10),
   },
-})
+});

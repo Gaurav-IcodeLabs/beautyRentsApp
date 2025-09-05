@@ -1,40 +1,54 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { widthScale } from '../../../util'
-import { fontWeight } from '../../../theme'
-import { FlashList } from '@shopify/flash-list'
-import { useTypedSelector } from '../../../sharetribeSetup'
-import { reviewsInProgressSelector, reviewsSelector } from '../Profile.slice'
-import { ReviewsCard } from '../../../components'
+import {
+  ActivityIndicator,
+  RefreshControl,
+  StyleSheet,
+  Text,
+} from 'react-native';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { widthScale } from '../../../util';
+import { fontWeight } from '../../../theme';
+import { FlashList } from '@shopify/flash-list';
+import { useAppDispatch, useTypedSelector } from '../../../sharetribeSetup';
+import {
+  getAllReviews,
+  reviewsInProgressSelector,
+  reviewsSelector,
+} from '../Profile.slice';
+import { ReviewsCard } from '../../../components';
 
 const ProfileReviewTab = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const reviews = useTypedSelector(reviewsSelector);
   const inProgress = useTypedSelector(reviewsInProgressSelector);
 
-  const keyExtractor = item => item.id.uuid;
+  const keyExtractor = (item: any) => item.id.uuid;
 
   const listEmptyComponent = () => {
     return inProgress ? (
-      <ActivityIndicator size={'large'} />
+      <ActivityIndicator style={styles.noResults} size={'large'} />
     ) : (
-      <View>
-        <Text style={styles.noResults}>
-          {t('ManageListingsPage.noResultsForCustomerReview')}
-        </Text>
-      </View>
+      <Text style={styles.noResults}>
+        {t('ManageListingsPage.noResultsForCustomerReview')}
+      </Text>
     );
+  };
+
+  const handleOnRefresh = () => {
+    dispatch(getAllReviews({}));
   };
 
   return (
     <FlashList
       data={reviews}
-      renderItem={({item}) => <ReviewsCard review={item} />}
+      renderItem={({ item }) => <ReviewsCard review={item} />}
       ListEmptyComponent={listEmptyComponent}
       keyExtractor={keyExtractor}
       showsVerticalScrollIndicator={false}
-      estimatedItemSize={143}
+      refreshControl={
+        <RefreshControl refreshing={inProgress} onRefresh={handleOnRefresh} />
+      }
     />
   );
 };
