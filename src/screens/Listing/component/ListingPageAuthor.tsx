@@ -1,24 +1,25 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import { ListingAuthor } from '../../../appTypes'
-import { Avatar, SelectionButton } from '../../../components'
-import { AppColors, colors, fontWeight } from '../../../theme'
-import { fontScale, widthScale } from '../../../util'
-import { useColors } from '../../../context'
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { ListingAuthor } from '../../../appTypes';
+import { Avatar, SelectionButton } from '../../../components';
+import { colors, fontWeight } from '../../../theme';
+import { fontScale, widthScale } from '../../../util';
+import { lightenColor } from '../../../util/data';
+import { useNavigation } from '@react-navigation/native';
 
 interface ListingPageAuthorProps {
-  author: ListingAuthor
-  setInquiryModalOpen?: () => void
-  showContact: boolean
+  author: ListingAuthor;
+  setInquiryModalOpen?: () => void;
+  showContact: boolean;
 }
 
 const ListingPageAuthor = (props: ListingPageAuthorProps) => {
-  const { author, setInquiryModalOpen, showContact } = props
-  const { t } = useTranslation()
+  const { author, setInquiryModalOpen, showContact } = props;
+  const { t } = useTranslation();
+  const navigation = useNavigation();
   // const currentUserId = useSelector(currentUserIdSelector)
   // const isAuthor = currentUserId === author?.id.uuid
-  const colors: AppColors = useColors()
   return (
     <View style={styles.container}>
       <View style={styles.innerCotainer}>
@@ -33,7 +34,9 @@ const ListingPageAuthor = (props: ListingPageAuthorProps) => {
         </View>
         <View style={styles.rightBtnView}>
           <SelectionButton
-            onPress={() => {}}
+            onPress={() =>
+              navigation.navigate('OtherUserProfile', { userId: author.id })
+            }
             title={t('UserCard.viewProfileLink')}
             isSelected={false}
             style={styles.rightbtn}
@@ -54,17 +57,17 @@ const ListingPageAuthor = (props: ListingPageAuthorProps) => {
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default ListingPageAuthor
+export default ListingPageAuthor;
 
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: widthScale(20),
-    paddingVertical: widthScale(10),
+    paddingVertical: widthScale(12),
     borderBottomWidth: 1,
-    borderColor: colors.frostedGrey,
+    borderColor: colors.lightGrey,
   },
   innerCotainer: {
     flexDirection: 'row',
@@ -80,21 +83,24 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   middleContainer: {
-    marginLeft: widthScale(10),
+    marginHorizontal: widthScale(10),
     flex: 1,
     justifyContent: 'center',
     gap: widthScale(5),
   },
   rightBtnView: {
-    justifyContent: 'center',
-    gap: widthScale(5),
+    marginTop: widthScale(5),
+    gap: widthScale(8),
   },
   rightbtn: {
-    paddingHorizontal: widthScale(8),
-    paddingVertical: widthScale(4),
+    paddingHorizontal: widthScale(10),
+    paddingVertical: widthScale(5),
+    backgroundColor: lightenColor(colors.marketplaceColor, 10),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rightbtnTxt: {
     fontSize: fontScale(12),
     fontWeight: fontWeight.semiBold,
   },
-})
+});

@@ -1,23 +1,23 @@
-import { View, Text, StyleSheet } from 'react-native'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { reviewsSelector } from '../Listing.slice'
-import { RootState } from '../../../sharetribeSetup'
-import { fontScale, widthScale } from '../../../util'
-import { colors, fontWeight } from '../../../theme'
-import { ReviewsCard } from '../../../components'
+import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { reviewsSelector } from '../Listing.slice';
+import { RootState } from '../../../sharetribeSetup';
+import { fontScale, widthScale } from '../../../util';
+import { colors, fontWeight } from '../../../theme';
+import { ReviewsCard } from '../../../components';
 
 interface ListingPageReviewsProps {
-  listingId: string
+  listingId: string;
 }
 
 export default function ListingPageReviews(props: ListingPageReviewsProps) {
-  const { listingId } = props
-  const { t } = useTranslation()
+  const { listingId } = props;
+  const { t } = useTranslation();
   const reviews = useSelector((state: RootState) =>
     reviewsSelector(state, listingId),
-  )
+  );
   if (!reviews || reviews?.length === 0) {
     return null;
   }
@@ -39,9 +39,9 @@ export default function ListingPageReviews(props: ListingPageReviewsProps) {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: widthScale(20),
-    paddingVertical: widthScale(10),
+    paddingVertical: widthScale(16),
     borderBottomWidth: 1,
-    borderColor: colors.frostedGrey,
+    borderColor: colors.lightGrey,
   },
   heading: {
     fontSize: fontScale(16),
