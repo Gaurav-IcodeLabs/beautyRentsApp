@@ -4,32 +4,17 @@ import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-  var window: UIWindow?
+class AppDelegate: RCTAppDelegate {
 
-  var reactNativeDelegate: ReactNativeDelegate?
-  var reactNativeFactory: RCTReactNativeFactory?
-
-  func application(
+  override func application(
     _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
   ) -> Bool {
-    let delegate = ReactNativeDelegate()
-    let factory = RCTReactNativeFactory(delegate: delegate)
-    delegate.dependencyProvider = RCTAppDependencyProvider()
-    showSplashScreen() 
-    reactNativeDelegate = delegate
-    reactNativeFactory = factory
-
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    factory.startReactNative(
-      withModuleName: "BeautyRents",
-      in: window,
-      launchOptions: launchOptions
-    )
-
-    return true
+    self.moduleName = "BeautyRents"
+    self.dependencyProvider = RCTAppDependencyProvider()
+    self.initialProps = [:]
+    showSplashScreen()
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
   //Add below method in AppDelegate.swift
@@ -42,9 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           print("⚠️ SplashView module not found")
       }
     }
-}
 
-class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     self.bundleURL()
   }
