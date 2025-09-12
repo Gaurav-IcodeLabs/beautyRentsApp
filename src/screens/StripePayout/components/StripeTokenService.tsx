@@ -1,9 +1,10 @@
-import { WebView } from 'react-native-webview'
+import {WebView} from 'react-native-webview';
 import {
   getStripeTokens,
   html,
-} from '../../../scripts/StripeAccountTokenScripts'
-import React from 'react'
+} from '../../../scripts/StripeAccountTokenScripts';
+import React from 'react';
+import {View} from 'react-native';
 
 /**
  * Creates a StripeTokenService object.
@@ -15,37 +16,44 @@ import React from 'react'
  * @param {Object} props.stripeData - The stripe data object.
  * @return {JSX.Element} The rendered component.
  */
+
 function StripeTokenService(props) {
+  const {isVisible, stripeData} = props;
   function onMessage(e) {
-    const { onSuccess, onCloseModal } = props
-    const { data } = e.nativeEvent
-    console.log('here data', data)
+    const {onSuccess, onCloseModal} = props;
+    const {data} = e.nativeEvent;
+    console.log('here data', data);
     if (data.includes('Error:')) {
-      onSuccess(new Error())
-      onCloseModal()
+      onSuccess(new Error());
+      onCloseModal();
     } else {
       onSuccess({
         accountToken: data,
-      })
-      onCloseModal()
+      });
+      onCloseModal();
     }
   }
 
-  const { isVisible, stripeData } = props
   if (isVisible) {
     return (
-      <WebView
-        source={{
-          html,
-          baseUrl: `${process.env.EXPO_PUBLIC_SDK_BASE_URL}`,
-        }}
-        injectedJavaScript={getStripeTokens(stripeData)}
-        onMessage={onMessage}
-      />
-    )
+      <View
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{
+          height: 0,
+          overflow: 'hidden',
+        }}>
+        <WebView
+          source={{
+            html,
+            baseUrl: `${process.env.REACT_NATIVE_SDK_BASE_URL}`,
+          }}
+          injectedJavaScript={getStripeTokens(stripeData)}
+          onMessage={onMessage}
+        />
+      </View>
+    );
   }
-
-  return null
+  return null;
 }
 
-export default StripeTokenService
+export default StripeTokenService;

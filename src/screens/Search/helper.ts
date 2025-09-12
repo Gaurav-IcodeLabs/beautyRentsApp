@@ -18,8 +18,8 @@ import {
   SCHEMA_TYPE_ENUM,
   SCHEMA_TYPE_MULTI_ENUM,
   subtractTime,
-} from '../../util'
-import { convertUnitToSubUnit, unitDivisor } from '../../util/currency'
+} from '../../util';
+import {convertUnitToSubUnit, unitDivisor} from '../../util/currency';
 
 const searchValidListingTypes = (config, listingTypes) => {
   return config.listing.enforceValidListingType
@@ -28,22 +28,22 @@ const searchValidListingTypes = (config, listingTypes) => {
         // pub_transactionProcessAlias: listingTypes.map(l => l.transactionType.alias),
         // pub_unitType: listingTypes.map(l => l.transactionType.unitType),
       }
-    : {}
-}
+    : {};
+};
 
 const omitInvalidCategoryParams = (config, params) => {
   const categoryConfig = config.search.defaultFilters?.find(
     f => f.schemaType === 'category',
-  )
-  const categories = config.categoryConfiguration.categories
-  const { key: prefix, scope } = categoryConfig || {}
-  const categoryParamPrefix = constructQueryParamName(prefix, scope)
+  );
+  const categories = config.categoryConfiguration.categories;
+  const {key: prefix, scope} = categoryConfig || {};
+  const categoryParamPrefix = constructQueryParamName(prefix, scope);
 
   const validURLParamForCategoryData = (prefix, categories, level, params) => {
-    const levelKey = `${categoryParamPrefix}${level}`
-    const levelValue = params?.[levelKey]
-    const foundCategory = categories.find(cat => cat.id === levelValue)
-    const subcategories = foundCategory?.subcategories || []
+    const levelKey = `${categoryParamPrefix}${level}`;
+    const levelValue = params?.[levelKey];
+    const foundCategory = categories.find(cat => cat.id === levelValue);
+    const subcategories = foundCategory?.subcategories || [];
     return foundCategory && subcategories.length > 0
       ? {
           [levelKey]: levelValue,
@@ -55,44 +55,44 @@ const omitInvalidCategoryParams = (config, params) => {
           ),
         }
       : foundCategory
-        ? { [levelKey]: levelValue }
-        : {}
-  }
+      ? {[levelKey]: levelValue}
+      : {};
+  };
 
   const categoryKeys = validURLParamForCategoryData(
     prefix,
     categories,
     1,
     params,
-  )
+  );
   const nonCategoryKeys = Object.entries(params).reduce(
     (picked, [k, v]) =>
-      k.startsWith(categoryParamPrefix) ? picked : { ...picked, [k]: v },
+      k.startsWith(categoryParamPrefix) ? picked : {...picked, [k]: v},
     {},
-  )
+  );
 
-  return { ...nonCategoryKeys, ...categoryKeys }
-}
+  return {...nonCategoryKeys, ...categoryKeys};
+};
 
 const priceSearchParams = (config, priceParam) => {
   const inSubunits = value =>
-    convertUnitToSubUnit(value, unitDivisor(config.currency))
-  const values = priceParam ? priceParam.split(',') : []
+    convertUnitToSubUnit(value, unitDivisor(config.currency));
+  const values = priceParam ? priceParam.split(',') : [];
   return priceParam && values.length === 2
     ? {
         price: [inSubunits(values[0]), inSubunits(values[1]) + 1].join(','),
       }
-    : {}
-}
+    : {};
+};
 
 const datesSearchParams = (config, datesParam) => {
-  const searchTZ = 'Etc/UTC'
-  const datesFilter = config.search.defaultFilters.find(f => f.key === 'dates')
-  const values = datesParam ? datesParam.split(',') : []
-  const hasValues = datesFilter && datesParam && values.length === 2
-  const { dateRangeMode, availability } = datesFilter || {}
-  const isNightlyMode = dateRangeMode === 'night'
-  const isEntireRangeAvailable = availability === 'time-full'
+  const searchTZ = 'Etc/UTC';
+  const datesFilter = config.search.defaultFilters.find(f => f.key === 'dates');
+  const values = datesParam ? datesParam.split(',') : [];
+  const hasValues = datesFilter && datesParam && values.length === 2;
+  const {dateRangeMode, availability} = datesFilter || {};
+  const isNightlyMode = dateRangeMode === 'night';
+  const isEntireRangeAvailable = availability === 'time-full';
 
   // SearchPage need to use a single time zone but listings can have different time zones
   // We need to expand/prolong the time window (start & end) to cover other time zones too.
@@ -103,34 +103,36 @@ const datesSearchParams = (config, datesParam) => {
   //   3) Make exact dates filtering against that specific time zone
   //   This setup would be better for dates filter,
   //   but it enforces a UX where location is always asked first and therefore configurability
-  const getProlongedStart = date => subtractTime(date, 14, 'hours', searchTZ)
-  const getProlongedEnd = date => addTime(date, 12, 'hours', searchTZ)
+  const getProlongedStart = date => subtractTime(date, 14, 'hours', searchTZ);
+  const getProlongedEnd = date => addTime(date, 12, 'hours', searchTZ);
 
-  const startDate = hasValues ? parseDateFromISO8601(values[0], searchTZ) : null
-  const endRaw = hasValues ? parseDateFromISO8601(values[1], searchTZ) : null
+  const startDate = hasValues
+    ? parseDateFromISO8601(values[0], searchTZ)
+    : null;
+  const endRaw = hasValues ? parseDateFromISO8601(values[1], searchTZ) : null;
   const endDate =
     hasValues && isNightlyMode
       ? endRaw
       : hasValues
-        ? getExclusiveEndDate(endRaw, searchTZ)
-        : null
+      ? getExclusiveEndDate(endRaw, searchTZ)
+      : null;
 
-  const today = getStartOf(new Date(), 'day', searchTZ)
-  const possibleStartDate = subtractTime(today, 14, 'hours', searchTZ)
+  const today = getStartOf(new Date(), 'day', searchTZ);
+  const possibleStartDate = subtractTime(today, 14, 'hours', searchTZ);
   const hasValidDates =
     hasValues &&
     startDate.getTime() >= possibleStartDate.getTime() &&
-    startDate.getTime() <= endDate.getTime()
+    startDate.getTime() <= endDate.getTime();
 
-  const dayCount = isEntireRangeAvailable ? daysBetween(startDate, endDate) : 1
-  const day = 1440
-  const hour = 60
+  const dayCount = isEntireRangeAvailable ? daysBetween(startDate, endDate) : 1;
+  const day = 1440;
+  const hour = 60;
   // When entire range is required to be available, we count minutes of included date range,
   // but there's a need to subtract one hour due to possibility of daylight saving time.
   // If partial range is needed, then we just make sure that the shortest time unit supported
   // is available within the range.
   // You might want to customize this to match with your time units (e.g. day: 1440 - 60)
-  const minDuration = isEntireRangeAvailable ? dayCount * day - hour : hour
+  const minDuration = isEntireRangeAvailable ? dayCount * day - hour : hour;
   return hasValidDates
     ? {
         start: getProlongedStart(startDate),
@@ -141,21 +143,19 @@ const datesSearchParams = (config, datesParam) => {
         // minDuration uses minutes
         minDuration,
       }
-    : {}
-}
+    : {};
+};
 
 const stockFilters = datesMaybe => {
-  const hasDatesFilterInUse = Object.keys(datesMaybe).length > 0
+  const hasDatesFilterInUse = Object.keys(datesMaybe).length > 0;
 
   // If dates filter is not in use,
   //   1) Add minStock filter with default value (1)
   //   2) Add relaxed stockMode: "match-undefined"
   // The latter is used to filter out all the listings that explicitly are out of stock,
   // but keeps bookable and inquiry listings.
-  return hasDatesFilterInUse
-    ? {}
-    : { minStock: 1, stockMode: 'match-undefined' }
-}
+  return hasDatesFilterInUse ? {} : {minStock: 1, stockMode: 'match-undefined'};
+};
 
 const handleMultipleSelect = (schemaType, key, option, setSelectedFilters) => {
   if (
@@ -163,27 +163,27 @@ const handleMultipleSelect = (schemaType, key, option, setSelectedFilters) => {
     schemaType === SCHEMA_TYPE_MULTI_ENUM
   ) {
     setSelectedFilters(prevFilters => {
-      const updatedFilters = { ...prevFilters }
+      const updatedFilters = {...prevFilters};
 
       if (updatedFilters[key]?.includes(option)) {
         // Option is already selected, remove it
         updatedFilters[key] = updatedFilters[key].filter(
           selectedOption => selectedOption !== option,
-        )
+        );
         if (updatedFilters[key].length === 0) {
-          delete updatedFilters[key]
+          delete updatedFilters[key];
         }
       } else {
         // Option is not selected, add it
         updatedFilters[key] = updatedFilters[key]
           ? [...updatedFilters[key], option]
-          : [option]
+          : [option];
       }
 
-      return updatedFilters
-    })
+      return updatedFilters;
+    });
   }
-}
+};
 
 const handleCategoryPress = (
   categoryId,
@@ -192,23 +192,23 @@ const handleCategoryPress = (
   categoryData,
 ) => {
   setSelectedCategories(prevSelected => {
-    const newSelected = { ...prevSelected }
+    const newSelected = {...prevSelected};
 
     // Reset selections at higher levels
     for (let i = level; i < categoryData.categoryLevelKeys.length; i++) {
-      delete newSelected[categoryData.categoryLevelKeys[i]]
+      delete newSelected[categoryData.categoryLevelKeys[i]];
     }
 
     // Toggle selection at the current level
     if (newSelected[categoryData.categoryLevelKeys[level - 1]] === categoryId) {
-      delete newSelected[categoryData.categoryLevelKeys[level - 1]]
+      delete newSelected[categoryData.categoryLevelKeys[level - 1]];
     } else {
-      newSelected[categoryData.categoryLevelKeys[level - 1]] = categoryId
+      newSelected[categoryData.categoryLevelKeys[level - 1]] = categoryId;
     }
 
-    return newSelected
-  })
-}
+    return newSelected;
+  });
+};
 
 /**
  * Converts miles to degrees.
@@ -216,7 +216,7 @@ const handleCategoryPress = (
  * @returns {number} - The distance in degrees.
  */
 function milesToDegrees(miles: number): number {
-  return miles * 0.0144927536231884
+  return miles * 0.0144927536231884;
 }
 
 /**
@@ -231,14 +231,14 @@ const createBounds = (
   lng: number,
   radiusMiles: number = 50,
 ): string => {
-  const degrees = milesToDegrees(radiusMiles)
-  const swLat = lat - degrees
-  const swLng = lng - degrees
-  const neLat = lat + degrees
-  const neLng = lng + degrees
-  return `${neLat},${neLng},${swLat},${swLng}`
-}
-export function calculateBounds(centerLat, centerLng, radiusInKm) {
+  const degrees = milesToDegrees(radiusMiles);
+  const swLat = lat - degrees;
+  const swLng = lng - degrees;
+  const neLat = lat + degrees;
+  const neLng = lng + degrees;
+  return `${neLat},${neLng},${swLat},${swLng}`;
+};
+function calculateBounds(centerLat, centerLng, radiusInKm) {
   const earthRadius = 6371;
   const radiusInRadians = radiusInKm / earthRadius;
   const centerLatRad = (centerLat * Math.PI) / 180;
@@ -267,4 +267,4 @@ export {
   handleCategoryPress,
   createBounds,
   calculateBounds,
-}
+};

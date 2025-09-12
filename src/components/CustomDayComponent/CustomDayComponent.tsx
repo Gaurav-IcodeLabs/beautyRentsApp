@@ -1,26 +1,24 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { widthScale } from '../../util'
-import { AppColors, colors } from '../../theme'
-import { useColors } from '../../context'
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import React from 'react';
+import {widthScale} from '../../util';
+import {colors} from '../../theme';
 
 function isBetweenDates(day, startDate, endDate) {
   // Convert strings to Date objects if necessary
-  const dayDate = new Date(day)
-  const startDateObj = new Date(startDate)
-  const endDateObj = new Date(endDate)
+  const dayDate = new Date(day);
+  const startDateObj = new Date(startDate);
+  const endDateObj = new Date(endDate);
 
   // Compare dates
-  return dayDate > startDateObj && dayDate < endDateObj
+  return dayDate > startDateObj && dayDate < endDateObj;
 }
 
 const CustomDayComponent = props => {
-  const { isSelected, isDayBlock, onDayPress, date, startDate, endDate } = props
-  const isBetweenRange = isBetweenDates(date.dateString, startDate, endDate)
-  const isSingleDay = startDate === endDate
-  const colors: AppColors = useColors()
+  const {isSelected, isDayBlock, onDayPress, date, startDate, endDate} = props;
+  const isBetweenRange = isBetweenDates(date.dateString, startDate, endDate);
+  const isSingleDay = startDate === endDate;
   return isDayBlock(date.dateString) ? (
-    <TouchableOpacity disabled style={{ padding: 10 }}>
+    <TouchableOpacity disabled style={{padding: widthScale(10)}}>
       <Text style={styles.unavailableDay}>{date.day}</Text>
     </TouchableOpacity>
   ) : (
@@ -35,19 +33,19 @@ const CustomDayComponent = props => {
               ...(isSingleDay ? styles.singleDayStyle : styles.startDateStyle),
             }
           : endDate === date.dateString
-            ? {
-                backgroundColor: colors.marketplaceColor,
+          ? {
+              backgroundColor: colors.marketplaceColor,
 
-                ...(isSingleDay ? styles.singleDayStyle : styles.endDateStyle),
-              }
-            : isBetweenRange
-              ? {
-                  backgroundColor: colors.marketplaceColor,
-                  ...(isSingleDay
-                    ? styles.singleDayStyle
-                    : styles.isBetweenRangeStyle),
-                }
-              : null,
+              ...(isSingleDay ? styles.singleDayStyle : styles.endDateStyle),
+            }
+          : isBetweenRange
+          ? {
+              backgroundColor: colors.marketplaceColor,
+              ...(isSingleDay
+                ? styles.singleDayStyle
+                : styles.isBetweenRangeStyle),
+            }
+          : null,
       ]}>
       <Text
         style={
@@ -56,10 +54,10 @@ const CustomDayComponent = props => {
         {date.day}
       </Text>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default CustomDayComponent
+export default CustomDayComponent;
 
 const styles = StyleSheet.create({
   dateContainer: {
@@ -99,4 +97,4 @@ const styles = StyleSheet.create({
   date: {
     // color: colors.black,
   },
-})
+});

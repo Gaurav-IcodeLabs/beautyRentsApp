@@ -1,21 +1,20 @@
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { ProfileScreenProps } from '../../appTypes';
-import { mailIcon, setting } from '../../assets';
-import { Avatar, ScreenHeader } from '../../components';
-import { useConfiguration } from '../../context';
-import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup';
+import React, {useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
+import {Image, StyleSheet, Text, View} from 'react-native';
+import {ProfileScreenProps} from '../../appTypes';
+import {mailIcon, setting} from '../../assets';
+import {Avatar, ScreenHeader} from '../../components';
+import {useConfiguration} from '../../context';
+import {useAppDispatch, useTypedSelector} from '../../sharetribeSetup';
 import {
   currentUserBioSelector,
   currentUserDisplayNameSelector,
   currentUserEmailSelector,
 } from '../../slices/user.slice';
-import { fontScale, heightScale, widthScale } from '../../util';
+import {fontScale, heightScale, widthScale} from '../../util';
 import ProfileBottomContent from './components/ProfileBottomContent';
-import { getAllReviews, getOwnListings } from './Profile.slice';
-import { colors, fontWeight } from '../../theme';
-
+import {getAllReviews, getOwnListings} from './Profile.slice';
+import {colors, fontWeight} from '../../theme';
 const getTabsData = t => {
   return [
     {
@@ -29,10 +28,10 @@ const getTabsData = t => {
   ];
 };
 
-export const Profile: React.FC<ProfileScreenProps> = ({ navigation }) => {
+export const Profile: React.FC<ProfileScreenProps> = ({navigation}) => {
   const config = useConfiguration();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const tabsData = getTabsData(t);
   const [selectedTab, setSelectedTab] = React.useState(tabsData[0].label);
   const bio = useTypedSelector(currentUserBioSelector);
@@ -41,13 +40,13 @@ export const Profile: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   useEffect(() => {
     dispatch(getAllReviews({}));
-    dispatch(getOwnListings({ config, page: 1 }));
-  }, []);
+    dispatch(getOwnListings({config, page: 1}));
+  }, [dispatch, config]);
 
   return (
     <View style={styles.flex1}>
       <ScreenHeader
-        backgroundColor={{ backgroundColor: colors.marketplaceColor }}
+        backgroundColor={{backgroundColor: colors.marketplaceColor}}
         rightIconContainerStyle={styles.rightIconContainerStyle}
         rightIcon={setting}
         rightIconStyle={styles.settingIcon}
@@ -57,7 +56,7 @@ export const Profile: React.FC<ProfileScreenProps> = ({ navigation }) => {
       <View style={styles.avatar}>
         <Avatar
           size={widthScale(110)}
-          style={[!bio && { marginBottom: heightScale(20) }]}
+          // style={[!bio && {marginBottom: heightScale(20)}]}
         />
       </View>
       <View style={styles.headerSection}>

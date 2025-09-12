@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Thunk } from '../../appTypes';
-import { RootState } from '../../sharetribeSetup';
-import { addMarketplaceEntities } from '../../slices/marketplaceData.slice';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Thunk} from '../../appTypes';
+import {RootState} from '../../sharetribeSetup';
+import {addMarketplaceEntities} from '../../slices/marketplaceData.slice';
 import {
   createImageVariantConfig,
   monthIdString,
@@ -9,13 +9,13 @@ import {
   storableError,
   stringifyDateToISO8601,
 } from '../../util';
-import { denormalisedResponseEntities } from '../../util/data';
-import { getProcess, isBookingProcessAlias } from '../../transactions';
-import { fetchMonthlyTimeSlots } from './Listing.helper';
-import { transactionLineItems } from '../../util/api';
+import {denormalisedResponseEntities} from '../../util/data';
+import {getProcess, isBookingProcessAlias} from '../../transactions';
+import {fetchMonthlyTimeSlots} from './Listing.helper';
+import {transactionLineItems} from '../../util/api';
 import moment from 'moment-timezone';
 
-const { UUID } = sdkTypes;
+const {UUID} = sdkTypes;
 const resultIds = data => data?.data?.map?.(l => l.id);
 
 type listingPageStateType = {
@@ -75,13 +75,13 @@ const listingSlice = createSlice({
     },
 
     removePageFromState: (state, action) => {
-      const { listingId } = action.payload;
-      const page = { ...state.page };
+      const {listingId} = action.payload;
+      const page = {...state.page};
       delete page?.[listingId];
       state.page = page;
     },
 
-    clearLineItems: (state, { payload: { listingId } }) => {
+    clearLineItems: (state, {payload: {listingId}}) => {
       const page = state.page?.[listingId];
       if (page && page.lineItems) {
         console.log('Clearing lineItems for:', listingId);
@@ -96,9 +96,9 @@ const listingSlice = createSlice({
         state,
         {
           meta: {
-            arg: { id },
+            arg: {id},
           },
-        }: { meta: { arg: string } },
+        }: {meta: {arg: string}},
       ) => {
         state.page[id].loadListingPageInprogress = true;
         state.page[id].loadListingPageError = null;
@@ -111,9 +111,9 @@ const listingSlice = createSlice({
         state,
         {
           meta: {
-            arg: { id },
+            arg: {id},
           },
-        }: { meta: { arg: string } },
+        }: {meta: {arg: string}},
       ) => {
         state.page[id].loadListingPageInprogress = false;
         state.page[id].loadListingPageError = null;
@@ -126,9 +126,9 @@ const listingSlice = createSlice({
         state,
         {
           meta: {
-            arg: { id },
+            arg: {id},
           },
-        }: { meta: { arg: string }; error: any },
+        }: {meta: {arg: string}; error: any},
       ) => {
         state.page[id].loadListingPageInprogress = false;
         state.page[id].loadListingPageSuccess = false;
@@ -138,17 +138,14 @@ const listingSlice = createSlice({
 
     builder.addCase(
       loadListingReviews.pending,
-      (state, { meta: { arg } }: { meta: { arg: string } }) => {
+      (state, {meta: {arg}}: {meta: {arg: string}}) => {
         state.page[arg].loadingReviewsInProgress = true;
         state.page[arg].reviewsError = null;
       },
     );
     builder.addCase(
       loadListingReviews.fulfilled,
-      (
-        state,
-        { meta: { arg }, payload }: { meta: { arg: string }; payload: any },
-      ) => {
+      (state, {meta: {arg}, payload}: {meta: {arg: string}; payload: any}) => {
         state.page[arg].loadingReviewsInProgress = false;
         state.page[arg].reviews = payload;
         state.page[arg].reviewsError = null;
@@ -157,7 +154,7 @@ const listingSlice = createSlice({
 
     builder.addCase(
       loadListingReviews.rejected,
-      (state, { meta: { arg } }: { meta: { arg: string }; error: any }) => {
+      (state, {meta: {arg}}: {meta: {arg: string}; error: any}) => {
         state.page[arg].loadingReviewsInProgress = false;
         state.page[arg].reviewsError = storableError(error);
       },
@@ -169,9 +166,9 @@ const listingSlice = createSlice({
         state,
         {
           meta: {
-            arg: { listingId },
+            arg: {listingId},
           },
-        }: { meta: { arg: string } },
+        }: {meta: {arg: string}},
       ) => {
         state.page[listingId].getSimilarListingsInProgress = true;
         state.page[listingId].getSimilarListingsError = null;
@@ -183,10 +180,10 @@ const listingSlice = createSlice({
         state,
         {
           meta: {
-            arg: { listingId },
+            arg: {listingId},
           },
           payload,
-        }: { meta: { arg: string }; payload: any },
+        }: {meta: {arg: string}; payload: any},
       ) => {
         state.page[listingId].getSimilarListingsInProgress = false;
         state.page[listingId].getSimilarListingsError = null;
@@ -201,9 +198,9 @@ const listingSlice = createSlice({
           state,
           {
             meta: {
-              arg: { listingId },
+              arg: {listingId},
             },
-          }: { meta: { arg: string }; error: any },
+          }: {meta: {arg: string}; error: any},
         ) => {
           state.page[listingId].getSimilarListingsInProgress = false;
           state.page[listingId].getSimilarListingsError = storableError(error);
@@ -215,7 +212,7 @@ const listingSlice = createSlice({
           state,
           {
             meta: {
-              arg: { listing },
+              arg: {listing},
             },
           },
         ) => {
@@ -229,7 +226,7 @@ const listingSlice = createSlice({
           state,
           {
             meta: {
-              arg: { listing },
+              arg: {listing},
             },
           },
         ) => {
@@ -242,17 +239,16 @@ const listingSlice = createSlice({
           state,
           {
             meta: {
-              arg: { listing },
+              arg: {listing},
             },
-          }: { meta: { arg: {} }; error: any },
+          }: {meta: {arg: {}}; error: any},
         ) => {
           state.page[listing.id.uuid].sendInquiryInProgress = false;
           state.page[listing.id.uuid].sendInquiryError = storableError(error);
         },
       )
-      .addCase(fetchTimeSlots.pending, (state, { meta }) => {
-        const { start, timeZone, listingId, useFetchTimeSlotsForDate } =
-          meta.arg;
+      .addCase(fetchTimeSlots.pending, (state, {meta}) => {
+        const {start, timeZone, listingId, useFetchTimeSlotsForDate} = meta.arg;
 
         if (useFetchTimeSlotsForDate) {
           // Daily fetch
@@ -283,12 +279,12 @@ const listingSlice = createSlice({
         }
       })
 
-      .addCase(fetchTimeSlots.fulfilled, (state, { meta, payload }) => {
-        const { listingId, useFetchTimeSlotsForDate } = meta.arg;
+      .addCase(fetchTimeSlots.fulfilled, (state, {meta, payload}) => {
+        const {listingId, useFetchTimeSlotsForDate} = meta.arg;
 
         if (useFetchTimeSlotsForDate && payload.dateId) {
           // Daily success
-          const { dateId, timeSlots } = payload;
+          const {dateId, timeSlots} = payload;
           state.page[listingId.uuid] = {
             ...state.page[listingId.uuid],
             timeSlotsForDate: {
@@ -301,7 +297,7 @@ const listingSlice = createSlice({
           };
         } else if (payload.monthId) {
           // Monthly success
-          const { monthId, timeSlots } = payload;
+          const {monthId, timeSlots} = payload;
           state.page[listingId.uuid] = {
             ...state.page[listingId.uuid],
             monthlyTimeSlots: {
@@ -316,9 +312,8 @@ const listingSlice = createSlice({
         }
       })
 
-      .addCase(fetchTimeSlots.rejected, (state, { meta, payload }) => {
-        const { start, timeZone, listingId, useFetchTimeSlotsForDate } =
-          meta.arg;
+      .addCase(fetchTimeSlots.rejected, (state, {meta, payload}) => {
+        const {start, timeZone, listingId, useFetchTimeSlotsForDate} = meta.arg;
 
         if (useFetchTimeSlotsForDate) {
           // Daily error
@@ -350,33 +345,30 @@ const listingSlice = createSlice({
         }
       })
 
-      .addCase(fetchTransactionLineItems.pending, (state, { meta }) => {
-        const { listingId } = meta.arg;
+      .addCase(fetchTransactionLineItems.pending, (state, {meta}) => {
+        const {listingId} = meta.arg;
         state.page[listingId.uuid].fetchLineItemsInProgress = true;
         state.page[listingId.uuid].fetchLineItemsError = null;
       })
       .addCase(
         fetchTransactionLineItems.fulfilled,
-        (state, { payload, meta }) => {
-          const { listingId } = meta.arg;
+        (state, {payload, meta}) => {
+          const {listingId} = meta.arg;
           state.page[listingId.uuid].fetchLineItemsInProgress = false;
           state.page[listingId.uuid].lineItems = payload;
         },
       )
-      .addCase(
-        fetchTransactionLineItems.rejected,
-        (state, { payload, meta }) => {
-          const { listingId } = meta.arg;
-          state.page[listingId.uuid].fetchLineItemsInProgress = false;
-          state.page[listingId.uuid].fetchLineItemsError = payload;
-        },
-      );
+      .addCase(fetchTransactionLineItems.rejected, (state, {payload, meta}) => {
+        const {listingId} = meta.arg;
+        state.page[listingId.uuid].fetchLineItemsInProgress = false;
+        state.page[listingId.uuid].fetchLineItemsError = payload;
+      });
   },
 });
 
 export const loadListing = createAsyncThunk<{}, {}, Thunk>(
   'listing/loadListing',
-  async ({ id, config }, { dispatch, extra: sdk }) => {
+  async ({id, config}, {dispatch, extra: sdk}) => {
     try {
       const {
         aspectWidth = 1,
@@ -401,11 +393,11 @@ export const loadListing = createAsyncThunk<{}, {}, Thunk>(
       const authorId = response.data.included?.find(
         (i: any) => i.type === 'users',
       )?.id.uuid;
-      dispatch(addMarketplaceEntities({ sdkResponse: response }));
+      dispatch(addMarketplaceEntities({sdkResponse: response}));
       await Promise.all([
         dispatch(loadListingReviews(id)),
         dispatch(
-          loadSimilarListings({ userId: authorId, config, listingId: id }),
+          loadSimilarListings({userId: authorId, config, listingId: id}),
         ),
       ]);
       const listing = response.data.data;
@@ -426,7 +418,7 @@ export const loadListing = createAsyncThunk<{}, {}, Thunk>(
 );
 export const loadListingReviews = createAsyncThunk<{}, {}, Thunk>(
   'listing/loadListingReviews',
-  async (id, { dispatch, extra: sdk }) => {
+  async (id, {dispatch, extra: sdk}) => {
     try {
       const listingId = new UUID(id);
       const response = await sdk.reviews.query({
@@ -435,7 +427,7 @@ export const loadListingReviews = createAsyncThunk<{}, {}, Thunk>(
         include: ['author', 'author.profileImage'],
       });
 
-      dispatch(addMarketplaceEntities({ sdkResponse: response }));
+      dispatch(addMarketplaceEntities({sdkResponse: response}));
       const reviews = denormalisedResponseEntities(response);
       return reviews;
     } catch (error) {
@@ -446,11 +438,11 @@ export const loadListingReviews = createAsyncThunk<{}, {}, Thunk>(
 
 export const loadSimilarListings = createAsyncThunk<
   {},
-  { userId: string; listingId: string },
+  {userId: string; listingId: string},
   Thunk
 >(
   'listing/getSimilarListings',
-  async ({ userId, config }, { dispatch, extra: sdk }) => {
+  async ({userId, config}, {dispatch, extra: sdk}) => {
     try {
       const {
         aspectWidth = 1,
@@ -473,7 +465,7 @@ export const loadSimilarListings = createAsyncThunk<
         ...createImageVariantConfig(`${variantPrefix}-2x`, 800, aspectRatio),
         perPage: 7,
       });
-      dispatch(addMarketplaceEntities({ sdkResponse: response }));
+      dispatch(addMarketplaceEntities({sdkResponse: response}));
       return response;
     } catch (error) {
       return storableError(error);
@@ -483,7 +475,7 @@ export const loadSimilarListings = createAsyncThunk<
 
 export const sendInquiry = createAsyncThunk(
   'listing/sendInquiry',
-  async ({ listing, message }, { dispatch, extra: sdk }) => {
+  async ({listing, message}, {dispatch, extra: sdk}) => {
     try {
       const processAlias =
         listing?.attributes?.publicData?.transactionProcessAlias;
@@ -493,12 +485,12 @@ export const sendInquiry = createAsyncThunk(
       const bodyParams = {
         transition: transitions.INQUIRE,
         processAlias,
-        params: { listingId },
+        params: {listingId},
       };
       const response = await sdk.transactions.initiate(bodyParams);
       const transactionId = response.data.data.id;
       // Send the message to the created transaction
-      await sdk.messages.send({ transactionId, content: message });
+      await sdk.messages.send({transactionId, content: message});
       return transactionId;
     } catch (error) {
       console.log('error', error);
@@ -513,35 +505,56 @@ const timeSlotsRequest = params => (dispatch, getState, sdk) => {
   });
 };
 
-export const fetchTimeSlots = createAsyncThunk(
+type FetchTimeSlotsArgs = {
+  listingId: any; // or UUID obj
+  start: Date;
+  end: Date;
+  timeZone: string;
+  options?: {
+    extraQueryParams?: {
+      intervalDuration: string;
+      intervalAlign: Date;
+      maxPerInterval: number;
+      minDurationStartingInInterval: number;
+      perPage: number;
+      page: number;
+    };
+    useFetchTimeSlotsForDate?: boolean;
+  } | null;
+};
+
+export const fetchTimeSlots = createAsyncThunk<
+  // Return type
+  {monthId?: string; dateId?: string; timeSlots: any},
+  // Arg type
+  FetchTimeSlotsArgs
+>(
   'listing/fetchTimeSlots',
-  async (
-    { listingId, start, end, timeZone, useFetchTimeSlotsForDate = false },
-    { dispatch },
-  ) => {
-    // const monthId = monthIdString(start, timeZone);
-    const extraParams = {
+  async ({listingId, start, end, timeZone, options}, {dispatch}) => {
+    const {extraQueryParams = null, useFetchTimeSlotsForDate = false} =
+      options || {};
+    // The maximum pagination page size for timeSlots is 500
+    const extraParams = extraQueryParams || {
       perPage: 500,
       page: 1,
     };
 
     try {
       const timeSlots = await dispatch(
-        timeSlotsRequest({ listingId, start, end, ...extraParams }),
+        timeSlotsRequest({listingId, start, end, ...extraParams}),
       );
 
       if (useFetchTimeSlotsForDate) {
         const dateId = stringifyDateToISO8601(start, timeZone);
-        return { dateId, timeSlots };
+        return {dateId, timeSlots};
       }
 
       const monthId = monthIdString(start, timeZone);
-      // console.log('monthId', monthId);
       // console.log('timeSlots in slice', JSON.stringify(timeSlots));
-      return { monthId, timeSlots };
+      return {monthId, timeSlots};
     } catch (e: any) {
       const error = storableError(e);
-      throw { error };
+      throw error;
     }
   },
 );
@@ -560,20 +573,19 @@ export const fetchTimeSlots = createAsyncThunk(
 
 export const fetchTransactionLineItems = createAsyncThunk(
   'listing/fetchTransactionLineItems',
-  async (params, { dispatch, extra: sdk }) => {
+  async params => {
     try {
       const response = await transactionLineItems(params);
       const lineItems = response?.data;
       return lineItems;
     } catch (e: any) {
-      console.log('e.data', JSON.stringify(e));
-      console.log(e, 'fetching-line-items-failed');
+      console.log(JSON.stringify(e), 'fetching-line-items-failed');
       return storableError(e);
     }
   },
 );
 
-export const { removePageFromState, addPageToState, clearLineItems } =
+export const {removePageFromState, addPageToState, clearLineItems} =
   listingSlice.actions;
 
 export const loadListingPageInprogressSelector = (

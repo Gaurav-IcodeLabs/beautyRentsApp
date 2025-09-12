@@ -4,8 +4,9 @@ NOTE: EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY is mandatory environment variable.
 This variable is set in a hidden file: .env
 To make Stripe connection work, you also need to set Stripe's private key in the Sharetribe Console.
 */
+import {REACT_NATIVE_STRIPE_PUBLISHABLE_KEY} from '@env';
 
-export const publishableKey = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY
+export const publishableKey = REACT_NATIVE_STRIPE_PUBLISHABLE_KEY;
 
 // A maximum number of days forwards during which a booking can be made.
 // This is limited due to Stripe holding funds up to 90 days from the
@@ -15,7 +16,7 @@ export const publishableKey = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY
 // If your marketplace is for US only, you should also be aware that available
 // time slots can only be fetched for 366 days into the future.
 // https://www.sharetribe.com/api-reference/marketplace.html#query-time-slots
-export const dayCountAvailableForBooking: number = 90
+export const dayCountAvailableForBooking: number = 90;
 
 /**
  * Default merchant category code (MCC)
@@ -25,7 +26,7 @@ export const dayCountAvailableForBooking: number = 90
  *
  * See the whole list of MCC codes from https://stripe.com/docs/connect/setting-mcc#list
  */
-export const defaultMCC: string = '5734'
+export const defaultMCC: string = '5734';
 
 /*
 Stripe only supports payments in certain countries, see full list
@@ -47,7 +48,7 @@ export const stripeAccountTypeOptions = [
     label: 'I Represent a company',
     key: 'company',
   },
-]
+];
 export const supportedCountries = [
   {
     //Australia
@@ -351,7 +352,7 @@ export const supportedCountries = [
       accountNumber: true,
     },
   },
-]
+];
 
 export const supportedCountriesWithNames = [
   {
@@ -656,4 +657,4 @@ export const supportedCountriesWithNames = [
       accountNumber: true,
     },
   },
-]
+];

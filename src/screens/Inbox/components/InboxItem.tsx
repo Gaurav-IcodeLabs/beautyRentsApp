@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {
   LISTING_UNIT_TYPES,
@@ -8,13 +8,13 @@ import {
   heightScale,
   widthScale,
 } from '../../../util';
-import { TX_TRANSITION_ACTOR_CUSTOMER } from '../../../transactions';
-import { colors, fontWeight } from '../../../theme';
-import { Avatar, UserDisplayName } from '../../../components';
-import { useTranslation } from 'react-i18next';
-import { lightenColor } from '../../../util/data';
+import {TX_TRANSITION_ACTOR_CUSTOMER} from '../../../transactions';
+import {colors, fontWeight} from '../../../theme';
+import {Avatar, UserDisplayName} from '../../../components';
+import {useTranslation} from 'react-i18next';
+import {lightenColor} from '../../../util/data';
 import BookingTimeInfoMaybe from './BookingTimeInfoMaybe';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 // Check if the transaction line-items use booking-related units
 const getUnitLineItem = lineItems => {
@@ -26,7 +26,7 @@ const getUnitLineItem = lineItems => {
 
 const InboxItem = props => {
   const navigation = useNavigation();
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const {
     transactionRole,
     tx,
@@ -35,18 +35,13 @@ const InboxItem = props => {
     isBooking,
   } = props;
 
-  const { customer, provider, listing, attributes } = tx;
-  const { lastTransitionedAt } = attributes ?? {};
-  const { title } = listing?.attributes || {};
+  const {customer, provider, listing, attributes} = tx;
+  const {lastTransitionedAt} = attributes ?? {};
+  const {title} = listing?.attributes || {};
   const lastUpdatedAt = getItemLastUpdatedTime(lastTransitionedAt);
 
-  const {
-    processName,
-    processState,
-    actionNeeded,
-    isSaleNotification,
-    isFinal,
-  } = stateData;
+  const {processName, processState, actionNeeded, isSaleNotification, isFinal} =
+    stateData;
   const isCustomer = transactionRole === TX_TRANSITION_ACTOR_CUSTOMER;
 
   const lineItems = tx.attributes?.lineItems;
@@ -88,18 +83,16 @@ const InboxItem = props => {
     <TouchableOpacity
       activeOpacity={0.5}
       style={styles.container}
-      onPress={handleItemPress}
-    >
+      onPress={handleItemPress}>
       <Avatar user={otherUser} size={widthScale(50)} />
-      {rowNotificationDot}
+      {/* {rowNotificationDot} */}
       <View style={styles.contentContainer}>
         <View style={styles.titleAndTime}>
           <View style={styles.titleSection}>
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
-              style={styles.titleStyle}
-            >
+              style={styles.titleStyle}>
               {otherUserDisplayName}
             </Text>
           </View>
@@ -117,8 +110,7 @@ const InboxItem = props => {
             <Text
               style={styles.description}
               numberOfLines={2}
-              ellipsizeMode="tail"
-            >
+              ellipsizeMode="tail">
               {title}
             </Text>
           </View>
@@ -190,7 +182,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: widthScale(12),
-    fontWeight: fontWeight.medium,
+    fontWeight: fontWeight.normal,
   },
   titleStyle: {
     fontWeight: fontWeight.semiBold,

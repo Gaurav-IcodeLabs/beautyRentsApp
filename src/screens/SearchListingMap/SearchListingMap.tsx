@@ -1,25 +1,24 @@
 import Mapbox from '@rnmapbox/maps';
 import _debounce from 'lodash/debounce';
-import React, { useCallback, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
-import { Listing, SearchListingMapProps } from '../../appTypes';
-import { ScreenHeader } from '../../components';
-import { useColors, useConfiguration } from '../../context';
-import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup';
+import React, {useCallback, useMemo, useRef} from 'react';
+import {useTranslation} from 'react-i18next';
+import {StyleSheet, TouchableOpacity, View, Image} from 'react-native';
+import {Geolocation, Listing, SearchListingMapProps} from '../../appTypes';
+import {ScreenHeader} from '../../components';
+import {useConfiguration} from '../../context';
+import {useAppDispatch, useTypedSelector} from '../../sharetribeSetup';
 import {
   entitiesSelector,
   getListingsById,
 } from '../../slices/marketplaceData.slice';
-import { AppColors, colors } from '../../theme';
-import { widthScale } from '../../util';
+import {colors} from '../../theme';
+import {widthScale} from '../../util';
 import {
   searchListingsByMap,
   searchListingsByMapResultIdsSelector,
 } from '../Search/Search.slice';
 import MapSelectedCoordinatesListings from './MapSelectedCoordinatesListing/MapSelectedCoordinatesListings';
-import { calculateBounds, createBounds } from '../Search/helper';
-import { clone } from 'zod/v4/core';
+import {createBounds} from '../Search/helper';
 
 export const SearchListingMap: React.FC<SearchListingMapProps> = () => {
   const token = process.env.REACT_NATIVE_MAPBOX_ACCESS_TOKEN;
@@ -29,33 +28,28 @@ export const SearchListingMap: React.FC<SearchListingMapProps> = () => {
       return;
     }
     Mapbox.setAccessToken(token);
-    console.log('Mapbox token set');
   }, [token]);
 
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const config = useConfiguration();
-  const mapRef = useRef(null);
-  const colors: AppColors = useColors();
-  const [selectedCoordinates, setSelectedCoordinates] = React.useState(null);
+  const mapRef = useRef<Mapbox.MapView>(null);
+  const [selectedCoordinates, setSelectedCoordinates] =
+    React.useState<Geolocation | null>(null);
 
   const searchListingsByMapResultIds = useTypedSelector(
     searchListingsByMapResultIdsSelector,
   );
   const entities = useTypedSelector(entitiesSelector);
-  console.log('entities.listings:', entities.listings);
   const listings = getListingsById(entities, searchListingsByMapResultIds);
-  console.log('listings:', listings);
-  console.log('listings length:', listings.length);
-  if (listings.length > 0) {
-    console.log(
-      'first listing geolocation:',
-      listings[0]?.attributes?.geolocation,
-    );
-  }
 
-  const isGeolocationEqual = (geo1, geo2) => {
-    if (!geo1 || !geo2) return false;
+  const isGeolocationEqual = (
+    geo1: Geolocation | null,
+    geo2: Geolocation | null,
+  ) => {
+    if (!geo1 || !geo2) {
+      return false;
+    }
     const tolerance = 0.0001;
     return (
       Math.abs(geo1.lat - geo2.lat) < tolerance &&
@@ -67,57 +61,57 @@ export const SearchListingMap: React.FC<SearchListingMapProps> = () => {
     isGeolocationEqual(listing?.attributes?.geolocation, selectedCoordinates),
   );
 
-  const getListingByBounds = async (event?: Mapbox.CameraChangedEvent) => {
-    console.log('getListingByBounds called');
-  
-    try {
-      const center = event?.properties?.center || (await mapRef.current?.getCenter());
-      const zoom = event?.properties?.zoom || (await mapRef.current?.getZoom());
-  
-      console.log('Map center from event:', center, 'zoom:', zoom);
-  
-      const bounds = createBounds(center[1], center[0], zoom);
-      console.log('bounds-->', bounds);
-  
-      const action = await dispatch(
-        searchListingsByMap({
-          bounds,
-          config,
-        }),
-      );
-  
-      if (action.meta.requestStatus === 'fulfilled') {
-        console.log('Dispatch result:', action.payload);
-      } else {
-        console.error('Dispatch failed:', action.payload);
+  const getListingByBounds = useCallback(
+    async (event?: any) => {
+      try {
+        const center =
+          event?.properties?.center || (await mapRef.current?.getCenter());
+        const zoom =
+          event?.properties?.zoom || (await mapRef.current?.getZoom());
+
+        // console.log('Map center from event:', center, 'zoom:', zoom);
+
+        const bounds = createBounds(center[1], center[0], zoom);
+        // console.log('bounds-->', bounds);
+
+        const action = await dispatch(
+          searchListingsByMap({
+            bounds,
+            config,
+          }),
+        );
+
+        if (action.meta.requestStatus === 'fulfilled') {
+          // console.log('Dispatch result:', action.payload);
+        } else {
+          // console.error('Dispatch failed:', action.payload);
+        }
+      } catch (err) {
+        console.error('Error in getListingByBounds:', err);
       }
-    } catch (err) {
-      console.error('Error in getListingByBounds:', err);
-    }
-  };
-  
+    },
+    [config, dispatch],
+  );
 
   const debounceFn = useMemo(
     () => _debounce(getListingByBounds, 300),
-    [dispatch, config] // keep stable
+    [getListingByBounds], // keep stable
   );
-
 
   return (
     <View style={styles.container}>
       <ScreenHeader title={t('Map.heading')} />
       <Mapbox.MapView
         ref={mapRef}
-        onRegionIsChanging={debounceFn}
+        // // onRegionIsChanging={debounceFn}
+        onCameraChanged={debounceFn}
         onDidFinishLoadingMap={() => {
-          console.log('Map loaded - triggering initial search');
           getListingByBounds();
         }}
-        onError={error => {
-          console.error('Mapbox error:', error);
-        }}
-        style={styles.mapContainer}
-      >
+        // onError={error => {
+        //   console.error('Mapbox error:', error);
+        // }}
+        style={styles.mapContainer}>
         <Mapbox.Camera
           defaultSettings={{
             centerCoordinate: [76.7, 30.7],
@@ -125,7 +119,7 @@ export const SearchListingMap: React.FC<SearchListingMapProps> = () => {
           }}
         />
 
-        {listings.map((listing: Listing, index) => {
+        {listings.map((listing: Listing, index: number) => {
           const geolocation = listing?.attributes?.geolocation;
           const firstImage =
             listing?.images?.[0]?.attributes?.variants?.['listing-card']?.url;
@@ -158,19 +152,17 @@ export const SearchListingMap: React.FC<SearchListingMapProps> = () => {
             <Mapbox.MarkerView
               allowOverlap
               key={index}
-              coordinate={[geolocation.lng, geolocation.lat]}
-            >
+              coordinate={[geolocation.lng, geolocation.lat]}>
               <TouchableOpacity
                 onPress={() => {
-                  console.log('Selected coordinates:', geolocation);
                   setSelectedCoordinates(geolocation);
-                }}
-              >
+                }}>
                 <Image
-                  source={{ uri: firstImage }}
-                  contentFit="cover"
+                  source={{uri: firstImage}}
+                  resizeMode="cover"
                   style={[
                     styles.image,
+                    // eslint-disable-next-line react-native/no-inline-styles
                     {
                       borderColor: isListingSelected
                         ? colors.white

@@ -1,57 +1,53 @@
-import { useNavigation } from '@react-navigation/native'
-import React, { FC, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import { ScreenHeader } from '../../components'
-import SavedCardDetails from '../../components/SavedCardDetails/SavedCardDetails'
+import React, {FC, useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {ScreenHeader} from '../../components';
+import SavedCardDetails from '../../components/SavedCardDetails/SavedCardDetails';
+// import {useNavigation} from '@react-navigation/native';
 import {
   currentUserProgressSelector,
   fetchCurrentUser,
   stripeCustomerSelector,
-} from '../../slices/user.slice'
-import { colors } from '../../theme'
-import { widthScale } from '../../util'
-import { ensurePaymentMethodCard, ensureStripeCustomer } from '../../util/data'
-import PaymentMethodsForm from './components/PaymentMethodsForm'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+} from '../../slices/user.slice';
+import {colors} from '../../theme';
+import {widthScale} from '../../util';
+import {ensurePaymentMethodCard, ensureStripeCustomer} from '../../util/data';
+import PaymentMethodsForm from './components/PaymentMethodsForm';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
+import {AppDispatch} from '../../sharetribeSetup';
 
-interface PaymentMethodProps { }
+interface PaymentMethodProps {}
 
-export const PaymentMethods: FC<PaymentMethodProps> = props => {
-  const navigation = useNavigation()
-  const stripeCustomer = useSelector(stripeCustomerSelector)
-  const currentUserProgress = useSelector(currentUserProgressSelector)
-  const { t } = useTranslation()
-  const dispatch = useDispatch()
+export const PaymentMethods: FC<PaymentMethodProps> = () => {
+  // const navigation = useNavigation();
+  const stripeCustomer = useSelector(stripeCustomerSelector);
+  const currentUserProgress = useSelector(currentUserProgressSelector);
+  const {t} = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     dispatch(
-      fetchCurrentUser({ include: ['stripeCustomer.defaultPaymentMethod'] }),
-    )
-  }, [dispatch])
+      fetchCurrentUser({include: ['stripeCustomer.defaultPaymentMethod']}),
+    );
+  }, [dispatch]);
 
   const stripeCustomerDefaultPaymentMethodId = ensurePaymentMethodCard(
     stripeCustomer?.defaultPaymentMethod,
-  ).id
+  ).id;
   const stripeCustomerDefaultPaymentMethodCard = ensurePaymentMethodCard(
     stripeCustomer?.defaultPaymentMethod,
-  ).attributes.card
+  ).attributes.card;
   const hasDefaultPaymentMethod =
     ensureStripeCustomer(stripeCustomer).attributes.stripeCustomerId &&
-    stripeCustomerDefaultPaymentMethodId
+    stripeCustomerDefaultPaymentMethodId;
   const card = hasDefaultPaymentMethod
     ? stripeCustomerDefaultPaymentMethodCard
-    : null
+    : null;
 
   return (
     <View style={styles.container}>
-      <ScreenHeader
-        onLeftIconPress={() => {
-          navigation.pop()
-        }}
-        title={t('PaymentMethodsPage.heading')}
-      />
+      <ScreenHeader title={t('PaymentMethodsPage.heading')} />
       {currentUserProgress ? (
         <View style={styles.screenLoaderStyle}>
           <ActivityIndicator size={'large'} color={colors.grey} />
@@ -59,7 +55,12 @@ export const PaymentMethods: FC<PaymentMethodProps> = props => {
       ) : (
         <>
           {hasDefaultPaymentMethod ? (
-            <SavedCardDetails card={card} />
+            <View
+              style={{
+                paddingHorizontal: widthScale(20),
+              }}>
+              <SavedCardDetails card={card} />
+            </View>
           ) : (
             <KeyboardAwareScrollView
               showsVerticalScrollIndicator={false}
@@ -76,16 +77,17 @@ export const PaymentMethods: FC<PaymentMethodProps> = props => {
         </>
       )}
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.white,
   },
   cardContainer: {
     flex: 1,
   },
-  contentContainer: { flexGrow: 1, marginBottom: widthScale(40) },
-  screenLoaderStyle: { justifyContent: 'center', flex: 1 },
-})
+  contentContainer: {flexGrow: 1, marginBottom: widthScale(40)},
+  screenLoaderStyle: {justifyContent: 'center', flex: 1},
+});

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, {FC} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -8,15 +8,16 @@ import {
   View,
   Image,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { card as cardIcon } from '../../assets';
+import {useDispatch, useSelector} from 'react-redux';
+import {card as cardIcon} from '../../assets';
 import {
   deletePMInProgressSelector,
   deletePaymentMethod,
 } from '../../slices/paymentMethods.slice';
-import { colors, fontWeight } from '../../theme';
-import { fontScale, hitSlope, widthScale } from '../../util';
-import { useTranslation } from 'react-i18next';
+import {colors, fontWeight} from '../../theme';
+import {fontScale, hitSlope, widthScale} from '../../util';
+import {useTranslation} from 'react-i18next';
+import {AppDispatch} from '../../sharetribeSetup';
 
 interface CardProps {
   brand: string;
@@ -29,12 +30,13 @@ interface SaveCardDetailsProp {
   card: CardProps;
 }
 const SavedCardDetails: FC<SaveCardDetailsProp> = props => {
-  const { card } = props;
+  const {card} = props;
+  const dispatch = useDispatch<AppDispatch>();
+  const {t} = useTranslation();
   const deletePMInProgress = useSelector(deletePMInProgressSelector);
-  const dispatch = useDispatch();
-  const { t } = useTranslation();
+
   const handleRemovePaymentMethod = () => {
-    dispatch(deletePaymentMethod());
+    dispatch(deletePaymentMethod({}));
   };
 
   const conditionalStyle = deletePMInProgress ? 'center' : 'flex-end';
@@ -54,7 +56,7 @@ const SavedCardDetails: FC<SaveCardDetailsProp> = props => {
       </View>
       <TouchableOpacity
         hitSlop={hitSlope(15)}
-        style={[styles.removeCardView, { alignSelf: conditionalStyle }]}
+        style={[styles.removeCardView, {alignSelf: conditionalStyle}]}
         onPress={() =>
           Alert.alert(
             t('SavedCardDetails.removeCardModalTitle'),
@@ -72,10 +74,11 @@ const SavedCardDetails: FC<SaveCardDetailsProp> = props => {
               },
             ],
           )
-        }
-      >
+        }>
         {deletePMInProgress ? (
-          <ActivityIndicator size={'small'} color={colors.grey} />
+          <View style={styles.loader}>
+            <ActivityIndicator size={'small'} color={colors.grey} />
+          </View>
         ) : (
           <Text style={styles.removeTextStyle}>
             {t('SavedCardDetails.deletePaymentMethod')}
@@ -89,10 +92,9 @@ const SavedCardDetails: FC<SaveCardDetailsProp> = props => {
 export default SavedCardDetails;
 
 const styles = StyleSheet.create({
-  flexDir: { flexDirection: 'row', flex: 1 },
   card: {
-    flex: 1,
-    marginHorizontal: widthScale(24),
+    // flex: 1,
+    // marginHorizontal: widthScale(24),
     marginTop: widthScale(30),
   },
   cardView: {
@@ -107,6 +109,7 @@ const styles = StyleSheet.create({
     height: widthScale(15),
     marginLeft: widthScale(16),
   },
+  flexDir: {flexDirection: 'row', flex: 1},
   dotted: {
     fontSize: fontScale(13),
     lineHeight: fontScale(18),
@@ -129,13 +132,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   removeTextStyle: {
-    fontSize: fontScale(13),
+    marginTop: widthScale(10),
+    fontSize: fontScale(14),
     lineHeight: fontScale(18),
-    fontWeight: fontWeight.medium,
-    color: colors.grey,
+    fontWeight: fontWeight.normal,
+    color: colors.darkGrey,
   },
   removeCardView: {
     marginTop: widthScale(7),
     marginLeft: widthScale(2),
+  },
+  loader: {
+    // backgroundColor: 'gold',
+    marginTop: widthScale(10),
   },
 });

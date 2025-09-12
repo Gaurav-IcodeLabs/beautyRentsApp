@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, {useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import isEqual from 'lodash/isEqual';
 import {
   LayoutAnimation,
@@ -12,11 +12,11 @@ import {
   View,
   Image,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cross } from '../../../assets';
-import { Button, RangeSlider, RenderTextInputField } from '../../../components';
-import { store, useAppDispatch } from '../../../sharetribeSetup';
-import { colors, fontWeight } from '../../../theme';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {cross} from '../../../assets';
+import {Button, RangeSlider, RenderTextInputField} from '../../../components';
+import {store, useAppDispatch} from '../../../sharetribeSetup';
+import {colors, fontWeight} from '../../../theme';
 import {
   fontScale,
   PRIMARY_FILTER,
@@ -24,7 +24,7 @@ import {
   SCHEMA_TYPE_TEXT,
   widthScale,
 } from '../../../util';
-import { handleCategoryPress, handleMultipleSelect } from '../helper';
+import {handleCategoryPress, handleMultipleSelect} from '../helper';
 import {
   defaultSearchParams,
   searchListings,
@@ -32,9 +32,9 @@ import {
 } from '../Search.slice';
 import RenderCategories from './RenderCategories';
 import SectionListItem from './SectionListItem';
-import { ListingSearchTypes } from '../../../appTypes';
-import { useForm } from 'react-hook-form';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import {ListingSearchTypes} from '../../../appTypes';
+import {useForm} from 'react-hook-form';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 
 const HIGHEST_VALUE = 100000;
 const LOWEST_VALUE = 0;
@@ -43,20 +43,20 @@ const FilterModal = props => {
     low: LOWEST_VALUE,
     high: HIGHEST_VALUE,
   });
-  const { visible, onRequestClose, config, activeSortKey, searchType } = props;
+  const {visible, onRequestClose, config, activeSortKey, searchType} = props;
   const showTextFilter = searchType === ListingSearchTypes.LOCATION;
   const [selectedCategories, setSelectedCategories] = useState({});
   const [selectedFilters, setSelectedFilters] = useState({});
   const dispatch = useAppDispatch();
-  const { top, bottom } = useSafeAreaInsets();
+  const {top, bottom} = useSafeAreaInsets();
   const categoryData = config.categoryConfiguration;
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
   const {
     control,
     getValues,
     setValue,
-    formState: { isValid },
+    formState: {isValid},
   } = useForm({
     defaultValues: {
       keywords: '',
@@ -70,11 +70,11 @@ const FilterModal = props => {
   });
 
   const prieceFilter = isPriceFilterActive
-    ? { price: `${range.low},${range.high}` }
+    ? {price: `${range.low},${range.high}`}
     : {};
   // Filter out text filters and filters with indexForSearch: false
   const filteredCustomFilters = useMemo(() => {
-    const { listingFields } = config?.listing || {};
+    const {listingFields} = config?.listing || {};
     return listingFields
       .filter(
         filter =>
@@ -109,7 +109,7 @@ const FilterModal = props => {
 
     const searchParams = searchParamsSelector(store.getState());
     const keywords = getValues('keywords');
-    const keywordsFilter = keywords ? { keywords: `${keywords}` } : {};
+    const keywordsFilter = keywords ? {keywords: `${keywords}`} : {};
     dispatch(
       searchListings({
         searchParams: {
@@ -136,20 +136,19 @@ const FilterModal = props => {
         config,
       }),
     );
-    setRange({ low: LOWEST_VALUE, high: HIGHEST_VALUE });
+    setRange({low: LOWEST_VALUE, high: HIGHEST_VALUE});
     onRequestClose();
   };
 
-  LayoutAnimation.easeInEaseOut();
+  // LayoutAnimation.easeInEaseOut();
 
   return (
     <Modal
       visible={visible}
       animationType="fade"
-      onRequestClose={onRequestClose}
-    >
+      onRequestClose={onRequestClose}>
       <View style={styles.container}>
-        <View style={[styles.header, { marginTop: top }]}>
+        <View style={[styles.header, {marginTop: top}]}>
           <View style={styles.headerInnerUpperConteainer}>
             <TouchableOpacity onPress={onRequestClose}>
               <Image contentFit="contain" source={cross} style={styles.cross} />
@@ -167,8 +166,7 @@ const FilterModal = props => {
 
         <KeyboardAwareScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollView}
-        >
+          contentContainerStyle={styles.scrollView}>
           <View style={styles.categoryContainer}>
             <Text style={styles.contentLable}>
               {t('FilterComponent.categoryLabel')}
@@ -195,7 +193,7 @@ const FilterModal = props => {
                 data: [filter], // Each filter becomes a section with one item
               }))}
               keyExtractor={item => item.key}
-              renderItem={({ item }) => (
+              renderItem={({item}) => (
                 <SectionListItem
                   selectedFilters={selectedFilters}
                   item={item}
@@ -209,7 +207,7 @@ const FilterModal = props => {
                   }
                 />
               )}
-              renderSectionHeader={({ section: { title } }) => (
+              renderSectionHeader={({section: {title}}) => (
                 <Text style={styles.contentLable}>{title}</Text>
               )}
               renderSectionFooter={() => <View style={styles.sectionFooter} />}
@@ -236,16 +234,16 @@ const FilterModal = props => {
             <RangeSlider
               valueHigh={range.high}
               valueLow={range.low}
-              initialValue={{ low: LOWEST_VALUE, high: HIGHEST_VALUE }}
+              initialValue={{low: LOWEST_VALUE, high: HIGHEST_VALUE}}
               handleValueChange={(low, high) => {
-                setRange({ low, high });
+                setRange({low, high});
               }}
               style={styles.rangeSlider}
             />
           </View>
         </KeyboardAwareScrollView>
         <Button
-          style={[styles.button, { marginBottom: bottom + widthScale(20) }]}
+          style={[styles.button, {marginBottom: bottom + widthScale(20)}]}
           text="Search"
           onPress={handleSearchQuery}
         />

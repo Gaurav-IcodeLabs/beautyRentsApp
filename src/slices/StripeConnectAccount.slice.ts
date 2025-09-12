@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { storableError } from '../util/errors'
-import { fetchCurrentUser } from './user.slice'
-import { RootState } from '../sharetribeSetup'
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {storableError} from '../util/errors';
+import {fetchCurrentUser} from './user.slice';
+import {RootState} from '../sharetribeSetup';
 
 const initialState = {
   // The state for creating a stripe account
@@ -25,7 +25,7 @@ const initialState = {
 
   // Indicates whether the stripe account has been fetched
   stripeAccountFetched: false,
-}
+};
 
 const StripeConnectAccount = createSlice({
   name: 'StripeConnectAccount',
@@ -38,60 +38,60 @@ const StripeConnectAccount = createSlice({
      * @param {object} action - The action object that triggered the function.
      */
     stripeAccountClearError: (state, action) => {
-      state = initialState
+      state = initialState;
     },
     clearStripeInfo: (state, action) => {
-      console.log('Stripe Info Cleared')
-      return initialState
+      console.log('Stripe Info Cleared');
+      return initialState;
     },
   },
   extraReducers: builder => {
     builder.addCase(createStripeAccount.pending, (state, action) => {
-      state.createStripeAccountError = null
-      state.createStripeAccountInProgress = true
-    })
+      state.createStripeAccountError = null;
+      state.createStripeAccountInProgress = true;
+    });
     builder.addCase(createStripeAccount.fulfilled, (state, action) => {
-      state.createStripeAccountInProgress = false
-      state.stripeAccount = action.payload
-      state.stripeAccountFetched = true
-    })
+      state.createStripeAccountInProgress = false;
+      state.stripeAccount = action.payload;
+      state.stripeAccountFetched = true;
+    });
     builder.addCase(createStripeAccount.rejected, (state, action) => {
-      state.createStripeAccountError = action.error
-      state.createStripeAccountInProgress = false
-    })
+      state.createStripeAccountError = action.error;
+      state.createStripeAccountInProgress = false;
+    });
 
     builder.addCase(updateStripeAccount.pending, (state, action) => {
-      state.updateStripeAccountError = null
-      state.updateStripeAccountInProgress = true
-    })
+      state.updateStripeAccountError = null;
+      state.updateStripeAccountInProgress = true;
+    });
     builder.addCase(updateStripeAccount.fulfilled, (state, action) => {
-      state.updateStripeAccountInProgress = false
-      state.stripeAccount = action.payload
-      state.stripeAccountFetched = true
-    })
+      state.updateStripeAccountInProgress = false;
+      state.stripeAccount = action.payload;
+      state.stripeAccountFetched = true;
+    });
     builder.addCase(updateStripeAccount.rejected, (state, action) => {
-      state.updateStripeAccountError = action.error
-      state.createStripeAccountInProgress = false
-    })
+      state.updateStripeAccountError = action.error;
+      state.createStripeAccountInProgress = false;
+    });
     builder.addCase(fetchStripeAccount.pending, (state, action) => {
-      state.fetchStripeAccountError = null
-      state.fetchStripeAccountInProgress = true
-    })
+      state.fetchStripeAccountError = null;
+      state.fetchStripeAccountInProgress = true;
+    });
     builder.addCase(fetchStripeAccount.fulfilled, (state, action) => {
-      state.stripeAccount = action.payload
-      state.fetchStripeAccountInProgress = false
-      state.stripeAccountFetched = true
-    })
+      state.stripeAccount = action.payload;
+      state.fetchStripeAccountInProgress = false;
+      state.stripeAccountFetched = true;
+    });
     builder.addCase(fetchStripeAccount.rejected, (state, action) => {
-      state.fetchStripeAccountError = action.error
-      state.fetchStripeAccountInProgress = false
-    })
+      state.fetchStripeAccountError = action.error;
+      state.fetchStripeAccountInProgress = false;
+    });
   },
-})
+});
 
 export const createStripeAccount = createAsyncThunk(
   'StripeConnectAccount/createStripeAccount',
-  async (params: any, { dispatch, extra: sdk }: any) => {
+  async (params: any, {dispatch, extra: sdk}: any) => {
     const {
       country,
       accountType,
@@ -99,52 +99,51 @@ export const createStripeAccount = createAsyncThunk(
       businessProfileMCC,
       businessProfileURL,
       accountToken,
-    } = params
+    } = params;
 
     // Capabilities are a collection of settings that can be requested for each provider.
     // What Capabilities are required determines what information Stripe requires to be
     // collected from the providers.
     // You can read more from here: https://stripe.com/docs/connect/capabilities-overview
     // In Flex both 'card_payments' and 'transfers' are required.
-    const requestedCapabilities = ['card_payments', 'transfers']
+    const requestedCapabilities = ['card_payments', 'transfers'];
 
-    console.log('params for uploading-->>', {
-      country,
-      accountToken,
-      bankAccountToken,
-      requestedCapabilities,
-      businessProfileMCC,
-      businessProfileURL,
-    })
+    // console.log('params for uploading-->>', {
+    //   country,
+    //   accountToken,
+    //   // bankAccountToken,
+    //   requestedCapabilities,
+    //   businessProfileMCC,
+    //   businessProfileURL,
+    // });
     return sdk.stripeAccount
       .create(
         {
           country,
           accountToken,
-          bankAccountToken,
+          // bankAccountToken,
           requestedCapabilities,
           businessProfileMCC,
           businessProfileURL,
         },
-
-        { expand: true },
+        {expand: true},
       )
       .then((response: any) => {
-        const res = dispatch(fetchCurrentUser({}))
-        const stripeAccount = response.data.data
-        return stripeAccount
+        const res = dispatch(fetchCurrentUser({}));
+        const stripeAccount = response.data.data;
+        return stripeAccount;
       })
       .catch((err: any) => {
-        console.log('sdk.stripeAccounterr', JSON.stringify(err))
-        const e = storableError(err)
+        console.log('sdk.stripeAccounterr', JSON.stringify(err));
+        const e = storableError(err);
         const stripeMessage =
           e.apiErrors && e.apiErrors.length > 0 && e.apiErrors[0].meta
             ? e.apiErrors[0].meta.stripeMessage
-            : null
-        throw e
-      })
+            : null;
+        throw e;
+      });
   },
-)
+);
 // This function is used for updating the bank account token
 // but could be expanded to other information as well.
 //
@@ -155,8 +154,8 @@ export const createStripeAccount = createAsyncThunk(
 // https://www.sharetribe.com/api-reference/?javascript#update-stripe-account
 export const updateStripeAccount = createAsyncThunk(
   'StripeConnectAccount/updateStripeAccount',
-  (params: any, { dispatch, getState, extra: sdk }: any) => {
-    const bankAccountToken = params.bankAccountToken
+  (params: any, {dispatch, getState, extra: sdk}: any) => {
+    const bankAccountToken = params.bankAccountToken;
 
     return sdk.stripeAccount
       .update(
@@ -164,46 +163,46 @@ export const updateStripeAccount = createAsyncThunk(
           bankAccountToken,
           requestedCapabilities: ['card_payments', 'transfers'],
         },
-        { expand: true },
+        {expand: true},
       )
       .then((response: any) => {
-        const stripeAccount = response.data.data
-        return stripeAccount
+        const stripeAccount = response.data.data;
+        return stripeAccount;
       })
       .catch((err: any) => {
-        const e = storableError(err)
+        const e = storableError(err);
         const stripeMessage =
           e.apiErrors && e.apiErrors.length > 0 && e.apiErrors[0].meta
             ? e.apiErrors[0].meta.stripeMessage
-            : null
+            : null;
         // console.error(err, 'update-stripe-account-failed', { stripeMessage })
-        throw e
-      })
+        throw e;
+      });
   },
-)
+);
 
 export const fetchStripeAccount = createAsyncThunk(
   'StripeConnectAccount/fetchStripeAccount',
-  async (_, { dispatch, getState, extra: sdk }: any) => {
+  async (_, {dispatch, getState, extra: sdk}: any) => {
     try {
-      const res = await sdk.stripeAccount.fetch()
-      const stripeAccount = res.data.data
-      return stripeAccount
+      const res = await sdk.stripeAccount.fetch();
+      const stripeAccount = res.data.data;
+      return stripeAccount;
     } catch (error: any) {
-      const e = storableError(error)
+      const e = storableError(error);
       const stripeMessage =
         e.apiErrors && e.apiErrors.length > 0 && e.apiErrors[0].meta
           ? e.apiErrors[0].meta.stripeMessage
-          : null
-      throw new Error(stripeMessage)
+          : null;
+      throw new Error(stripeMessage);
     }
   },
-)
+);
 
 export const getStripeConnectAccountLink = createAsyncThunk(
   'StripeConnectAccount/getStripeConnectAccountLink',
-  (params: any, { dispatch, getState, extra: sdk }: any) => {
-    const { failureURL, successURL, type } = params
+  (params: any, {dispatch, getState, extra: sdk}: any) => {
+    const {failureURL, successURL, type} = params;
     return sdk.stripeAccountLinks
       .create({
         failureURL,
@@ -213,24 +212,24 @@ export const getStripeConnectAccountLink = createAsyncThunk(
       })
       .then((response: any) => {
         // Return the account link
-        return response.data.data.attributes.url
+        return response.data.data.attributes.url;
       })
       .catch((err: any) => {
-        const e = storableError(err)
+        const e = storableError(err);
 
         const stripeMessage =
           e.apiErrors && e.apiErrors.length > 0 && e.apiErrors[0].meta
             ? e.apiErrors[0].meta.stripeMessage
-            : null
+            : null;
         // console.error(err, 'get-stripe-account-link-failed', { stripeMessage })
-        throw e
-      })
+        throw e;
+      });
   },
-)
+);
 
 //// action creators /////
-export const { stripeAccountClearError, clearStripeInfo } =
-  StripeConnectAccount.actions
+export const {stripeAccountClearError, clearStripeInfo} =
+  StripeConnectAccount.actions;
 
 //missing
 export const getAccountLinkErrorSelector = state =>
@@ -254,6 +253,6 @@ export const getAccountLinkErrorSelector = state =>
   stripeAccountFetchedSelector = state =>
     state.StripeConnectAccount.stripeAccountFetched,
   fetchStripeAccountInProgress = state =>
-    state.StripeConnectAccount.fetchStripeAccountInProgress
+    state.StripeConnectAccount.fetchStripeAccountInProgress;
 
-export default StripeConnectAccount.reducer
+export default StripeConnectAccount.reducer;

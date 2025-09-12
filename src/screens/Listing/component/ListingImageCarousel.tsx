@@ -1,14 +1,14 @@
 import React from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Image as ImageTypes } from '../../../appTypes/interfaces/common';
+import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Image as ImageTypes} from '../../../appTypes/interfaces/common';
 import {
   AnimatedDotsCarousel,
   AppImage,
   FullImageModal,
   LikeButton,
 } from '../../../components';
-import { fontScale, screenWidth, widthScale } from '../../../util';
-import { colors, fontWeight } from '../../../theme';
+import {fontScale, screenWidth, widthScale} from '../../../util';
+import {colors, fontWeight} from '../../../theme';
 
 interface ListingImageCarouselProps {
   images: ImageTypes[];
@@ -18,7 +18,7 @@ interface ListingImageCarouselProps {
 }
 
 const ListingImageCarousel = (props: ListingImageCarouselProps) => {
-  const { images, totalRatingSum = 0, totalRatings = 0, listingId } = props;
+  const {images, totalRatingSum = 0, totalRatings = 0, listingId} = props;
   const [open, setOpen] = React.useState(false);
   const [image, setImage] = React.useState<ImageTypes | null>(null);
   const [paginationIndex, setPaginationIndex] = React.useState(0);
@@ -26,7 +26,7 @@ const ListingImageCarousel = (props: ListingImageCarouselProps) => {
   const onScrollEnd = (e: any) => {
     const {
       nativeEvent: {
-        contentOffset: { x },
+        contentOffset: {x},
       },
     } = e;
     const index = Math.floor(x / screenWidth);
@@ -44,21 +44,20 @@ const ListingImageCarousel = (props: ListingImageCarouselProps) => {
         data={images}
         overScrollMode="never"
         bounces={false}
-        renderItem={({ item }) => {
+        renderItem={({item}) => {
           return (
             <Pressable
               onPress={() => {
-                setOpen(true);
-                setImage(item);
+                // setOpen(true);
+                // setImage(item);
               }}
-              style={styles.imageContainer}
-            >
+              style={styles.imageContainer}>
               <AppImage
                 source={{
                   uri: item?.attributes?.variants?.['listing-card']?.url,
                 }}
                 width={screenWidth - widthScale(40)}
-                style={{ borderRadius: widthScale(10) }}
+                style={{borderRadius: widthScale(10)}}
               />
             </Pressable>
           );
@@ -77,9 +76,8 @@ const ListingImageCarousel = (props: ListingImageCarouselProps) => {
       <View
         style={[
           styles.ratingSection,
-          { bottom: images?.length > 1 ? widthScale(7 + 28) : widthScale(7) },
-        ]}
-      >
+          {bottom: images?.length > 1 ? widthScale(7 + 28) : widthScale(7)},
+        ]}>
         <Text style={styles.rating}>
           {averageRating} ({totalRatings}) {'Reviews'}
         </Text>

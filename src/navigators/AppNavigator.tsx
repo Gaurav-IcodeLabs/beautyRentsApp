@@ -6,12 +6,12 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
-import React, { useEffect } from 'react';
-import { AppStackParamList } from '../appTypes';
+import React, {useEffect} from 'react';
+import {AppStackParamList} from '../appTypes';
 import * as Screens from '../screens';
-import { useTypedSelector } from '../sharetribeSetup';
-import { currentUserIdSelector } from '../slices/user.slice';
-import { Linking } from 'react-native';
+import {useTypedSelector} from '../sharetribeSetup';
+import {currentUserIdSelector} from '../slices/user.slice';
+import {Linking} from 'react-native';
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -81,9 +81,8 @@ const AppStack = () => {
 
   return (
     <Stack.Navigator
-      screenOptions={{ headerShown: false, gestureEnabled: false }}
-      initialRouteName={currentUserId ? 'Main' : 'Login'}
-    >
+      screenOptions={{headerShown: false, gestureEnabled: false}}
+      initialRouteName={currentUserId ? 'Main' : 'Login'}>
       <Stack.Screen name="SignUp" component={Screens.SignUp} />
       <Stack.Screen name="Login" component={Screens.Login} />
       <Stack.Screen
@@ -97,13 +96,13 @@ const AppStack = () => {
       <Stack.Screen name="Listing" component={Screens.Listing} />
       <Stack.Screen name="Inbox" component={Screens.Inbox} />
       <Stack.Screen name="Settings" component={Screens.Settings} />
-      {/* <Stack.Screen name="PaymentMethods" component={Screens.PaymentMethods} /> */}
+      <Stack.Screen name="PaymentMethods" component={Screens.PaymentMethods} />
       <Stack.Screen name="Profile" component={Screens.Profile} />
       <Stack.Screen name="TermsOfService" component={Screens.TermsOfService} />
       <Stack.Screen name="PrivacyPolicy" component={Screens.PrivacyPolicy} />
       <Stack.Screen name="About" component={Screens.About} />
       <Stack.Screen name="ResetPassword" component={Screens.ResetPassword} />
-      {/* <Stack.Screen name="PayoutSetup" component={Screens.PayoutSetup} /> */}
+      <Stack.Screen name="PayoutSetup" component={Screens.PayoutSetup} />
       <Stack.Screen name="ContactDetails" component={Screens.ContactDetails} />
       <Stack.Screen name="DeleteAccount" component={Screens.DeleteAccount} />
       <Stack.Screen
@@ -114,8 +113,8 @@ const AppStack = () => {
         name="ProfileSettings"
         component={Screens.ProfileSettings}
       />
-      {/* <Stack.Screen name="Transaction" component={Screens.Transaction} /> */}
-      {/* <Stack.Screen name="Checkout" component={Screens.Checkout} /> */}
+      <Stack.Screen name="Transaction" component={Screens.Transaction} />
+      <Stack.Screen name="Checkout" component={Screens.Checkout} />
       <Stack.Screen
         name="SearchListingMap"
         component={Screens.SearchListingMap}
