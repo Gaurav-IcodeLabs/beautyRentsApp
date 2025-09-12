@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {
   fontScale,
@@ -6,11 +6,11 @@ import {
   types as sdkTypes,
   widthScale,
 } from '../../../util';
-import { formatMoney } from '../../../util/currency';
-import { useTranslation } from 'react-i18next';
-import { colors, fontWeight } from '../../../theme';
+import {formatMoney} from '../../../util/currency';
+import {useTranslation} from 'react-i18next';
+import {colors, fontWeight} from '../../../theme';
 
-const { Money } = sdkTypes;
+const {Money} = sdkTypes;
 
 // Validate the assumption that the commission exists and the amount
 // is zero or positive.
@@ -23,8 +23,8 @@ const isValidCommission = commissionLineItem => {
 };
 
 const LineItemCustomerCommissionMaybe = props => {
-  const { t } = useTranslation();
-  const { lineItems, isCustomer, marketplaceName } = props;
+  const {t} = useTranslation();
+  const {lineItems, isCustomer, marketplaceName} = props;
 
   const customerCommissionLineItem = lineItems.find(
     item => item.code === LINE_ITEM_CUSTOMER_COMMISSION && !item.reversal,
@@ -35,7 +35,6 @@ const LineItemCustomerCommissionMaybe = props => {
 
   if (isCustomer && customerCommissionLineItem) {
     if (!isValidCommission(customerCommissionLineItem)) {
-      // eslint-disable-next-line no-console
       console.error(
         'invalid commission line item:',
         customerCommissionLineItem,
@@ -45,7 +44,8 @@ const LineItemCustomerCommissionMaybe = props => {
       );
     }
 
-    const commission = customerCommissionLineItem.lineTotal;
+    const commission = customerCommissionLineItem?.lineTotal;
+    const commissionAmount = commission ? formatMoney(commission, 2) : null;
 
     commissionItem = (
       <>
@@ -56,7 +56,7 @@ const LineItemCustomerCommissionMaybe = props => {
               role: 'customer',
             })}
           </Text>
-          <Text style={styles.value}>{formatMoney(commission, 2)}</Text>
+          <Text style={styles.value}>{commissionAmount}</Text>
         </View>
         <View style={styles.itemSeperatorStyle} />
       </>

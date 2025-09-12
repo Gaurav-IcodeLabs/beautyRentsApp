@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {
   fontScale,
@@ -19,11 +19,11 @@ import LineItemCustomerCommissionRefundMaybe from './lineItems/LineItemCustomerC
 import LineItemProviderCommissionMaybe from './lineItems/LineItemProviderCommissionMaybe';
 import LineItemProviderCommissionRefundMaybe from './lineItems/LineItemProviderCommissionRefundMaybe';
 import LineItemTotalPrice from './lineItems/LineItemTotalPrice';
-import { useTranslation } from 'react-i18next';
-import { colors, fontWeight } from '../../theme';
+import {useTranslation} from 'react-i18next';
+import {colors, fontWeight} from '../../theme';
 
-const OrderBreakdown = props => {
-  const { t } = useTranslation();
+const OrderBreakdown = (props: any) => {
+  const {t} = useTranslation();
   const {
     userRole,
     transaction,
@@ -36,18 +36,18 @@ const OrderBreakdown = props => {
 
   const isCustomer = userRole === 'customer';
   const isProvider = userRole === 'provider';
-  const allLineItems = transaction.attributes.lineItems || [];
+  const allLineItems = transaction?.attributes?.lineItems || [];
   // We'll show only line-items that are specific for the current userRole (customer vs provider)
-  const lineItems = allLineItems.filter(lineItem =>
-    lineItem.includeFor.includes(userRole),
+  const lineItems = allLineItems?.filter((lineItem: any) =>
+    lineItem?.includeFor.includes(userRole),
   );
   const unitLineItem = lineItems.find(
-    item => LISTING_UNIT_TYPES.includes(item.code) && !item.reversal,
+    (item: any) => LISTING_UNIT_TYPES.includes(item.code) && !item.reversal,
   );
   // Line-item code that matches with base unit: day, night, hour, item
   const lineItemUnitType = unitLineItem?.code;
 
-  const hasCommissionLineItem = lineItems.find(item => {
+  const hasCommissionLineItem = lineItems?.find((item: any) => {
     const hasCustomerCommission =
       isCustomer && item.code === LINE_ITEM_CUSTOMER_COMMISSION;
     const hasProviderCommission =

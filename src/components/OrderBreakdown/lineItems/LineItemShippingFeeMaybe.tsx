@@ -1,26 +1,28 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import { fontScale, LINE_ITEM_SHIPPING_FEE, widthScale } from '../../../util';
-import { useTranslation } from 'react-i18next';
-import { formatMoney } from '../../../util/currency';
-import { colors, fontWeight } from '../../../theme';
+import {fontScale, LINE_ITEM_SHIPPING_FEE, widthScale} from '../../../util';
+import {useTranslation} from 'react-i18next';
+import {formatMoney} from '../../../util/currency';
+import {colors, fontWeight} from '../../../theme';
 
-const LineItemShippingFeeMaybe = props => {
-  const { t } = useTranslation();
+const LineItemShippingFeeMaybe = (props: any) => {
+  const {t} = useTranslation();
 
-  const { lineItems } = props;
+  const {lineItems} = props;
 
   const shippingFeeLineItem = lineItems.find(
-    item => item.code === LINE_ITEM_SHIPPING_FEE && !item.reversal,
+    (item: any) => item.code === LINE_ITEM_SHIPPING_FEE && !item.reversal,
   );
+  const amount =
+    shippingFeeLineItem && shippingFeeLineItem?.lineTotal
+      ? formatMoney(shippingFeeLineItem?.lineTotal, 2)
+      : null;
 
   return shippingFeeLineItem ? (
     <>
       <View style={styles.container}>
         <Text style={styles.label}>{t('OrderBreakdown.shippingFee')}</Text>
-        <Text style={styles.value}>
-          {formatMoney(shippingFeeLineItem?.lineTotal, 2)}
-        </Text>
+        <Text style={styles.value}>{amount}</Text>
       </View>
       <View style={styles.itemSeperatorStyle} />
     </>
