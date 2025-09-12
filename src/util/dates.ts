@@ -1,5 +1,5 @@
 import moment from 'moment-timezone/builds/moment-timezone-with-data-10-year-range.min';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
 export const START_DATE = 'startDate';
 export const END_DATE = 'endDate';
@@ -140,7 +140,7 @@ export const daysBetween = (startDate, endDate) => {
 };
 
 export const getItemLastUpdatedTime = (date: string): string => {
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const currentTime = new Date().getTime();
   const postTime = new Date(date).getTime();
   const timeDifferenceInSeconds = Math.round((currentTime - postTime) / 1000);
@@ -212,7 +212,7 @@ export const isSameDay = (date1, date2, timeZone) => {
  */
 export const isValidTimeZone = timeZone => {
   try {
-    new Intl.DateTimeFormat('en-US', { timeZone }).format();
+    new Intl.DateTimeFormat('en-US', {timeZone}).format();
     return true;
   } catch (e) {
     return false;
@@ -262,7 +262,7 @@ const getTimeZoneMaybe = timeZone => {
     if (!isValidTimeZone(timeZone)) {
       throw new Error(`Given time zone key (${timeZone}) is not valid.`);
     }
-    return { timeZone };
+    return {timeZone};
   }
   return {};
 };
@@ -283,7 +283,7 @@ const getTimeZoneMaybe = timeZone => {
  */
 
 export const formatDateIntoPartials = (date, opts = {}) => {
-  const { timeZone } = opts;
+  const {timeZone} = opts;
   const timeZoneMaybe = getTimeZoneMaybe(timeZone);
 
   // console.log('date.....', JSON.stringify(date))
@@ -295,7 +295,7 @@ export const formatDateIntoPartials = (date, opts = {}) => {
 
   const now = new Date();
   const yearMaybe =
-    now.getFullYear() === date.getFullYear() ? {} : { year: 'numeric' };
+    now.getFullYear() === date.getFullYear() ? {} : {year: 'numeric'};
 
   const formatDate = formatOptions => {
     return date.toLocaleString('en-US', formatOptions);
@@ -311,10 +311,42 @@ export const formatDateIntoPartials = (date, opts = {}) => {
 
   return {
     date: formatDate(formatString),
-    time: formatDate({ hour: 'numeric', minute: 'numeric', ...timeZoneMaybe }),
+    time: formatDate({hour: 'numeric', minute: 'numeric', ...timeZoneMaybe}),
     dateAndTime: formatDate(formatString),
   };
 };
+
+// export const formatDateIntoPartials = (
+//   date: Date | string | number,
+//   opts: {timeZone?: string} = {},
+// ) => {
+//   const {timeZone} = opts;
+//   const timeZoneMaybe = getTimeZoneMaybe(timeZone);
+//   console.log('timeZoneMaybe', timeZoneMaybe);
+
+//   if (!(date instanceof Date)) {
+//     // console.error('Invalid date object:', date);
+//     return {}; // Return an empty object or handle the error appropriately
+//   }
+
+//   // Use moment-timezone if timeZone is provided
+//   const mDate = timeZone ? moment.tz(date, timeZone) : moment(date);
+//   if (!mDate.isValid()) {
+//     return {date: '', time: '', dateAndTime: ''};
+//   }
+
+//   const now = moment();
+//   const localizedNow = timeZone ? now.tz(timeZone) : now;
+//   const yearMaybe = localizedNow.isSame(mDate, 'year') ? {} : {year: 'numeric'};
+
+//   return {
+//     date: mDate.format(yearMaybe.year ? 'MMM D, YYYY' : 'MMM D'),
+//     time: mDate.format('hh:mm A'),
+//     dateAndTime: mDate.format(
+//       yearMaybe.year ? 'MMM D, YYYY hh:mm A' : 'MMM D hh:mm A',
+//     ),
+//   };
+// };
 
 /**
  * Format the given date. Printed string depends on how close the date is the current day.
@@ -333,7 +365,7 @@ export const formatDateWithProximity = (date, todayString, opts = {}) => {
     throw new Error(`Invalid params for formatDate: (${date}, ${todayString})`);
   }
 
-  const { timeZone } = opts;
+  const {timeZone} = opts;
   const localizedNow = timeZone ? moment().tz(timeZone) : moment();
 
   const dateMoment = timeZone ? moment(date).tz(timeZone) : moment(date);
@@ -612,7 +644,10 @@ const findBookingUnitBoundaries = params => {
     return findBookingUnitBoundaries({
       ...params,
       cumulatedResults: [...cumulatedResults, ...newBoundary],
+      // currentBoundary: nextBoundaryFn(currentBoundary, timeUnit, timeZone),
+
       currentBoundary: moment(
+        //previous
         nextBoundaryFn(currentBoundary, timeUnit, timeZone),
       ),
     });
