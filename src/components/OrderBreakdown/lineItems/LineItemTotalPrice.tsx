@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import { getProcess, resolveLatestProcessName } from '../../../transactions';
-import { useTranslation } from 'react-i18next';
-import { formatMoney } from '../../../util/currency';
-import { colors, fontWeight } from '../../../theme';
-import { fontScale } from '../../../util';
+import {getProcess, resolveLatestProcessName} from '../../../transactions';
+import {useTranslation} from 'react-i18next';
+import {formatMoney} from '../../../util/currency';
+import {colors, fontWeight} from '../../../theme';
+import {fontScale, widthScale} from '../../../util';
 
-const LineItemTotalPrice = props => {
-  const { t } = useTranslation();
-  const { transaction, isProvider } = props;
+const LineItemTotalPrice = (props: any) => {
+  const {t} = useTranslation();
+  const {transaction, isProvider} = props;
   const processName = resolveLatestProcessName(
     transaction?.attributes?.processName,
   );
@@ -37,12 +37,15 @@ const LineItemTotalPrice = props => {
   const totalPrice = isProvider
     ? transaction.attributes.payoutTotal
     : transaction.attributes.payinTotal;
-  const formattedTotalPrice = formatMoney(totalPrice, 2);
+  const formattedTotalPrice = totalPrice ? formatMoney(totalPrice, 2) : null;
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{totalLabel}</Text>
-      <Text style={styles.value}>{formattedTotalPrice}</Text>
-    </View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.label}>{totalLabel}</Text>
+        <Text style={styles.value}>{formattedTotalPrice}</Text>
+      </View>
+      <View style={styles.itemSeperatorStyle} />
+    </>
   );
 };
 
@@ -53,8 +56,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.lightGrey,
   },
   label: {
     fontSize: fontScale(14),
@@ -65,5 +66,10 @@ const styles = StyleSheet.create({
     fontSize: fontScale(14),
     fontWeight: fontWeight.normal,
     color: colors.black,
+  },
+  itemSeperatorStyle: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.grey,
+    marginVertical: widthScale(6),
   },
 });

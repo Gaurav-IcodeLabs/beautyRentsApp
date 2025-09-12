@@ -1,4 +1,4 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 export type AppStackParamList = {
   SignUp: undefined;
@@ -16,6 +16,7 @@ export type AppStackParamList = {
   ResetPassword: undefined;
   Main: undefined;
   ProfileSettings: undefined;
+  PaymentMethods: undefined;
   TermsOfService: undefined;
   PrivacyPolicy: undefined;
   About: undefined;
@@ -25,6 +26,8 @@ export type AppStackParamList = {
   SearchListingMap: undefined;
   OtherUserProfile: undefined;
   WishList: undefined;
+  Checkout: undefined;
+  Transaction: undefined;
 };
 
 export type SignupScreenProps = NativeStackScreenProps<

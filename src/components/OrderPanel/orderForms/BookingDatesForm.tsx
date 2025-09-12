@@ -1,8 +1,8 @@
-import React, { memo, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { Alert, LayoutAnimation, StyleSheet, ScrollView } from 'react-native';
-import { useConfiguration } from '../../../context';
+import React, {memo, useState} from 'react';
+import {useForm} from 'react-hook-form';
+import {useTranslation} from 'react-i18next';
+import {Alert, StyleSheet, ScrollView, View} from 'react-native';
+import {useConfiguration} from '../../../context';
 import {
   fetchLineItemsErrorSelector,
   fetchLineItemsInProgressSelector,
@@ -10,16 +10,16 @@ import {
   lineItemsSelector,
   monthlyTimeSlotsSelector,
 } from '../../../screens/Listing/Listing.slice';
-import { useAppDispatch, useTypedSelector } from '../../../sharetribeSetup';
-import { BOOKING_PROCESS_NAME } from '../../../transactions';
+import {useAppDispatch, useTypedSelector} from '../../../sharetribeSetup';
+import {BOOKING_PROCESS_NAME} from '../../../transactions';
 import {
   getStartOf,
   timeOfDayFromLocalToTimeZone,
   widthScale,
 } from '../../../util';
-import { Button } from '../../Button/Button';
-import { Calendar } from '../../Calendar/Calendar';
-import { RenderTextInputField } from '../../RenderTextInputField/RenderTextInputField';
+import {Button} from '../../Button/Button';
+import {Calendar} from '../../Calendar/Calendar';
+import {RenderTextInputField} from '../../RenderTextInputField/RenderTextInputField';
 import EstimatedCustomerBreakdownMaybe from '../components/EstimatedCustomerBreakdownMaybe';
 
 import moment from 'moment';
@@ -29,22 +29,29 @@ import {
   pickMonthlyTimeSlots,
   timeSlotEqualsDay,
 } from '../OrderPanel.helper';
+import {PROVIDER_VALID_COUPON_CODE} from '@env';
 
 const TODAY = new Date();
 
-const BookingDatesForm = props => {
-  const { onSubmit, price, listingId, timeZone, marketplaceCurrency } = props;
-  LayoutAnimation.linear();
-  const { t } = useTranslation();
-  const config = useConfiguration();
+const BookingDatesForm = (props: any) => {
+  const {
+    onSubmit,
+    price,
+    listingId,
+    timeZone,
+    marketplaceCurrency,
+    onCloseBookingModal,
+    isInstantBooking,
+  } = props;
+  const {t} = useTranslation();
+  const config = useConfiguration() as any;
   const dispatch = useAppDispatch();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const monthlyTimeSlots = useTypedSelector(state =>
     monthlyTimeSlotsSelector(state, listingId.uuid),
   );
-  const lineItems = useTypedSelector(state =>
-    lineItemsSelector(state, listingId.uuid),
-  );
+  const lineItems =
+    useTypedSelector(state => lineItemsSelector(state, listingId.uuid)) || [];
 
   const fetchLineItemsInProgress = useTypedSelector(state =>
     fetchLineItemsInProgressSelector(state, listingId.uuid),
@@ -56,40 +63,43 @@ const BookingDatesForm = props => {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
 
+  const buttonKey = isInstantBooking
+    ? 'BookingTimeForm.bookNow'
+    : 'BookingDatesForm.requestToBook';
+
   const {
     control,
     handleSubmit,
     setValue,
-    watch,
     getValues,
-    formState: { errors, isValid, isDirty },
+    // formState: {errors, isValid, isDirty},
     reset,
   } = useForm({
     defaultValues: {
+      isDayOrHourBooking: 'day',
       bookingEndDate: '',
       bookingStartDate: '',
+      couponCode: '',
     },
     mode: 'all',
   });
 
-  const dateFormattingOptions = {
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
-  };
-
-  const formattedDate = new Intl.DateTimeFormat(
-    'en-US',
-    dateFormattingOptions,
-  ).format(TODAY);
+  }).format(TODAY);
 
   const handleStartDate = () => {
     setIsCalendarOpen(true);
   };
 
   const handleOnSubmit = values => {
-    const { bookingStartDate, bookingEndDate } = values;
-    if (!bookingStartDate && !bookingEndDate) return;
+    const {bookingStartDate, bookingEndDate, isDayOrHourBooking, couponCode} =
+      values;
+    if (!bookingStartDate && !bookingEndDate) {
+      return;
+    }
     const startDate = bookingStartDate
       ? timeOfDayFromLocalToTimeZone(selectedStartDate, timeZone)
       : null;
@@ -98,13 +108,22 @@ const BookingDatesForm = props => {
       : null;
     endDate?.setDate(endDate.getDate() + 1);
 
+    const hasCouponDiscount = lineItems.some(
+      item => item?.code === 'line-item/coupon-discount',
+    );
+
     const param = {
+      isDayOrHourBooking,
       bookingDates: {
         startDate: startDate,
         endDate: endDate,
       },
+      ...(hasCouponDiscount && couponCode === PROVIDER_VALID_COUPON_CODE
+        ? {couponCode}
+        : {}),
     };
 
+    onCloseBookingModal();
     onSubmit(param);
     setSelectedStartDate(null);
     setSelectedEndDate(null);
@@ -133,6 +152,31 @@ const BookingDatesForm = props => {
     dispatch(fetchTransactionLineItems(params));
   };
 
+  const handleApplyClick = async () => {
+    const coupon = getValues('couponCode');
+    if (coupon !== PROVIDER_VALID_COUPON_CODE) {
+      return;
+    }
+
+    const startDate = timeOfDayFromLocalToTimeZone(selectedStartDate, timeZone);
+    const endDate = timeOfDayFromLocalToTimeZone(selectedEndDate, timeZone);
+    endDate?.setDate(endDate.getDate() + 1);
+
+    const params = {
+      orderData: {
+        bookingStart: startDate,
+        bookingEnd: endDate,
+        couponCode: coupon,
+      },
+      listingId,
+      isOwnListing: false,
+      isDayOrHourBooking: 'day',
+      marketplaceCurrency: marketplaceCurrency,
+    };
+
+    dispatch(fetchTransactionLineItems(params));
+  };
+
   const breakdownData =
     getValues().bookingStartDate && getValues().bookingEndDate
       ? {
@@ -148,8 +192,8 @@ const BookingDatesForm = props => {
     !fetchLineItemsError;
 
   const markedDates = {
-    [selectedStartDate]: { selected: true, disableTouchEvent: true },
-    [selectedEndDate]: { selected: true, disableTouchEvent: true },
+    [selectedStartDate]: {selected: true, disableTouchEvent: true},
+    [selectedEndDate]: {selected: true, disableTouchEvent: true},
   };
 
   const isDayBlock = date => {
@@ -166,7 +210,7 @@ const BookingDatesForm = props => {
     );
   };
 
-  const customDayComponent = memo(({ date, state }) => {
+  const customDayComponent = memo(({date, state}) => {
     const isSelected = markedDates[date.dateString]?.selected ?? false;
     return (
       <CustomDayComponent
@@ -231,8 +275,7 @@ const BookingDatesForm = props => {
     <ScrollView
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
-      bounces={false}
-    >
+      bounces={false}>
       <RenderTextInputField
         control={control}
         name={'bookingStartDate'}
@@ -250,6 +293,26 @@ const BookingDatesForm = props => {
         editable={false}
       />
 
+      <View style={styles.couponCodeSection}>
+        <RenderTextInputField
+          control={control}
+          name={'couponCode'}
+          labelKey={'Coupon Code'}
+          placeholderKey={'Enter your coupon code'}
+          style={styles.couponInput}
+          autoCapitalize="none"
+        />
+
+        <Button
+          text="Apply"
+          onPress={() => handleApplyClick()}
+          style={styles.couponBtn}
+          disabled={
+            !selectedStartDate || !selectedEndDate || fetchLineItemsInProgress
+          }
+        />
+      </View>
+
       {showEstimatedBreakdown ? (
         <EstimatedCustomerBreakdownMaybe
           breakdownData={breakdownData}
@@ -262,10 +325,12 @@ const BookingDatesForm = props => {
       ) : null}
 
       <Button
-        text={t('BookingDatesForm.requestToBook')}
+        text={t(buttonKey)}
         onPress={handleSubmit(handleOnSubmit)}
         loading={fetchLineItemsInProgress}
-        disabled={!selectedStartDate || !selectedEndDate}
+        disabled={
+          !selectedStartDate || !selectedEndDate || fetchLineItemsInProgress
+        }
       />
       {isCalendarOpen && (
         <Calendar
@@ -296,5 +361,17 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingBottom: widthScale(50),
+  },
+  couponCodeSection: {
+    flexDirection: 'row',
+    marginBottom: widthScale(20),
+  },
+  couponInput: {
+    flex: 1,
+    marginRight: widthScale(20),
+  },
+  couponBtn: {
+    paddingHorizontal: widthScale(20),
+    marginTop: widthScale(28),
   },
 });

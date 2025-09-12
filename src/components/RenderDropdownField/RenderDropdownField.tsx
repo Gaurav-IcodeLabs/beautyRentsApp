@@ -1,11 +1,11 @@
 import React from 'react';
-import { Controller } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { colors, fontWeight } from '../../theme';
-import { fontScale, heightScale, screenWidth, widthScale } from '../../util';
-import { lightenColor } from '../../util/data';
+import {Controller} from 'react-hook-form';
+import {useTranslation} from 'react-i18next';
+import {StyleProp, StyleSheet, Text, View, ViewStyle} from 'react-native';
+import {Dropdown} from 'react-native-element-dropdown';
+import {colors, fontWeight} from '../../theme';
+import {fontScale, heightScale, screenWidth, widthScale} from '../../util';
+import {lightenColor} from '../../util/data';
 
 interface RenderDropdownFieldProps {
   disabled?: boolean;
@@ -44,21 +44,22 @@ export const RenderDropdownField = (props: RenderDropdownFieldProps) => {
     style = {},
   } = props;
   // const [isFocus, setIsFocus] = React.useState(false);
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   // const colors: AppColors = useColors()
-  if (disabled) return null;
+  if (disabled) {
+    return null;
+  }
   return (
     <View
       style={[
         Styles.container,
         style,
-        containerWidth ? { width: screenWidth - widthScale(40) } : '',
-      ]}
-    >
+        containerWidth ? {width: screenWidth - widthScale(40)} : '',
+      ]}>
       <Controller
         control={control}
         name={name}
-        render={({ field: { value, onChange, onBlur } }) => {
+        render={({field: {value, onChange, onBlur}}) => {
           return (
             <View style={[Styles.outerContainer]}>
               {lableKey ? (
@@ -86,8 +87,7 @@ export const RenderDropdownField = (props: RenderDropdownFieldProps) => {
                             ? lightenColor(colors.marketplaceColor, 10)
                             : colors.white,
                         },
-                      ]}
-                    >
+                      ]}>
                       <Text style={[Styles.itemText]}>
                         {item[`${itemRenderKey}`]}
                       </Text>
@@ -107,8 +107,9 @@ export const RenderDropdownField = (props: RenderDropdownFieldProps) => {
                   onBlur();
                 }}
                 onChange={item => {
-                  if (onDropDownValueChange)
+                  if (onDropDownValueChange) {
                     onDropDownValueChange(item, onChange);
+                  }
                   // setIsFocus(false);
                 }}
               />

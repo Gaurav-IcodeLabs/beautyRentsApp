@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {
   fontScale,
@@ -8,12 +8,12 @@ import {
   widthScale,
 } from '../../../util';
 import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
-import { colors, fontWeight } from '../../../theme';
+import {useTranslation} from 'react-i18next';
+import {colors, fontWeight} from '../../../theme';
 
-const BookingPeriod = props => {
-  const { t } = useTranslation();
-  const { startDate, endDate, dateType, timeZone } = props;
+const BookingPeriod = (props: any) => {
+  const {t} = useTranslation();
+  const {startDate, endDate} = props;
 
   const formattedStartString = dayjs(startDate).format('DD MMM dddd');
 
@@ -26,7 +26,9 @@ const BookingPeriod = props => {
       </View>
       <View style={styles.section}>
         <Text style={styles.label}>{t('OrderBreakdown.bookingEnd')}</Text>
-        <Text style={[styles.value, { textAlign: 'right' }]}>
+        <Text
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={[styles.value, {textAlign: 'right'}]}>
           {formattedEndString}
         </Text>
       </View>
@@ -34,8 +36,8 @@ const BookingPeriod = props => {
   );
 };
 
-const LineItemBookingPeriod = props => {
-  const { booking, code, dateType, timeZone } = props;
+const LineItemBookingPeriod = (props: any) => {
+  const {booking, code, dateType, timeZone} = props;
 
   if (!booking) {
     return null;
@@ -44,7 +46,7 @@ const LineItemBookingPeriod = props => {
   // from actual start and end times used for availability reservation. It can help in situations
   // where there are preparation time needed between bookings.
   // Read more: https://www.sharetribe.com/api-reference/marketplace.html#bookings
-  const { start, end, displayStart, displayEnd } = booking.attributes;
+  const {start, end, displayStart, displayEnd} = booking.attributes;
   const localStartDate = displayStart || start;
   const localEndDateRaw = displayEnd || end;
 
@@ -53,7 +55,7 @@ const LineItemBookingPeriod = props => {
   const endDay =
     isNightly || isHour
       ? localEndDateRaw
-      : subtractTime(localEndDateRaw, 1, 'days');
+      : subtractTime(localEndDateRaw, 1, 'days', timeZone);
   return (
     <>
       <BookingPeriod

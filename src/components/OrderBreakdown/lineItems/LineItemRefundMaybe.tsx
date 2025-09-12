@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import { formatMoney } from '../../../util/currency';
+import {formatMoney} from '../../../util/currency';
 import {
   fontScale,
   LINE_ITEM_CUSTOMER_COMMISSION,
@@ -9,10 +9,10 @@ import {
   widthScale,
 } from '../../../util';
 import Decimal from 'decimal.js';
-import { useTranslation } from 'react-i18next';
-import { colors, fontWeight } from '../../../theme';
+import {useTranslation} from 'react-i18next';
+import {colors, fontWeight} from '../../../theme';
 
-const { Money } = sdkTypes;
+const {Money} = sdkTypes;
 /**
  * Calculates the total price in sub units for multiple line items.
  */
@@ -44,8 +44,8 @@ const nonCommissionReversalLineItems = lineItems => {
 };
 
 const LineItemRefundMaybe = props => {
-  const { t } = useTranslation();
-  const { lineItems, marketplaceCurrency } = props;
+  const {t} = useTranslation();
+  const {lineItems, marketplaceCurrency} = props;
 
   // all non-commission, reversal line items
   const refundLineItems = nonCommissionReversalLineItems(lineItems);

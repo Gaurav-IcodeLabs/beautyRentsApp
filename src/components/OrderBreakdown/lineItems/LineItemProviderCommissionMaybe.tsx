@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {
   fontScale,
@@ -6,26 +6,27 @@ import {
   types as sdkTypes,
   widthScale,
 } from '../../../util';
-import { formatMoney } from '../../../util/currency';
-import { useTranslation } from 'react-i18next';
-import { colors, fontWeight } from '../../../theme';
+import {formatMoney} from '../../../util/currency';
+import {useTranslation} from 'react-i18next';
+import {colors, fontWeight} from '../../../theme';
 
-const { Money } = sdkTypes;
+const {Money} = sdkTypes;
 // Validate the assumption that the commission exists and the amount
 // is zero or negative.
-const isValidCommission = commissionLineItem => {
+const isValidCommission = (commissionLineItem: any) => {
   return (
     commissionLineItem.lineTotal instanceof Money &&
     commissionLineItem.lineTotal.amount <= 0
   );
 };
 
-const LineItemProviderCommissionMaybe = props => {
-  const { t } = useTranslation();
-  const { lineItems, isProvider, marketplaceName } = props;
+const LineItemProviderCommissionMaybe = (props: any) => {
+  const {t} = useTranslation();
+  const {lineItems, isProvider, marketplaceName} = props;
 
   const providerCommissionLineItem = lineItems.find(
-    item => item.code === LINE_ITEM_PROVIDER_COMMISSION && !item.reversal,
+    (item: any) =>
+      item.code === LINE_ITEM_PROVIDER_COMMISSION && !item.reversal,
   );
 
   // If commission is passed it will be shown as a fee already reduces from the total price
@@ -37,7 +38,6 @@ const LineItemProviderCommissionMaybe = props => {
   // https://www.sharetribe.com/docs/concepts/transaction-process/
   if (isProvider && providerCommissionLineItem) {
     if (!isValidCommission(providerCommissionLineItem)) {
-      // eslint-disable-next-line no-console
       console.error(
         'invalid commission line item:',
         providerCommissionLineItem,
@@ -47,7 +47,8 @@ const LineItemProviderCommissionMaybe = props => {
       );
     }
 
-    const commission = providerCommissionLineItem.lineTotal;
+    const commission = providerCommissionLineItem?.lineTotal;
+    const commissionAmount = commission ? formatMoney(commission, 2) : null;
 
     commissionItem = (
       <>
@@ -58,7 +59,7 @@ const LineItemProviderCommissionMaybe = props => {
               role: 'provider',
             })}
           </Text>
-          <Text style={styles.value}>{formatMoney(commission, 2)}</Text>
+          <Text style={styles.value}>{commissionAmount}</Text>
         </View>
         <View style={styles.itemSeperatorStyle} />
       </>

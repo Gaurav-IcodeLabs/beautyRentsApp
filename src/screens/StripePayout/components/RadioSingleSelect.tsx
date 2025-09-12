@@ -1,8 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { FC } from 'react';
-import { Controller } from 'react-hook-form';
-import { fontScale, heightScale, widthScale } from '../../../util';
-import { colors } from '../../../theme';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {FC} from 'react';
+import {Controller} from 'react-hook-form';
+import {fontScale, heightScale, widthScale} from '../../../util';
+import {colors, fontWeight} from '../../../theme';
 
 type BookingTypeOption = {
   id: string;
@@ -20,33 +20,33 @@ type RadioSingleSelectProps = {
   disabled?: boolean;
 };
 const RadioSingleSelect: FC<RadioSingleSelectProps> = props => {
-  const { control, name, options = [], disabled } = props;
-  // const color: AppColors = useColors()
+  const {control, name, options = [], disabled} = props;
 
   return (
     <View style={styles.GAP}>
       <Controller
         control={control}
         name={name}
-        render={({ field: { onChange, value } }) => {
-          return options?.map(item => (
-            <TouchableOpacity
-              disabled={disabled}
-              style={styles.rowCont}
-              key={item.id}
-              onPress={() => onChange(item.key)}
-            >
-              {value === item.key ? (
-                <View style={[styles.Incircle]}>
-                  <View style={[styles.fillCircle]} />
-                </View>
-              ) : (
-                <View style={styles.offCircle} />
-              )}
-              <Text style={styles.textRadio}>{item.label}</Text>
-            </TouchableOpacity>
-          ));
-        }}
+        render={({field: {onChange, value}}) => (
+          <View>
+            {options?.map(item => (
+              <TouchableOpacity
+                disabled={disabled}
+                style={styles.rowCont}
+                key={item.id}
+                onPress={() => onChange(item.key)}>
+                {value === item.key ? (
+                  <View style={styles.Incircle}>
+                    <View style={styles.fillCircle} />
+                  </View>
+                ) : (
+                  <View style={styles.offCircle} />
+                )}
+                <Text style={styles.textRadio}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       />
     </View>
   );
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   },
   textRadio: {
     fontSize: fontScale(15),
-    fontWeight: '500',
+    fontWeight: fontWeight.normal,
     marginLeft: widthScale(15),
   },
 });

@@ -1,22 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { widthScale } from '../../../util'
-import { colors } from '../../../theme'
+import {StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+import {useTranslation} from 'react-i18next';
+import {fontScale, widthScale} from '../../../util';
+import {colors, fontWeight} from '../../../theme';
 
-const BreakdownMaybe = props => {
-  const { t } = useTranslation()
-  const { orderBreakdown, processName } = props
+const BreakdownMaybe = (props: any) => {
+  const {t} = useTranslation();
+  const {orderBreakdown, processName} = props;
   return orderBreakdown ? (
     <View style={styles.container}>
-      <Text>{t(`TransactionPanel.${processName}.orderBreakdownTitle`)}</Text>
+      <Text style={styles.heading}>
+        {t(`TransactionPanel.${processName}.orderBreakdownTitle`)}
+      </Text>
       <View style={styles.itemSeperatorStyle} />
       {orderBreakdown}
     </View>
-  ) : null
-}
+  ) : null;
+};
 
-export default BreakdownMaybe
+export default BreakdownMaybe;
 
 const styles = StyleSheet.create({
   itemSeperatorStyle: {
@@ -25,6 +27,11 @@ const styles = StyleSheet.create({
     marginVertical: widthScale(6),
   },
   container: {
-    padding: widthScale(20),
+    // padding: widthScale(20),
   },
-})
+  heading: {
+    fontSize: fontScale(16),
+    fontWeight: fontWeight.medium,
+    color: colors.black,
+  },
+});

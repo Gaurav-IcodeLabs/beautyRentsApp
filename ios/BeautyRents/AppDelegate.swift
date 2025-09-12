@@ -4,36 +4,31 @@ import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-  var window: UIWindow?
+class AppDelegate: RCTAppDelegate {
 
-  var reactNativeDelegate: ReactNativeDelegate?
-  var reactNativeFactory: RCTReactNativeFactory?
-
-  func application(
+  override func application(
     _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
   ) -> Bool {
-    let delegate = ReactNativeDelegate()
-    let factory = RCTReactNativeFactory(delegate: delegate)
-    delegate.dependencyProvider = RCTAppDependencyProvider()
-
-    reactNativeDelegate = delegate
-    reactNativeFactory = factory
-
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    factory.startReactNative(
-      withModuleName: "BeautyRents",
-      in: window,
-      launchOptions: launchOptions
-    )
-
-    return true
+    self.moduleName = "BeautyRents"
+    self.dependencyProvider = RCTAppDependencyProvider()
+    self.initialProps = [:]
+    showSplashScreen()
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-}
 
-class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+  //Add below method in AppDelegate.swift
+    private func showSplashScreen() {
+      if let splashClass = NSClassFromString("SplashView") as? NSObject.Type,
+          let splashInstance = splashClass.perform(NSSelectorFromString("sharedInstance"))?.takeUnretainedValue() as? NSObject {
+          splashInstance.perform(NSSelectorFromString("showSplash"))
+          print("✅ Splash Screen Shown Successfully")
+      } else {
+          print("⚠️ SplashView module not found")
+      }
+    }
+
+
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     self.bundleURL()
   }

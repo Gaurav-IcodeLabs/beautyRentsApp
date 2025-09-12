@@ -1,24 +1,26 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import { fontScale, LINE_ITEM_PICKUP_FEE, widthScale } from '../../../util';
-import { useTranslation } from 'react-i18next';
-import { formatMoney } from '../../../util/currency';
-import { colors, fontWeight } from '../../../theme';
+import {fontScale, LINE_ITEM_PICKUP_FEE, widthScale} from '../../../util';
+import {useTranslation} from 'react-i18next';
+import {formatMoney} from '../../../util/currency';
+import {colors, fontWeight} from '../../../theme';
 
-const LineItemPickupFeeMaybe = props => {
-  const { t } = useTranslation();
-  const { lineItems } = props;
+const LineItemPickupFeeMaybe = (props: any) => {
+  const {t} = useTranslation();
+  const {lineItems} = props;
 
   const pickupFeeLineItem = lineItems.find(
-    item => item.code === LINE_ITEM_PICKUP_FEE && !item.reversal,
+    (item: any) => item.code === LINE_ITEM_PICKUP_FEE && !item.reversal,
   );
+  const amount =
+    pickupFeeLineItem && pickupFeeLineItem?.lineTotal
+      ? formatMoney(pickupFeeLineItem?.lineTotal, 2)
+      : null;
   return pickupFeeLineItem ? (
     <>
       <View style={styles.container}>
         <Text style={styles.label}>{t('OrderBreakdown.pickupFee')}</Text>
-        <Text style={styles.value}>
-          {formatMoney(pickupFeeLineItem?.lineTotal, 2)}
-        </Text>
+        <Text style={styles.value}>{amount}</Text>
       </View>
       <View style={styles.itemSeperatorStyle} />
     </>

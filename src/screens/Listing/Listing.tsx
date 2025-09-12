@@ -1,11 +1,11 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { ListingScreenProps } from '../../appTypes';
-import { ScreenHeader } from '../../components';
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import {ListingScreenProps} from '../../appTypes';
+import {ScreenHeader} from '../../components';
 import OrderPanel from '../../components/OrderPanel/OrderPanel';
-import { useConfiguration } from '../../context';
-import { useAppDispatch, useTypedSelector } from '../../sharetribeSetup';
+import {useConfiguration} from '../../context';
+import {useAppDispatch, useTypedSelector} from '../../sharetribeSetup';
 import {
   entitiesSelector,
   getListingsById,
@@ -14,8 +14,8 @@ import {
   INQUIRY_PROCESS_NAME,
   resolveLatestProcessName,
 } from '../../transactions';
-import { types as sdkTypes, timestampToDate, widthScale } from '../../util';
-import { setInitialValues } from '../Checkout/Checkout.slice';
+import {types as sdkTypes, timestampToDate, widthScale} from '../../util';
+import {setInitialValues} from '../Checkout/Checkout.slice';
 import CustomListingFields from './component/CustomListingFields';
 import ListingDetails from './component/ListingDetails';
 import ListingImageCarousel from './component/ListingImageCarousel';
@@ -29,10 +29,10 @@ import {
   loadListing,
 } from './Listing.slice';
 import InquiryModal from './modal/InquiryModal';
-import { colors } from '../../theme';
-import { currentUserIdSelector } from '../../slices/user.slice';
+import {colors} from '../../theme';
+import {currentUserIdSelector} from '../../slices/user.slice';
 
-const { UUID } = sdkTypes;
+const {UUID} = sdkTypes;
 
 export const Listing: React.FC<ListingScreenProps> = props => {
   const navigation = useNavigation();
@@ -45,7 +45,9 @@ export const Listing: React.FC<ListingScreenProps> = props => {
   );
   const currentUserId = useTypedSelector(currentUserIdSelector);
   useMemo(() => {
-    if (isListingPageCreated) return;
+    if (isListingPageCreated) {
+      return;
+    }
     dispatch(addPageToState(pageListingId));
   }, []);
   const entities = useTypedSelector(entitiesSelector);
@@ -66,10 +68,10 @@ export const Listing: React.FC<ListingScreenProps> = props => {
   } = listing?.attributes || {};
 
   useEffect(() => {
-    dispatch(loadListing({ id: pageListingId, config }));
+    dispatch(loadListing({id: pageListingId, config}));
   }, []);
 
-  const handleOrderSubmit = values => {
+  const handleOrderSubmit = (values: any) => {
     const {
       bookingDates,
       bookingStartTime,
@@ -78,9 +80,11 @@ export const Listing: React.FC<ListingScreenProps> = props => {
       bookingEndDate, // not relevant (omit)
       quantity: quantityRaw,
       deliveryMethod,
+      isDayOrHourBooking,
       ...otherOrderData
     } = values || {};
-    console.log('values', values);
+    // console.log('bookingStartTime', bookingStartTime);
+    // console.log('bookingEndTime', bookingEndTime);
 
     const bookingMaybe = bookingDates
       ? {
@@ -99,8 +103,8 @@ export const Listing: React.FC<ListingScreenProps> = props => {
       : {};
 
     const quantity = Number.parseInt(quantityRaw, 10);
-    const quantityMaybe = Number.isInteger(quantity) ? { quantity } : {};
-    const deliveryMethodMaybe = deliveryMethod ? { deliveryMethod } : {};
+    const quantityMaybe = Number.isInteger(quantity) ? {quantity} : {};
+    const deliveryMethodMaybe = deliveryMethod ? {deliveryMethod} : {};
     const initialValues = {
       listing,
       orderData: {
@@ -108,13 +112,16 @@ export const Listing: React.FC<ListingScreenProps> = props => {
         ...quantityMaybe,
         ...deliveryMethodMaybe,
         ...otherOrderData,
+        isDayOrHourBooking,
       },
       confirmPaymentError: null,
     };
-    console.log('initialValues', initialValues);
 
-    // dispatch(setInitialValues(initialValues));
-    // navigation.navigate('Checkout');
+    // console.log('initialValues', JSON.stringify(initialValues));
+    // return;
+
+    dispatch(setInitialValues(initialValues));
+    navigation.navigate('Checkout');
   };
 
   const transactionProcessAlias =

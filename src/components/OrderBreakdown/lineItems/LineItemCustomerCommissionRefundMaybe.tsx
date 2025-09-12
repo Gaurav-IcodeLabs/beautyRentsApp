@@ -1,29 +1,31 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {
   fontScale,
   LINE_ITEM_CUSTOMER_COMMISSION,
   widthScale,
 } from '../../../util';
-import { formatMoney } from '../../../util/currency';
-import { useTranslation } from 'react-i18next';
-import { colors, fontWeight } from '../../../theme';
+import {formatMoney} from '../../../util/currency';
+import {useTranslation} from 'react-i18next';
+import {colors, fontWeight} from '../../../theme';
 
-const LineItemCustomerCommissionRefundMaybe = props => {
-  const { t } = useTranslation();
-  const { lineItems, isCustomer, marketplaceName } = props;
+const LineItemCustomerCommissionRefundMaybe = (props: any) => {
+  const {t} = useTranslation();
+  const {lineItems, isCustomer, marketplaceName} = props;
 
   const refund = lineItems.find(
-    item => item.code === LINE_ITEM_CUSTOMER_COMMISSION && item.reversal,
+    (item: any) => item.code === LINE_ITEM_CUSTOMER_COMMISSION && item.reversal,
   );
+  const refundAmount =
+    refund && refund?.lineTotal ? formatMoney(refund?.lineTotal, 2) : null;
 
   return isCustomer && refund ? (
     <>
       <View style={styles.container}>
         <Text style={styles.label}>
-          {t('OrderBreakdown.refundCustomerFee', { marketplaceName })}
+          {t('OrderBreakdown.refundCustomerFee', {marketplaceName})}
         </Text>
-        <Text style={styles.value}>{formatMoney(refund.lineTotal, 2)}</Text>
+        <Text style={styles.value}>{refundAmount}</Text>
       </View>
       <View style={styles.itemSeperatorStyle} />
     </>

@@ -3,14 +3,15 @@
 // You can find these api endpoints from 'server/api/...' directory
 import CookieManager from '@react-native-cookies/cookies';
 import appSettings from '../config/settings';
-import { types as sdkTypes, transit } from './sdkLoader';
+import {types as sdkTypes, transit} from './sdkLoader';
 import Decimal from 'decimal.js';
 import sharetribeTokenStore from '../sharetribeTokenStore';
-import { SHARETRIBE_SDK_CLIENT_ID } from '../sharetribeSetup';
+import {SHARETRIBE_SDK_CLIENT_ID} from '../sharetribeSetup';
+import {REACT_NATIVE_MARKETPLACE_ROOT_URL} from '@env';
 
 export const apiBaseUrl = () => {
-  // return 'http://192.168.68.123:3500';
-  return process.env.REACT_NATIVE_MARKETPLACE_ROOT_URL;
+  // return 'http://192.168.68.124:3500';
+  return REACT_NATIVE_MARKETPLACE_ROOT_URL;
 };
 // Application type handlers for JS SDK.
 //
@@ -33,7 +34,7 @@ const serialize = data => {
 };
 
 const deserialize = str => {
-  return transit.read(str, { typeHandlers });
+  return transit.read(str, {typeHandlers});
 };
 
 const methods = {
@@ -47,12 +48,12 @@ const methods = {
 // If server/api returns data from SDK, you should set Content-Type to 'application/transit+json'
 const request = (path, options = {}, token = '') => {
   const url = `${apiBaseUrl()}${path}`;
-  const { credentials, headers, body, ...rest } = options;
+  const {credentials, headers, body, ...rest} = options;
   // If headers are not set, we assume that the body should be serialized as transit format.
   const shouldSerializeBody =
     (!headers || headers['Content-Type'] === 'application/transit+json') &&
     body;
-  const bodyMaybe = shouldSerializeBody ? { body: serialize(body) } : {};
+  const bodyMaybe = shouldSerializeBody ? {body: serialize(body)} : {};
 
   const fetchOptions = {
     credentials: credentials || 'include',
@@ -60,7 +61,7 @@ const request = (path, options = {}, token = '') => {
     // we default to 'application/transit+json' as content type (as SDK uses transit).
     headers: headers || {
       'Content-Type': 'application/transit+json',
-      ...(token ? { Cookie: token } : {}),
+      ...(token ? {Cookie: token} : {}),
     },
     ...bodyMaybe,
     ...rest,

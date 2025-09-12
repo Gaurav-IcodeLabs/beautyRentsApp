@@ -3,7 +3,7 @@
  *   - default-booking
  */
 
-import { Transitions } from '../appTypes'
+import {Transitions} from '../appTypes';
 
 /**
  * Transitions
@@ -47,6 +47,8 @@ export const transitions = {
   // The backend automatically expire the transaction.
   EXPIRE: 'transition/expire',
 
+  INSTANT_BOOKING: 'transition/instant-booking',
+
   // Admin can also cancel the transition.
   CANCEL: 'transition/cancel',
 
@@ -64,7 +66,7 @@ export const transitions = {
   EXPIRE_CUSTOMER_REVIEW_PERIOD: 'transition/expire-customer-review-period',
   EXPIRE_PROVIDER_REVIEW_PERIOD: 'transition/expire-provider-review-period',
   EXPIRE_REVIEW_PERIOD: 'transition/expire-review-period',
-}
+};
 
 /**
  * States
@@ -89,7 +91,7 @@ export const states = {
   REVIEWED: 'reviewed',
   REVIEWED_BY_CUSTOMER: 'reviewed-by-customer',
   REVIEWED_BY_PROVIDER: 'reviewed-by-provider',
-}
+};
 
 /**
  * Description of transaction process graph
@@ -172,9 +174,9 @@ export const graph = {
         [transitions.EXPIRE_CUSTOMER_REVIEW_PERIOD]: states.REVIEWED,
       },
     },
-    [states.REVIEWED]: { type: 'final' },
+    [states.REVIEWED]: {type: 'final'},
   },
-}
+};
 
 // Check if a transition is the kind that should be rendered
 // when showing transition history (e.g. ActivityFeed)
@@ -194,8 +196,8 @@ export const isRelevantPastTransition = (transition: Transitions) => {
     transitions.REVIEW_1_BY_PROVIDER,
     transitions.REVIEW_2_BY_CUSTOMER,
     transitions.REVIEW_2_BY_PROVIDER,
-  ].includes(transition)
-}
+  ].includes(transition);
+};
 
 // Processes might be different on how reviews are handled.
 // Default processes use two-sided diamond shape, where either party can make the review first
@@ -203,8 +205,8 @@ export const isCustomerReview = (transition: Transitions) => {
   return [
     transitions.REVIEW_1_BY_CUSTOMER,
     transitions.REVIEW_2_BY_CUSTOMER,
-  ].includes(transition)
-}
+  ].includes(transition);
+};
 
 // Processes might be different on how reviews are handled.
 // Default processes use two-sided diamond shape, where either party can make the review first
@@ -212,8 +214,8 @@ export const isProviderReview = (transition: Transitions) => {
   return [
     transitions.REVIEW_1_BY_PROVIDER,
     transitions.REVIEW_2_BY_PROVIDER,
-  ].includes(transition)
-}
+  ].includes(transition);
+};
 
 // Check if the given transition is privileged.
 //
@@ -225,8 +227,8 @@ export const isPrivileged = (transition: Transitions) => {
   return [
     transitions.REQUEST_PAYMENT,
     transitions.REQUEST_PAYMENT_AFTER_INQUIRY,
-  ].includes(transition)
-}
+  ].includes(transition);
+};
 
 // Check when transaction is completed (booking over)
 export const isCompleted = (transition: Transitions) => {
@@ -240,9 +242,9 @@ export const isCompleted = (transition: Transitions) => {
     transitions.EXPIRE_REVIEW_PERIOD,
     transitions.EXPIRE_CUSTOMER_REVIEW_PERIOD,
     transitions.EXPIRE_PROVIDER_REVIEW_PERIOD,
-  ]
-  return txCompletedTransitions.includes(transition)
-}
+  ];
+  return txCompletedTransitions.includes(transition);
+};
 
 // Check when transaction is refunded (booking did not happen)
 // In these transitions action/stripe-refund-payment is called
@@ -252,8 +254,8 @@ export const isRefunded = (transition: Transitions) => {
     transitions.EXPIRE,
     transitions.CANCEL,
     transitions.DECLINE,
-  ]
-  return txRefundedTransitions.includes(transition)
-}
+  ];
+  return txRefundedTransitions.includes(transition);
+};
 
-export const statesNeedingProviderAttention = [states.PREAUTHORIZED]
+export const statesNeedingProviderAttention = [states.PREAUTHORIZED];

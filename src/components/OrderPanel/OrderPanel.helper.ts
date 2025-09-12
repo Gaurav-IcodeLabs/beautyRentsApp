@@ -1,4 +1,3 @@
-import { getMonthlyFetchRange } from '../../screens/EditListing/components/EditListingAvailabilityPanel/EditListingAvailabilityPanel.helper';
 import {
   TIME_SLOT_TIME,
   findNextBoundary,
@@ -9,6 +8,7 @@ import {
   isInRange,
   isSameDate,
   monthIdString,
+  parseDateFromISO8601,
   stringifyDateToISO8601,
   timeSlotsPerDate,
   timestampToDate,
@@ -44,7 +44,7 @@ export const markedRange = (startDate, endDate) => {
   return dateRange.reduce(
     (acc, date) => ({
       ...acc,
-      [date]: { selected: true, disableTouchEvent: true },
+      [date]: {selected: true, disableTouchEvent: true},
     }),
     {},
   );
@@ -53,7 +53,7 @@ export const markedRange = (startDate, endDate) => {
 // new functions
 
 export const getAvailableStartTimes = params => {
-  const { timeZone, bookingStart, timeSlotsOnSelectedDate } = params;
+  const {timeZone, bookingStart, timeSlotsOnSelectedDate} = params;
 
   if (
     timeSlotsOnSelectedDate.length === 0 ||
@@ -125,6 +125,30 @@ export const removeUnnecessaryBoundaries = (timeSlots, seatsEnabled) => {
   }, []);
 };
 
+export const getMonthStartInTimeZone = (monthId, timeZone) => {
+  const month = parseDateFromISO8601(`${monthId}-01`, timeZone);
+  return getStartOf(month, 'month', timeZone, 0, 'months');
+};
+
+export const nextMonthFn = (currentMoment, timeZone, offset = 1) =>
+  getStartOf(currentMoment, 'month', timeZone, offset, 'months');
+
+export const getMonthlyFetchRange = (monthlyTimeSlots, timeZone) => {
+  const monthStrings = Object.entries(monthlyTimeSlots).reduce(
+    (picked, entry) => {
+      return Array.isArray(entry[1].timeSlots) ? [...picked, entry[0]] : picked;
+    },
+    [],
+  );
+  const firstMonth = getMonthStartInTimeZone(monthStrings[0], timeZone);
+  const lastMonth = getMonthStartInTimeZone(
+    monthStrings[monthStrings.length - 1],
+    timeZone,
+  );
+  const exclusiveEndMonth = nextMonthFn(lastMonth, timeZone);
+  return [firstMonth, exclusiveEndMonth];
+};
+
 const getMonthlyTimeSlotsOnDate = (
   monthlyTimeSlots,
   date,
@@ -137,7 +161,7 @@ const getMonthlyTimeSlotsOnDate = (
     monthlyTimeSlots,
     timeZone,
   );
-  const opts = { minDurationStartingInDay };
+  const opts = {minDurationStartingInDay};
   const monthlyTimeSlotsData = timeSlotsPerDate(
     startMonth,
     endMonth,
@@ -189,8 +213,7 @@ export const getTimeSlotsOnDate = (timeSlots, date, timeZone) => {
 };
 
 export const getAvailableEndTimes = params => {
-  const { timeZone, bookingStartTime, bookingEndDate, selectedTimeSlot } =
-    params;
+  const {timeZone, bookingStartTime, bookingEndDate, selectedTimeSlot} = params;
   if (
     !selectedTimeSlot ||
     !selectedTimeSlot.attributes ||
@@ -415,5 +438,5 @@ export const getAllTimeValues = (
 
   const finalTimeSlots = seatsEnabled ? combinedTimeSlot : selectedTimeSlot;
 
-  return { startTime, endDate, endTime, selectedTimeSlot: finalTimeSlots };
+  return {startTime, endDate, endTime, selectedTimeSlot: finalTimeSlots};
 };

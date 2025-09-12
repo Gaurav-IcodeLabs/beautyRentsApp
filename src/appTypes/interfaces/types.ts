@@ -1,4 +1,4 @@
-import { ImageVariantsMap } from './common'
+import {ImageVariantsMap} from './common';
 
 export type ImageVariants =
   | 'default'
@@ -19,6 +19,8 @@ export type ImageVariants =
   | 'landscape1200'
   | 'portrait1200'
   | 'original1200'
+  | 'listing-card'
+  | 'listing-card-2x';
 
 export type Colors =
   | 'marketplaceColor'
@@ -43,13 +45,13 @@ export type Colors =
   | 'darkGrey'
   | 'lightestGrey'
   | 'lightRedColor'
-  | 'savedCardBackground'
+  | 'savedCardBackground';
 
 export type CategoryLevels =
   | 'categoryLevel1'
   | 'categoryLevel2'
   | 'categoryLevel3'
-  | 'categoryLevel4'
+  | 'categoryLevel4';
 
 export type Transitions =
   | 'CONFIRM_PAYMENT'
@@ -65,7 +67,7 @@ export type Transitions =
   | 'REVIEW_1_BY_CUSTOMER'
   | 'REVIEW_1_BY_PROVIDER'
   | 'REVIEW_2_BY_CUSTOMER'
-  | 'REVIEW_2_BY_PROVIDER'
+  | 'REVIEW_2_BY_PROVIDER';
 
 export type EntityType =
   | 'user'
@@ -90,34 +92,34 @@ export type EntityType =
   | 'processTransition'
   | 'timeSlot'
   | 'stockAdjustment'
-  | unknown
+  | unknown;
 
 export type CurrentUserRelationships =
   | 'marketplace'
   | 'profileImage'
   | 'stripeAccount'
   | 'stripeCustomer'
-  | 'stripeCustomer.defaultPaymentMethod'
+  | 'stripeCustomer.defaultPaymentMethod';
 
-export type alias = 'latest'
+export type alias = 'latest';
 
 export type CurrentUserQueryParams = {
-  expand?: boolean
-  include?: CurrentUserRelationships[]
-  'fields.image'?: ImageVariantsMap[]
-}
+  expand?: boolean;
+  include?: CurrentUserRelationships[];
+  'fields.image'?: ImageVariantsMap[];
+};
 
 export type MessageRelationships =
   | 'sender'
   | 'sender.profileImage'
-  | 'transaction'
+  | 'transaction';
 
 export type ReviewRelationships =
   | 'author'
   | 'author.profileImage'
   | 'listing'
   | 'subject'
-  | 'subject.profileImage'
+  | 'subject.profileImage';
 
 export type TransactionRelationships =
   | 'marketplace'
@@ -137,26 +139,26 @@ export type TransactionRelationships =
   | 'reviews.subject.profileImage'
   | 'messages'
   | 'messages.sender'
-  | 'messages.sender.profileImage'
+  | 'messages.sender.profileImage';
 
 export type BookingRelationships =
   | 'transaction'
   | 'transaction.customer'
-  | 'transaction.customer.profileImage'
+  | 'transaction.customer.profileImage';
 
 export type ListingRelationships =
   | 'marketplace'
   | 'author'
   | 'author.profileImage'
   | 'images'
-  | 'currentStock'
+  | 'currentStock';
 
 export type OwnListingRelationships =
   | 'marketplace'
   | 'author'
   | 'author.profileImage'
   | 'images'
-  | 'currentStock'
+  | 'currentStock';
 
 export type StockAdjustmentRelationships =
   | 'ownListing'
@@ -164,13 +166,13 @@ export type StockAdjustmentRelationships =
   | 'stockReservation'
   | 'stockReservation.transaction'
   | 'stockReservation.transaction.customer'
-  | 'stockReservation.transaction.customer.profileImage'
+  | 'stockReservation.transaction.customer.profileImage';
 
 export type RequestedCapabilities =
   | 'card_payments'
   | 'transfers'
-  | 'legacy_payments'
+  | 'legacy_payments';
 
-export type AvailabilityExceptionRelationships = 'ownListing'
+export type AvailabilityExceptionRelationships = 'ownListing';
 
-export type UserRelationships = 'marketplace' | 'profileImage'
+export type UserRelationships = 'marketplace' | 'profileImage';

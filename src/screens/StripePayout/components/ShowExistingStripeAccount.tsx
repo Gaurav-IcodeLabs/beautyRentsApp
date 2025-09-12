@@ -1,72 +1,72 @@
-import { Linking, StyleSheet, Text, View, Image } from 'react-native'
-import React, { FC, useState } from 'react'
+import {Linking, StyleSheet, Text, View, Image} from 'react-native';
+import React, {FC, useState} from 'react';
 import {
   getBankAccountLast4Digits,
   getStripeAccountData,
   hasRequirements,
-} from '../../../helpers/StripeHelpers'
-import { useAppDispatch, useTypedSelector } from '../../../sharetribeSetup'
+} from '../../../helpers/StripeHelpers';
+import {useAppDispatch, useTypedSelector} from '../../../sharetribeSetup';
 import {
   getStripeConnectAccountLink,
   stripeAccountSelector,
-} from '../../../slices/StripeConnectAccount.slice'
-import { fontScale, heightScale, widthScale } from '../../../util'
-import { colors, fontWeight } from '../../../theme'
-import { useTranslation } from 'react-i18next'
-import { Button } from '../../../components'
-import { checkMark } from '../../../assets'
-import StripeWebViewDetailForm from './StripeWebViewDetailForm'
-import { StripeConnect } from '../../../appTypes'
-type ShowExistingStripeAccountPropTypes = {}
-const ShowExistingStripeAccount: FC<
-  ShowExistingStripeAccountPropTypes
-> = props => {
-  const { t } = useTranslation()
-  const dispatch = useAppDispatch()
-  const [isLoadingStripeLink, setLoadingStripeLink] = useState(false)
+} from '../../../slices/StripeConnectAccount.slice';
+import {fontScale, heightScale, widthScale} from '../../../util';
+import {colors, fontWeight} from '../../../theme';
+import {useTranslation} from 'react-i18next';
+import {Button} from '../../../components';
+import {checkMark} from '../../../assets';
+import StripeWebViewDetailForm from './StripeWebViewDetailForm';
+import {StripeConnect} from '../../../appTypes';
+import {REACT_NATIVE_SDK_BASE_URL} from '@env';
+
+const ShowExistingStripeAccount: FC = () => {
+  const {t} = useTranslation();
+  const dispatch = useAppDispatch();
+  const [isLoadingStripeLink, setLoadingStripeLink] = useState(false);
   const [isWebViewVisible, setWebViewVisible] = useState({
     show: false,
     url: '',
-  })
-  const stripeAccount = useTypedSelector(stripeAccountSelector)
-  const stripeConnected = !!stripeAccount && !!stripeAccount.id
-  const accountId = stripeAccount?.id
+  });
+  const stripeAccount = useTypedSelector(stripeAccountSelector) as any;
+  const stripeConnected = !!stripeAccount && !!stripeAccount.id;
+  const accountId = stripeAccount?.id;
   const stripeAccountData = stripeConnected
     ? getStripeAccountData(stripeAccount)
-    : null
+    : null;
   const stripeBankAccountLastDigits =
-    getBankAccountLast4Digits(stripeAccountData)
+    getBankAccountLast4Digits(stripeAccountData);
   const requirementsMissing =
     stripeAccount &&
     (hasRequirements(stripeAccountData, 'past_due') ||
-      hasRequirements(stripeAccountData, 'currently_due'))
+      hasRequirements(stripeAccountData, 'currently_due'));
 
   const handleStripeAgreement = async () => {
-    await Linking.openURL(StripeConnect.STRIPE_CONNECTED_ACCOUNT_AGREEMENT_LINK)
-  }
-  const handleGetStripeConnectAccountLinkFn =
-    (commonParams: any) => (type: any) => () => {
-      setLoadingStripeLink(true)
-      dispatch(getStripeConnectAccountLink({ type, ...commonParams }))
-        .then((url: any) => {
-          setLoadingStripeLink(false)
-          setWebViewVisible({ show: true, url: url?.payload })
-          // Linking.openURL(url.payload)
-        })
-        .catch((err: any) => {
-          setLoadingStripeLink(false)
-        })
-    }
+    await Linking.openURL(
+      StripeConnect.STRIPE_CONNECTED_ACCOUNT_AGREEMENT_LINK,
+    );
+  };
 
-  const handleGetStripeConnectAccountLink = handleGetStripeConnectAccountLinkFn(
-    {
-      accountId,
-      failureURL:
-        process.env.EXPO_PUBLIC_SDK_BASE_URL + '/account/payments/failure',
-      successURL:
-        process.env.EXPO_PUBLIC_SDK_BASE_URL + '/account/payments/success',
-    },
-  )
+  const handleGetStripeConnectAccountLink = async (type: string) => {
+    try {
+      setLoadingStripeLink(true);
+
+      const url = await dispatch(
+        getStripeConnectAccountLink({
+          type,
+          accountId,
+          failureURL: `${REACT_NATIVE_SDK_BASE_URL}/account/payments/failure`,
+          successURL: `${REACT_NATIVE_SDK_BASE_URL}/account/payments/success`,
+        }),
+      ).unwrap();
+
+      setWebViewVisible({show: true, url});
+      // Linking.openURL(url);
+    } catch (err) {
+      console.error('Failed to get Stripe account link:', err);
+    } finally {
+      setLoadingStripeLink(false);
+    }
+  };
 
   return (
     <View style={styles.topMargin}>
@@ -86,9 +86,9 @@ const ShowExistingStripeAccount: FC<
               loading={isLoadingStripeLink}
               disabled={isLoadingStripeLink}
               text={t('StripeVerifyButtonText')}
-              onPress={handleGetStripeConnectAccountLink(
-                'custom_account_verification',
-              )}
+              onPress={() =>
+                handleGetStripeConnectAccountLink('custom_account_verification')
+              }
             />
           </View>
           <Text style={styles.agreeText}>
@@ -108,16 +108,18 @@ const ShowExistingStripeAccount: FC<
             <View style={styles.tick}>
               <Image source={checkMark} />
             </View>
-            <Text style={[styles.infoText, { alignSelf: 'center' }]}>
+            <Text
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={[styles.infoText, {alignSelf: 'center'}]}>
               {t('StripeConnectAccountStatusBox.verificationSuccessTitle')}
             </Text>
             <Button
               loading={isLoadingStripeLink}
               disabled={isLoadingStripeLink}
               text={t('StripeEditAccountText')}
-              onPress={handleGetStripeConnectAccountLink(
-                'custom_account_verification',
-              )}
+              onPress={() =>
+                handleGetStripeConnectAccountLink('custom_account_verification')
+              }
             />
           </View>
           <Text style={styles.agreeText}>
@@ -141,15 +143,14 @@ const ShowExistingStripeAccount: FC<
         />
       )}
     </View>
-  )
-}
+  );
+};
 
-export default ShowExistingStripeAccount
+export default ShowExistingStripeAccount;
 
 const styles = StyleSheet.create({
   cardContainer: {
-    width: '100%',
-    backgroundColor: 'silver',
+    backgroundColor: colors.lightGrey,
     height: heightScale(45),
     borderRadius: fontScale(10),
     justifyContent: 'space-between',
@@ -166,20 +167,21 @@ const styles = StyleSheet.create({
     paddingVertical: heightScale(15),
     paddingHorizontal: widthScale(10),
     width: '100%',
-    backgroundColor: colors.greyishWhite,
-    borderWidth: 0.5,
-    borderColor: 'crimson',
+    backgroundColor: colors.lightGrey,
+    borderWidth: 1,
+    borderColor: colors.marketplaceColor,
     marginTop: heightScale(15),
     borderRadius: widthScale(10),
   },
   infoText: {
-    fontWeight: fontWeight.semiBold,
+    fontSize: widthScale(14),
+    fontWeight: fontWeight.medium,
     color: colors.black,
     textAlign: 'justify',
     marginBottom: heightScale(10),
   },
   agreeText: {
-    fontWeight: '500',
+    fontWeight: fontWeight.medium,
     color: colors.grey,
     textAlign: 'center',
     marginTop: heightScale(15),
@@ -192,7 +194,7 @@ const styles = StyleSheet.create({
     paddingVertical: heightScale(15),
     paddingHorizontal: widthScale(10),
     width: '100%',
-    backgroundColor: colors.greyishWhite,
+    backgroundColor: colors.white,
     borderWidth: 0.5,
     borderColor: 'green',
     marginTop: heightScale(15),
@@ -211,4 +213,4 @@ const styles = StyleSheet.create({
   textWeight: {
     color: colors.black,
   },
-})
+});

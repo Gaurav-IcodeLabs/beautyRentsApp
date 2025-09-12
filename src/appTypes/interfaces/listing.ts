@@ -1,5 +1,5 @@
-import { ImageAttributes, UUID } from './common';
-import { CategoryLevels } from './types';
+import {ImageAttributes, UUID} from './common';
+import {CategoryLevels} from './types';
 
 export interface Listing {
   id: UUID;
@@ -42,6 +42,7 @@ export interface ListingPublicData extends Categories {
   totalRatingSum?: number;
   totalRatings?: number;
   isFeatured?: boolean;
+  price_per_day?: number | null;
 }
 
 export interface Location {

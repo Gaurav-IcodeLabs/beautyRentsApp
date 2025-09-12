@@ -1,5 +1,5 @@
-export const html = `<script src="https://js.stripe.com/v3/"></script>`
-
+export const html = '<script src="https://js.stripe.com/v3/"></script>';
+import {REACT_NATIVE_STRIPE_PUBLISHABLE_KEY} from '@env';
 /**
  * Retrieves the Stripe tokens for a given data object.
  *
@@ -8,7 +8,7 @@ export const html = `<script src="https://js.stripe.com/v3/"></script>`
  */
 export function getStripeTokens(data: any) {
   return `
-    const stripe = window.Stripe("${process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY}");
+    const stripe = window.Stripe("${REACT_NATIVE_STRIPE_PUBLISHABLE_KEY}");
     async function getTokenAccount() {
       const res = await stripe.createToken("account", {
         business_type:'${data.accountType}',
@@ -30,5 +30,5 @@ export function getStripeTokens(data: any) {
     }
   getTokens();
   true;
-  `
+  `;
 }

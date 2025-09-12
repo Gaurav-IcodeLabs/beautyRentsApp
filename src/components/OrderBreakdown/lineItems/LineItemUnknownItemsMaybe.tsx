@@ -1,25 +1,25 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import { fontScale, LINE_ITEMS, widthScale } from '../../../util';
-import { formatMoney } from '../../../util/currency';
-import { humanizeLineItemCode } from '../../../util/data';
-import { colors, fontWeight } from '../../../theme';
+import {fontScale, LINE_ITEMS, widthScale} from '../../../util';
+import {formatMoney} from '../../../util/currency';
+import {humanizeLineItemCode} from '../../../util/data';
+import {colors, fontWeight} from '../../../theme';
 
-const LineItemUnknownItemsMaybe = props => {
-  const { lineItems, isProvider } = props;
+const LineItemUnknownItemsMaybe = (props: any) => {
+  const {lineItems, isProvider} = props;
 
   // resolve unknown non-reversal line items
   const allItems = lineItems.filter(
-    item => LINE_ITEMS.indexOf(item.code) === -1 && !item.reversal,
+    (item: any) => LINE_ITEMS.indexOf(item.code) === -1 && !item.reversal,
   );
 
   const items = isProvider
-    ? allItems.filter(item => item.includeFor.includes('provider'))
-    : allItems.filter(item => item.includeFor.includes('customer'));
+    ? allItems.filter((item: any) => item.includeFor.includes('provider'))
+    : allItems.filter((item: any) => item.includeFor.includes('customer'));
   return items.length > 0 ? (
     <>
       <View>
-        {items?.map((item, i) => {
+        {items?.map((item: any, i: number) => {
           const quantity = item.quantity;
 
           const label =
@@ -27,7 +27,9 @@ const LineItemUnknownItemsMaybe = props => {
               ? `${humanizeLineItemCode(item.code)} x ${quantity}`
               : humanizeLineItemCode(item.code);
 
-          const formattedTotal = formatMoney(item.lineTotal, 2);
+          const formattedTotal = item?.lineTotal
+            ? formatMoney(item.lineTotal, 2)
+            : null;
           return (
             <View key={i} style={styles.invoiceTexts}>
               <Text style={styles.label}>{label}</Text>

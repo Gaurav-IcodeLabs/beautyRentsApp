@@ -1,26 +1,27 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
-import React, { useEffect } from 'react';
-import { useColors, useConfiguration } from '../../../context';
-import { useTranslation } from 'react-i18next';
-import { fontScale, widthScale } from '../../../util';
-import { AppColors, colors, fontWeight } from '../../../theme';
-// import Mapbox from '@rnmapbox/maps';
+import {StyleSheet, Text, View, Image} from 'react-native';
+import React, {useEffect} from 'react';
+import {useConfiguration} from '../../../context';
+import {useTranslation} from 'react-i18next';
+import {fontScale, widthScale} from '../../../util';
+import {colors, fontWeight} from '../../../theme';
+import Mapbox from '@rnmapbox/maps';
 
 interface ListingPageMapProps {
   geolocation: any;
 }
 
 const ListingPageMap = (props: ListingPageMapProps) => {
-  const { geolocation } = props;
-  const { branding } = useConfiguration();
-  const { t } = useTranslation();
-  const colors: AppColors = useColors();
-  const token = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const {geolocation} = props;
+  const {branding} = useConfiguration();
+  const {t} = useTranslation();
+  const token = process.env.REACT_NATIVE_MAPBOX_ACCESS_TOKEN;
   const logo = branding.logoImageMobile.attributes.variants.scaled2x.url ?? '';
 
-  // useEffect(() => {
-  //   Mapbox.setAccessToken(token);
-  // }, []);
+  useEffect(() => {
+    if (token) {
+      Mapbox.setAccessToken(token);
+    }
+  }, [token]);
 
   if (!geolocation) {
     return null;
@@ -28,7 +29,7 @@ const ListingPageMap = (props: ListingPageMapProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>{t('ListingPage.locationTitle')}</Text>
-      {/* <Mapbox.MapView style={styles.mapContainer}>
+      <Mapbox.MapView style={styles.mapContainer}>
         <Mapbox.Camera
           animationDuration={2000}
           zoomLevel={14}
@@ -36,12 +37,12 @@ const ListingPageMap = (props: ListingPageMapProps) => {
         />
         <Mapbox.MarkerView coordinate={[geolocation.lng, geolocation.lat]}>
           <Image
-            source={{ uri: logo }}
-            contentFit="contain"
-            style={[styles.image, { borderColor: colors.marketplaceColor }]}
+            source={{uri: logo}}
+            resizeMode="contain"
+            style={styles.image}
           />
         </Mapbox.MarkerView>
-      </Mapbox.MapView> */}
+      </Mapbox.MapView>
     </View>
   );
 };
@@ -72,5 +73,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     backgroundColor: colors.white,
     borderRadius: widthScale(25),
+    borderColor: colors.marketplaceColor,
   },
 });

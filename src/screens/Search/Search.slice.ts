@@ -162,11 +162,14 @@ export const searchListingsByMap = createAsyncThunk<{}, {}, Thunk>(
   'search/searchListingsByMap',
   async (data, { dispatch, extra: sdk }) => {
     try {
+      // const {bounds, config} = data;
+      // console.log('bounds',JSON.stringify(bounds))
       const { bounds, config } = data;
       const searchParams = defaultSearchParams(config);
       const params = {
         ...searchParams,
         bounds,
+        page: 1,
         perPage: 20,
       };
       const response = await sdk.listings.query(params);
@@ -176,7 +179,7 @@ export const searchListingsByMap = createAsyncThunk<{}, {}, Thunk>(
         addMarketplaceEntities({ sdkResponse: response, sanitizeConfig }),
       );
       return response;
-    } catch (error) {
+    } catch (error: any) {
       console.log('Error in searchListings', storableError(error));
       return storableError(error);
     }

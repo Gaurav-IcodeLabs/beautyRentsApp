@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {
   fontScale,
@@ -7,16 +7,19 @@ import {
   LINE_ITEM_NIGHT,
   widthScale,
 } from '../../../util';
-import { formatMoney } from '../../../util/currency';
-import { colors, fontWeight } from '../../../theme';
+import {formatMoney} from '../../../util/currency';
+import {colors, fontWeight} from '../../../theme';
 
-const LineItemBasePriceMaybe = props => {
-  const { lineItems, code } = props;
+const LineItemBasePriceMaybe = (props: any) => {
+  const {lineItems, code} = props;
   const unitPurchase = lineItems.find(
-    item => item.code === code && !item.reversal,
+    (item: any) => item.code === code && !item.reversal,
   );
-
-  const quantity = unitPurchase ? unitPurchase.quantity.toString() : null;
+  const quantity = unitPurchase
+    ? typeof unitPurchase.quantity === 'object' && unitPurchase.quantity.value
+      ? unitPurchase.quantity.value.toString()
+      : unitPurchase.quantity.toString()
+    : null;
   const unitPrice = unitPurchase
     ? formatMoney(unitPurchase.unitPrice, 2)
     : null;
