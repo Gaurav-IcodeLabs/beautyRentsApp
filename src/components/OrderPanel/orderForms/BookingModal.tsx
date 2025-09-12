@@ -7,22 +7,22 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import { colors, fontWeight } from '../../../theme';
-import { cross } from '../../../assets';
-import { fontScale, types, widthScale } from '../../../util';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {colors, fontWeight} from '../../../theme';
+import {cross} from '../../../assets';
+import {fontScale, types, widthScale} from '../../../util';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RadioButton from '../../RadioButton/RadioButton';
-import { useTranslation } from 'react-i18next';
-import { formatMoney } from '../../../util/currency';
+import {useTranslation} from 'react-i18next';
+import {formatMoney} from '../../../util/currency';
 import BookingDatesForm from './BookingDatesForm';
 import BookingTimeForm from './BookingTimeForm';
-import { useAppDispatch } from '../../../sharetribeSetup';
-import { clearLineItems } from '../../../screens/Listing/Listing.slice';
+import {useAppDispatch} from '../../../sharetribeSetup';
+import {clearLineItems} from '../../../screens/Listing/Listing.slice';
 
 const BookingModal = (props: any) => {
   const dispatch = useAppDispatch();
-  const { top } = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const {top} = useSafeAreaInsets();
+  const {t} = useTranslation();
   const {
     visible,
     onCloseModal,
@@ -35,27 +35,23 @@ const BookingModal = (props: any) => {
     marketplaceCurrency,
     showBookingDatesForm,
     showBookingTimeForm,
+    isInstantBooking,
   } = props;
   const dayPrice =
     price_per_day && new types.Money(price_per_day * 100, marketplaceCurrency);
   const [bookingType, setBookingType] = React.useState('');
 
   const handleSelectBookingType = (type: string) => {
-    dispatch(clearLineItems({ listingId: listing.id.uuid }));
+    dispatch(clearLineItems({listingId: listing.id.uuid}));
     setBookingType(type);
   };
 
   return (
-    <Modal
-      visible={visible}
-      onRequestClose={onCloseModal}
-      animationType="slide"
-    >
+    <Modal visible={visible} onRequestClose={onCloseModal} animationType="fade">
       <View style={styles.container}>
         <TouchableOpacity
-          style={[styles.closeContainerStyle, { marginTop: top }]}
-          onPress={onCloseModal}
-        >
+          style={[styles.closeContainerStyle, {marginTop: top}]}
+          onPress={onCloseModal}>
           <Image
             source={cross}
             style={styles.crossImageStyle}
@@ -83,8 +79,7 @@ const BookingModal = (props: any) => {
           activeOpacity={0.5}
           style={styles.section}
           disabled={!price || !showBookingTimeForm}
-          onPress={() => handleSelectBookingType('entireDay')}
-        >
+          onPress={() => handleSelectBookingType('entireDay')}>
           <RadioButton
             isActive={bookingType === 'entireDay'}
             onPress={() => handleSelectBookingType('entireDay')}
@@ -98,10 +93,9 @@ const BookingModal = (props: any) => {
 
         <TouchableOpacity
           activeOpacity={0.5}
-          style={[styles.section, { marginBottom: widthScale(20) }]}
+          style={[styles.section, {marginBottom: widthScale(20)}]}
           disabled={!price_per_day || !showBookingDatesForm}
-          onPress={() => handleSelectBookingType('specificSlot')}
-        >
+          onPress={() => handleSelectBookingType('specificSlot')}>
           <RadioButton
             isActive={bookingType === 'specificSlot'}
             onPress={() => handleSelectBookingType('specificSlot')}
@@ -124,6 +118,7 @@ const BookingModal = (props: any) => {
             listingId={listing.id}
             onCloseBookingModal={onCloseModal}
             marketplaceCurrency={marketplaceCurrency}
+            isInstantBooking={isInstantBooking}
           />
         ) : bookingType === 'specificSlot' ? (
           <BookingTimeForm
@@ -136,6 +131,7 @@ const BookingModal = (props: any) => {
             listingId={listing.id}
             onCloseBookingModal={onCloseModal}
             marketplaceCurrency={marketplaceCurrency}
+            isInstantBooking={isInstantBooking}
           />
         ) : null}
       </View>
